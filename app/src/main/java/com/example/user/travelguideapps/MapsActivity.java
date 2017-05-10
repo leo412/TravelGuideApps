@@ -97,7 +97,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private TextView mDistanceView;
     private LocationListViewAdapter Locationadapter;
     private ArrayList Waypoint = new ArrayList();
+    private Boolean newcolor=false;
 
+private Location CurrentLocation;
     private Polyline TempPoly;
     List<LinkedHashMap<String, String>> nearbyPlacesList = null;
     ProgressDialog pd;
@@ -229,7 +231,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 //               Button d=(Button) parent.findViewById(R.id.details_btn);
 //
 //                d.setVisibility(View.GONE);
-//TODO:Figure out how to
                 HashMap<String, Object> obj = (HashMap<String, Object>) listView.getItemAtPosition(position);
                 String lat = (String) obj.get("lat");
                 String lng = (String) obj.get("lng");
@@ -245,6 +246,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //  Toast.makeText(getApplicationContext(), lat.toString(), Toast.LENGTH_SHORT).show();
                 LatLng latlng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
                 Marker result = null;
+                //For each marker in the map...where the lat equals to the lat provided by the listview
                 for (Marker c : mapMarkers) {
                     Log.d("Well", String.valueOf(c.getPosition().latitude));
 
@@ -291,12 +293,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         setIntent(intent);
-
+        //Just show path directly?
         //Get placeid and sace
         String place_id = intent.getStringExtra("place_id");
         if (place_id != null) {
+
             Waypoint.add(place_id);
             Toast.makeText(getApplicationContext(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
+            //Use these waypoints to change all marker.
+
+            LatLng latlng=new LatLng(CurrentLocation.getLatitude(),CurrentLocation.getLongitude());
+            String url = getDirectionsUrl(latlng, null);
+
+            DownloadTask downloadTask = new DownloadTask();
+            Log.d(TAG, "THE URL is IS " + url);
+
+            // Start downloading json data from Google Directions API
+            downloadTask.execute(url);
+
 
         }
 
@@ -310,7 +324,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             } else
 
             {
-
+newcolor=false;
                 mMap.clear();
                 switch (v.getId()) {
                     case R.id.Bar:
@@ -371,11 +385,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
             double lng = Double.parseDouble(googlePlace.get("lng"));
-
             double lat = Double.parseDouble(googlePlace.get("lat"));
 
             String photo_reference = googlePlace.get("photo_reference");
-
+            //TODO:Doing this, must try Here it is, try to provide different markers.
             LatLng latLng = new LatLng(lat, lng);
             markerOptions.position(latLng);
             markerOptions.title(placeName + " : " + vicinity);
@@ -415,6 +428,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        //Well need it to let mMap.setmylocationenabled
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
@@ -440,7 +454,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     Log.d("onMarkerCLick", marker.toString());
                     ArrayList<View> children = new ArrayList<View>();
-                    Log.d("ListChile", String.valueOf(listView.getCount()));
 
                     for (int i = listView.getCount() - 1; i >= 0; i--) {
                         HashMap<String, Object> obj = (HashMap<String, Object>) listView.getItemAtPosition(i);
@@ -473,7 +486,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private void showPath(Marker marker) {
 
         marker.showInfoWindow();
-
+        //this will only remove the single line ... i guess
         if (TempPoly != null) {
             TempPoly.remove();
         }
@@ -518,10 +531,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         // Getting URL to the Google Directions API
         String url = getDirectionsUrl(origin, dest);
-
+//Doing this, should... easiest way is to get a variable here to change color...
         DownloadTask downloadTask = new DownloadTask();
         Log.d(TAG, "THE URL is  IS " + url);
-
+newcolor=true;
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
 
@@ -593,42 +606,71 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         // Destination of route
-        String str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        String str_dest="";
+        if (dest!=null) {
+            Log.d(TAG, "whathasbeendone1");
+
+            str_dest = "destination=" + dest.latitude + "," + dest.longitude;
+        }
+
+        //TODO: fixed this pile of messy code.. Logic might become easier.
         String waypoint=new String();
         StringBuilder waypointsb=new StringBuilder();
         if (!Waypoint.isEmpty()) {
-             waypointsb.append("&waypoints=");
+            Log.d(TAG, "whathasbeendone2");
 
-            for (int i = 0; i < Waypoint.size(); i++) {
-                 waypoint =(waypointsb.append("place_id:"+Waypoint.get(i)+"|").toString());
+            waypointsb.append("&waypoints=");
+            waypointsb.append("optimize:true|");
 
+
+            if (dest!=null) {
+                Log.d(TAG, "whathasbeendone3");
+
+                for (int i = 0; i < Waypoint.size(); i++) {
+                    //TODO:Optimize =true should not be hard coded, require to change according to users choice,
+                    //optimize:true|
+                    waypoint = (waypointsb.append("place_id:"+ Waypoint.get(i) + "|").toString());
+                    Log.d(TAG, "whathasbeendone4");
+
+                }
+
+
+            }else{
+str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
+                //When waypoint has only 1 varible
+               if(Waypoint.size()!=1) {
+                   for (int i = 0; i < Waypoint.size() - 1; i++) {
+                       Log.d(TAG, "whathasbeendone5");
+
+                       waypoint = (waypointsb.append( "place_id:"+Waypoint.get(i) + "|").toString());
+
+                   }
+               }
             }
-
-
 //To remove "|"
-            waypoint=waypoint.substring(0,waypoint.length()-1);
+            if (!waypoint.isEmpty()) {
 
+                waypoint = waypoint.substring(0, waypoint.length() - 1);
+            }
         }else{
+            Log.d(TAG, "whathasbeendone6");
 
             waypoint="";
         }
         // Sensor enabled
         String sensor = "sensor=false";
         String parameters;
-   //     if (Waypoint == null) {
-            // Building the parameters to the web service
-            parameters = str_origin + "&" + str_dest +waypoint+"&" + sensor + "&key=AIzaSyAQjMlUIxrybWWkko4AVHmE_Evr1I625cs";
-    //    } else {
 
-      //      parameters = str_origin + "&" + str_dest + "&" + sensor + "key=AIzaSyAQjMlUIxrybWWkko4AVHmE_Evr1I625cs";
+        Log.d(TAG, "whathasbeendone7");
 
+            parameters = str_origin + "&" + str_dest + waypoint + "&" + sensor + "&key=AIzaSyAQjMlUIxrybWWkko4AVHmE_Evr1I625cs";
 
-      //  }
         // Output format
         String output = "json";
 
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
+        Log.d(TAG, "whathasbeendone8"+url);
 
         return url;
     }
@@ -851,10 +893,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Adding all the points in the route to LineOptions
                 lineOptions.addAll(points);
                 lineOptions.width(10);
-
+                //TODO: Create a global variable For result
                 //TODO:DOing this , try to have dfifferent colours?
-                lineOptions.color(Color.RED);
+                //Must do this first or else way too confusing when checking......
+                if(newcolor) {
+                    lineOptions.color(Color.BLUE);
 
+                }else{
+
+                    lineOptions.color(Color.RED);
+
+                }
+
+                //To show distance (need to change to total distance
                 mDistanceView.setText("Distance= " + distance);
                 mDurationView.setText("Duration= " + duration);
 
@@ -1011,6 +1062,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocationRequest.setNumUpdates(1);
         mLocationRequest.setFastestInterval(1000);
 
+
+
         // Get the location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         // Define the criteria how to select the locatioin provider -> use
@@ -1025,13 +1078,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
         Log.d(TAG, "This is mGoogleApiClient" + mGoogleApiClient);
 
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+         CurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         // Location location = locationManager.getLastKnownLocation(provider);
-        Log.d(TAG, "This is Currentlocationchecking" + location);
+        Log.d(TAG, "This is Currentlocationchecking" + CurrentLocation);
 
         // LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        return location;
+        return CurrentLocation;
     }
 
 

@@ -48,7 +48,7 @@ path.add(hmDistance);
                     HashMap<String, String> hmDuration = new HashMap<String, String>();
                     hmDuration.put("duration", jDuration.getString("text"));
                     path.add(hmDuration);
-
+    
                     /** Traversing all steps */
                     for(int k=0;k<jSteps.length();k++){
                         String polyline = "";

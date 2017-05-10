@@ -5,6 +5,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.pm.PackageManager;
@@ -15,7 +16,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
@@ -28,6 +32,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +47,7 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.List;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.READ_CONTACTS;
 
 /**
@@ -52,6 +59,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Id to identity READ_CONTACTS permission request.
      */
     private static final int REQUEST_READ_CONTACTS = 0;
+    private static final int REQUEST_FINE_LOCATIONS = 1;
+
     private static final String TAG = "LoginActivity";
     /**
      * A dummy authentication store containing known user names and passwords.
@@ -70,7 +79,9 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-
+    private ImageView login_background;
+private FrameLayout frame;
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -91,6 +102,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         };
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -113,8 +126,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 return false;
             }
         });
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+//TODO: Put Access for location access,else just plain stop user from logging in
+        Button mEmailSignInButton = (Button) findViewById(R.id.signin_button);
 //        boolean connected = false;
 //        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 //        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
@@ -137,24 +150,79 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 if (!DetectConnection.checkInternetConnection(LoginActivity.this)) {
                     Toast.makeText(getApplicationContext(), "Internet is not connected!", Toast.LENGTH_SHORT).show();
                 } else
+//TODO:Check ifthis is working
+                {    int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
+//Check if there is permission, if yes login
+                    Log.d(TAG, "inside this 1");
 
-                {
+                    if (ContextCompat.checkSelfPermission(LoginActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        Log.d(TAG, "inside this 2");
+                        ActivityCompat.requestPermissions(LoginActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                                MY_PERMISSION_ACCESS_COURSE_LOCATION);
+                        // Should we show an explanation?
+                        //Show dialog for permission
+                        if (ActivityCompat.shouldShowRequestPermissionRationale(LoginActivity.this,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                            // Show an explanation to the user *asynchronously* -- don't block
+                            // this thread waiting for the user's response! After the user
+                            // sees the explanation, try again to request the permission.
+                            Log.d(TAG, "inside this3");
+                             //extra from bot
+                            showDialogOK("This permission is important for the apps to run, without it you cannot login",
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            switch (which) {
+                                                case DialogInterface.BUTTON_POSITIVE:
+                                                    //user enables permisssion do your task..
+                                                    break;
+
+                                            }
+                                        }
+                                    });
+
+
+                        }
+                    }else{
+                    //If permission is accepted.
                     attemptLogin();
+
+                    }
                 }
             }
         });
 
         mLoginFormView = findViewById(R.id.login_form);
+
+        Log.d(TAG, "logintestformview"+mLoginFormView);
+        login_background= (ImageView) findViewById(R.id.login_background);
+        Log.d(TAG, "logintestbackground"+login_background);
+
+
+       // login_background.setImageAlpha(50);
+   //     mLoginPageView=findViewById(R.id.login_page);
+      //mLoginPageView.setAlpha((float) 0.5);
         mProgressView = findViewById(R.id.login_progress);
 
 
+    }
+    private void showDialogOK(String message, DialogInterface.OnClickListener okListener) {
+        new AlertDialog.Builder(LoginActivity.this)
+                .setTitle("Warning!")
+                .setMessage(message)
+                .setPositiveButton("OK", okListener)
+                .create()
+                .show();
     }
 
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;
         }
-
+        if (!mayRequestLocations()) {
+            return;
+        }
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -179,6 +247,31 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
         return false;
     }
+    private boolean mayRequestLocations() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        if (checkSelfPermission(ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            return true;
+        }
+        if (shouldShowRequestPermissionRationale(ACCESS_FINE_LOCATION)) {
+            Snackbar.make(mEmailView, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+                    .setAction(android.R.string.ok, new View.OnClickListener() {
+                        @Override
+                        @TargetApi(Build.VERSION_CODES.M)
+                        public void onClick(View v) {
+                            requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATIONS);
+                        }
+                    });
+        } else {
+
+
+            requestPermissions(new String[]{ACCESS_FINE_LOCATION}, REQUEST_FINE_LOCATIONS);
+
+
+        }
+        return false;
+    }
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
@@ -194,12 +287,44 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
      * Callback received when a permissions request has been completed.
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete();
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_READ_CONTACTS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
             }
+            case REQUEST_FINE_LOCATIONS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                } else {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                }
+                return;
+            }
+
+
+
+            // other 'case' lines to check for other
+            // permissions this app might request
         }
     }
 
@@ -230,6 +355,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
+        }else if (password.isEmpty()){
+
+            mPasswordView.setError("Password cannot be empty");
+            focusView = mPasswordView;
+            cancel = true;
+
         }
 
         // Check for a valid email address.
