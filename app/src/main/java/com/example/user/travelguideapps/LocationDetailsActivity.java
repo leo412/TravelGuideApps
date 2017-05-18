@@ -5,13 +5,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.NavUtils;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -36,7 +32,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class LocationDetailsActivity extends AppCompatActivity{
+public class LocationDetailsActivity extends BaseActivity{
 String TAG="tag";
     private TextView place_name;
     private View place_location;
@@ -49,10 +45,10 @@ String TAG="tag";
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_details);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+      //  Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 
-        setSupportActionBar(toolbar);
-place_location=(TextView)findViewById(R.id.place_location);
+     //   setSupportActionBar(toolbar);
+        place_location=(TextView)findViewById(R.id.place_location);
         place_name=(TextView)findViewById(R.id.details_place_name);
       //  imageView1=(ImageView)findViewById(R.id.imageView1);
         //imageView2=(ImageView)findViewById(R.id.imageView2);
@@ -80,17 +76,6 @@ String takethistotest="https://maps.googleapis.com/maps/api/place/details/json?p
 
         Log.d(TAG, "Latest is"+data);
 
-        //TODO: remove this button if not used
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-
-            public void onClick(View view) {
-                Snackbar.make(view, "Not using this anyway", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
-            }
-        });
 Button setplacebutton=(Button) findViewById(R.id.setplacebutton);
 
 setplacebutton.setOnClickListener(new View.OnClickListener() {

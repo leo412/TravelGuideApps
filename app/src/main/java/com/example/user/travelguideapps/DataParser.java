@@ -16,9 +16,7 @@ import java.util.List;
 
 import static android.content.ContentValues.TAG;
 //Get Places (Why name Datapasers
-/**
- * Created by navneet on 23/7/16.
- */
+
 public class DataParser {
 //TODO: Make it obtain all data available?
 //This is where Data is obtain from the internet

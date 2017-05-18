@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.LoaderManager.LoaderCallbacks;
+import android.app.ProgressDialog;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -81,10 +82,14 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
     private ImageView login_background;
 private FrameLayout frame;
+    ProgressDialog pd;
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        pd = new ProgressDialog(this);
+        pd.setMessage("Logging in");
+        pd.setCancelable(false);
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -196,15 +201,14 @@ private FrameLayout frame;
         mLoginFormView = findViewById(R.id.login_form);
 
         Log.d(TAG, "logintestformview"+mLoginFormView);
-        login_background= (ImageView) findViewById(R.id.login_background);
-        Log.d(TAG, "logintestbackground"+login_background);
+        //login_background= (ImageView) findViewById(R.id.login_background);
+        //Log.d(TAG, "logintestbackground"+login_background);
 
 
        // login_background.setImageAlpha(50);
    //     mLoginPageView=findViewById(R.id.login_page);
       //mLoginPageView.setAlpha((float) 0.5);
-        mProgressView = findViewById(R.id.login_progress);
-
+      //  mProgressView = findViewById(R.id.login_progress);
 
     }
     private void showDialogOK(String message, DialogInterface.OnClickListener okListener) {
@@ -335,6 +339,7 @@ private FrameLayout frame;
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+        pd.show();
         if (mAuthTask != null) {
             return;
         }
@@ -381,10 +386,12 @@ private FrameLayout frame;
         } else {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
-            showProgress(true);
+            //showProgress(true);
+            pd.show();
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
+        pd.dismiss();
     }
 
     private boolean isEmailValid(String email) {
@@ -561,8 +568,8 @@ private FrameLayout frame;
                                                     // the auth state listener will be notified and logic to handle the
                                                     // signed in user can be handled in the listener.
                                                     if (!task.isSuccessful()) {
-                                                        showProgress(false);
-
+                                                     //   showProgress(false);
+pd.dismiss();
                                                         Log.d(TAG, "Testing Not Success" + task.getException());
                                                         task.getException();
                                                         notification = "Incorrect Password";
@@ -588,8 +595,8 @@ private FrameLayout frame;
 
 
                                                         Log.d(TAG, "Testing is Success" + task.isSuccessful());
-                                                        showProgress(false);
-
+                                                    //    showProgress(false);
+pd.dismiss();
                                                         notification = "New Account is Successfully created";
                                                         Toast.makeText(LoginActivity.this, "New Account is Successfully created, Please verify it in your email first",
                                                                 Toast.LENGTH_SHORT).show();
@@ -612,16 +619,16 @@ private FrameLayout frame;
                                 {
                                     Toast.makeText(LoginActivity.this, "Email is not verified, pls verify your email first.",
                                             Toast.LENGTH_SHORT).show();
-                                    showProgress(false);
-
+                               //     showProgress(false);
+pd.dismiss();
                                 } else {
 
 
                                     Log.w(TAG, "signInCompleted");
-                                    showProgress(false);
+                                  //  showProgress(false);
+pd.dismiss();
 
-
-                                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, MapsActivity.class));
+                                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainMenuActivity.class));
                                     //finish();
                                 }
                             }
@@ -671,7 +678,8 @@ private FrameLayout frame;
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-            showProgress(false);
+          //  showProgress(false);
+            pd.dismiss();
         }
     }
 }

@@ -6,9 +6,14 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
@@ -18,19 +23,22 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,12 +51,14 @@ import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -80,8 +90,11 @@ import static com.example.user.travelguideapps.R.id.map;
 //Make an "Selected places.page?, show all time/ location/ distance/ and arrangable
 //https://developer.android.com/guide/topics/ui/drag-drop.html use drag and drop is eariser...?
 //if drag and drop not working....
+//TODO:create checkbox in listview to update selected places?
+//TODO:prevent same location to be set? (Also, change set to place -> Uncheck etc
+//TODO: that freakin disable View Details from other listview item  problem........ (And Checked listview
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
     private static final String TAG = "tag";
     ArrayList<LatLng> markerPoints;
     private static final String TAG_HOME = "home";
@@ -98,7 +111,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationListViewAdapter Locationadapter;
     private ArrayList Waypoint = new ArrayList();
     private Boolean newcolor=false;
-
+private NumberPicker numberpicker;
 private Location CurrentLocation;
     private Polyline TempPoly;
     List<LinkedHashMap<String, String>> nearbyPlacesList = null;
@@ -109,28 +122,29 @@ private Location CurrentLocation;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest = new LocationRequest();
     ArrayList<Marker> mapMarkers;
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "cccccccccccYep");
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        Log.d(TAG, "Successfully Logged in");
-
-        super.onCreate(savedInstanceState);
-        pd = new ProgressDialog(MapsActivity.this);
+        fa = super.getActivity();
+        view = (ConstraintLayout) inflater.inflate(R.layout.activity_maps, container, false);
+        Log.d(TAG, "ccccccccccc"+view);
+        pd = new ProgressDialog(getActivity());
         pd.setMessage("Loading Path...");
         pd.setCancelable(false);
 
+numberpicker=(NumberPicker)view.findViewById(R.id.radiusPicker);
+        numberpicker.setMaxValue(10);
+        numberpicker.setMinValue(1);
+        numberpicker.setValue(1);
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .enableAutoManage(this /* FragmentActivity */,
-                        (GoogleApiClient.OnConnectionFailedListener) this /*
-                        OnConnectionFailedListener */)
                 .addApi(Drive.API)
                 .addScope(Drive.SCOPE_FILE)
                 .addApi(LocationServices.API)
                 .addApi(AppIndex.API).build();
         if (mGoogleApiClient == null) {
 
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) this)
                     .addOnConnectionFailedListener(this)
                     .addApi(LocationServices.API)
@@ -140,30 +154,31 @@ private Location CurrentLocation;
         }
 
 
-        setContentView(R.layout.activity_maps);
+
+        //   setContentView(R.layout.activity_maps);
         markerPoints = new ArrayList<LatLng>();
 //        LayoutInflater inflater = (LayoutInflater) this
 //                .getSystemService(this.LAYOUT_INFLATER_SERVICE);
 
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        //    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mHandler = new Handler();
 
-        AutoCompleteTextView from = (AutoCompleteTextView) findViewById(R.id.from);
-        AutoCompleteTextView to = (AutoCompleteTextView) findViewById(R.id.to);
+        //     AutoCompleteTextView from = (AutoCompleteTextView) view.findViewById(R.id.from);
+        //    AutoCompleteTextView to = (AutoCompleteTextView) view.findViewById(R.id.to);
 
         // AutoCompleteTextView from = (AutoCompleteTextView) v.findViewById(R.id.from);
         //   AutoCompleteTextView to = (AutoCompleteTextView) v.findViewById(R.id.to);
-        Button but = (Button) findViewById(R.id.load_directions);
+        Button but = (Button)  view.findViewById(R.id.load_directions);
 
-        Button SearchBar = (Button) findViewById(R.id.Bar);
-        Button SearchBank = (Button) findViewById(R.id.Bank);
-        Button SearchAmusement = (Button) findViewById(R.id.amusement_park);
-        Button SearchCafe = (Button) findViewById(R.id.cafe);
-        Button SearchCasino = (Button) findViewById(R.id.casino);
-        Button SearchNightCLub = (Button) findViewById(R.id.night_club);
-        mDurationView = (TextView) findViewById(R.id.duration_label);
-        mDistanceView = (TextView) findViewById(R.id.distance_label);
+        Button SearchBar = (Button)  view.findViewById(R.id.Bar);
+        Button SearchBank = (Button)  view.findViewById(R.id.Bank);
+        Button SearchAmusement = (Button)  view.findViewById(R.id.amusement_park);
+        Button SearchCafe = (Button)  view.findViewById(R.id.cafe);
+        Button SearchCasino = (Button)  view.findViewById(R.id.casino);
+        Button SearchNightCLub = (Button)  view.findViewById(R.id.night_club);
+        mDurationView = (TextView)  view.findViewById(R.id.duration_label);
+        mDistanceView = (TextView)  view.findViewById(R.id.distance_label);
 
 
         SearchBar.setOnClickListener(onClickListener);
@@ -178,9 +193,9 @@ private Location CurrentLocation;
         //  from.setText("Google is your friend.", TextView.BufferType.EDITABLE);
 
 
-        listView = (ListView) findViewById(R.id.poilist);
+        listView = (ListView)  view.findViewById(R.id.poilist);
 
-        final TextView emptyText = (TextView) findViewById(android.R.id.empty);
+        final TextView emptyText = (TextView)  view.findViewById(android.R.id.empty);
         listView.setEmptyView(emptyText);
         // FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
@@ -237,9 +252,17 @@ private Location CurrentLocation;
                 //TODO: the "Selected" refresh when finish loading / Check if Focused on item how to do "somthing"
 
 
+
+                view.setSelected(true);
+
+
+
+
                 Button b = (Button) view.findViewById(R.id.details_btn);
                 b.setVisibility(View.VISIBLE);
-                view.setSelected(true);
+
+
+
 
 
                 Log.d("Yourtag", lat);
@@ -254,9 +277,9 @@ private Location CurrentLocation;
                         Log.d("Its done ", lat);
                         showPath(c);
                         result = c;
-
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-                        mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+                        //This should not be here... showpath is already up there.
+                        //       mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
+                        //      mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
 
                         break;
                     }
@@ -266,13 +289,14 @@ private Location CurrentLocation;
         });
 
 
-        from.setAdapter(new LocationAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
-        to.setAdapter(new LocationAutoCompleteAdapter(this, android.R.layout.simple_dropdown_item_1line));
-
+        //from.setAdapter(new LocationAutoCompleteAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line));
+        //    to.setAdapter(new LocationAutoCompleteAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line));
+        getChildFragmentManager();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(map);
-        mapFragment.getMapAsync(this);
+
+                  mapFragment.getMapAsync(this);
         // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing
         // API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -283,44 +307,52 @@ private Location CurrentLocation;
         }
 
 
-        mMapFormView = findViewById(R.id.list_form);
-        mProgressView = findViewById(R.id.maps_progress);
+        mMapFormView = view.findViewById(R.id.list_form);
+        mProgressView = view.findViewById(R.id.maps_progress);
 
         Log.d(TAG, "Visibibility checking if progess is showing" + mProgressView.getVisibility());
+        return view;
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        Log.d(TAG, "Successfully Logged in");
+
+        super.onCreate(savedInstanceState);
+
 
     }
-
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        //Just show path directly?
-        //Get placeid and sace
-        String place_id = intent.getStringExtra("place_id");
-        if (place_id != null) {
-
-            Waypoint.add(place_id);
-            Toast.makeText(getApplicationContext(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
-            //Use these waypoints to change all marker.
-
-            LatLng latlng=new LatLng(CurrentLocation.getLatitude(),CurrentLocation.getLongitude());
-            String url = getDirectionsUrl(latlng, null);
-
-            DownloadTask downloadTask = new DownloadTask();
-            Log.d(TAG, "THE URL is IS " + url);
-
-            // Start downloading json data from Google Directions API
-            downloadTask.execute(url);
-
-
-        }
-
-    }
+//TODO: THISIOEN
+//    protected void onNewIntent(Intent intent) {
+//        super.onNewIntent(intent);
+//        setIntent(intent);
+//        //Just show path directly?
+//        //Get placeid and sace
+//        String place_id = intent.getStringExtra("place_id");
+//        if (place_id != null) {
+//
+//            Waypoint.add(place_id);
+//            Toast.makeText(getApplicationContext(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
+//            //Use these waypoints to change all marker.
+//
+//            LatLng latlng=new LatLng(CurrentLocation.getLatitude(),CurrentLocation.getLongitude());
+//            String url = getDirectionsUrl(latlng, null);
+//
+//            DownloadTask downloadTask = new DownloadTask();
+//            Log.d(TAG, "THE URL is IS " + url);
+//
+//            // Start downloading json data from Google Directions API
+//            downloadTask.execute(url);
+//
+//
+//        }
+//
+//    }
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (!DetectConnection.checkInternetConnection(MapsActivity.this)) {
-                Toast.makeText(getApplicationContext(), "No Internet!", Toast.LENGTH_SHORT).show();
+            if (!DetectConnection.checkInternetConnection(getActivity())) {
+                Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
             } else
 
             {
@@ -359,8 +391,9 @@ newcolor=false;
         StringBuilder sbValue = new StringBuilder(sbMethod());
         PlacesTask placesTask = new PlacesTask();
         placesTask.execute(sbValue.toString());
+        //TODO:Find out how to add image to there
 
-        TextView emptyText = (TextView) findViewById(android.R.id.empty);
+        TextView emptyText = (TextView) view.findViewById(android.R.id.empty);
         listView.setEmptyView(emptyText);
 
         if (listView == null) {
@@ -371,10 +404,53 @@ newcolor=false;
 
 
     }
+    //Uses for text sizes in Marker
+    public static int convertToPixels(Context context, int nDP)
+    {
+        final float conversionScale = context.getResources().getDisplayMetrics().density;
 
+        return (int) ((nDP * conversionScale) + 0.5f) ;
+
+    }
+    private Bitmap writeTextOnDrawable(int drawableId, String text) {
+
+        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId)
+                .copy(Bitmap.Config.ARGB_8888, true);
+      bm=  Bitmap.createScaledBitmap(bm, 100, 100, false);
+        Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
+
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.WHITE);
+        paint.setTypeface(tf);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(convertToPixels(getActivity(), 11));
+
+        Rect textRect = new Rect();
+        paint.getTextBounds(text, 0, text.length(), textRect);
+
+        Canvas canvas = new Canvas(bm);
+
+        //If the text is bigger than the canvas , reduce the font size
+        if(textRect.width() >= (canvas.getWidth() - 4))     //the padding on either sides is considered as 4, so as to appropriately fit in the text
+            paint.setTextSize(convertToPixels(getActivity(), 7));        //Scaling needs to be used for different dpi's
+
+        //Calculate the positions
+        int xPos = (canvas.getWidth() / 2) - 2;     //-2 is for regulating the x position offset
+
+        //"- ((paint.descent() + paint.ascent()) / 2)" is the distance from the baseline to the center.
+        int yPos = (int) ((canvas.getHeight() / 2)) ;
+// - ((paint.descent() + paint.ascent()) / 2)
+        canvas.drawText(text, xPos, yPos, paint);
+
+        return  bm;
+    }
 
     //TODO:Currently Doing this, try to do a if else for 1 marker (select list)? or multiple marker
     private void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
+
+
+
 
         mapMarkers = new ArrayList<Marker>();
         for (int i = 0; i < nearbyPlacesList.size(); i++) {
@@ -387,21 +463,49 @@ newcolor=false;
             double lng = Double.parseDouble(googlePlace.get("lng"));
             double lat = Double.parseDouble(googlePlace.get("lat"));
 
+
+
             String photo_reference = googlePlace.get("photo_reference");
             //TODO:Doing this, must try Here it is, try to provide different markers.
             LatLng latLng = new LatLng(lat, lng);
             markerOptions.position(latLng);
             markerOptions.title(placeName + " : " + vicinity);
+
+
+            //Run the provate function above to get special marker
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.marker,Integer.toString(i) )));
+
+
+
+            // markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+       //     markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bmp));
+         //   Log.d("onPostExecute", "ooooooo" + bmp.toString());
+
+
             mapMarkers.add(mMap.addMarker(markerOptions));
             mMap.addMarker(markerOptions);
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            //Default
+
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (Marker marker : mapMarkers) {
+                builder.include(marker.getPosition());
+            }
+            LatLngBounds bounds = builder.build();
+            int padding = 150; // offset from edges of the map in pixels
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+           mMap.animateCamera(cu);
+        //    mMap.moveCamera(cu);
+
+
+
             //move map camera
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+        //    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+         //   mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
         }
     }
 
-    protected void onStart() {
+    public void onStart() {
         mGoogleApiClient.connect();
         super.onStart();
         // ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -409,7 +513,7 @@ newcolor=false;
         AppIndex.AppIndexApi.start(mGoogleApiClient, getIndexApiAction());
     }
 
-    protected void onStop() {
+    public void onStop() {
         mGoogleApiClient.disconnect();
         super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
 // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -427,18 +531,20 @@ newcolor=false;
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        Log.d("onMarkerCLick", "ISTHISNOTRUN");
+
         mMap = googleMap;
         //Well need it to let mMap.setmylocationenabled
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     MY_PERMISSION_ACCESS_COURSE_LOCATION);
         }
 
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSION_ACCESS_COURSE_LOCATION);
         }
 
@@ -447,8 +553,8 @@ newcolor=false;
             @Override
             public boolean onMarkerClick(Marker marker) {
                 DetectConnection check = new DetectConnection();
-                if (!DetectConnection.checkInternetConnection(MapsActivity.this)) {
-                    Toast.makeText(getApplicationContext(), "No Internet!", Toast.LENGTH_SHORT).show();
+                if (!DetectConnection.checkInternetConnection(getActivity())) {
+                    Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
                     return false;
                 } else {
 
@@ -485,6 +591,10 @@ newcolor=false;
     //Also when marker is clicked
     private void showPath(Marker marker) {
 
+        Log.d(TAG, "showpath" + marker);
+        Log.d(TAG, "mapmarkers" + mapMarkers);
+
+
         marker.showInfoWindow();
         //this will only remove the single line ... i guess
         if (TempPoly != null) {
@@ -496,7 +606,6 @@ newcolor=false;
         LatLng currentLatlng = new LatLng(location.getLatitude(), location.getLongitude());
         markerPoints.add(currentLatlng);
 
-
         LatLng ClickedMarker = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
 
         Log.d(TAG, "Current Location Lat is " + ClickedMarker);
@@ -506,29 +615,46 @@ newcolor=false;
 
         // Creating MarkerOptions
 
-        MarkerOptions options = new MarkerOptions();
-        Log.d(TAG, "Current Checking " + currentLatlng.longitude);
 
-        // Setting the position of the marker
-//For the stating part, this is for non sensational problems
-        /**
-         * For the start location, the color of marker is GREEN and
-         * for the end location, the color of marker is RED.
-         */
-//                if (markerPoints.size() == 1) {
-//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-//                } else if (markerPoints.size() == 2) {
-//                    options.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-//                }
 
-        // Add new marker to the Google Map Android API V2
-        // mMap.addMarker(options);
 
-        // Checks, whether start and end locations are captured
-//                if (markerPoints.size() >= 2) {
+
         LatLng origin = markerPoints.get(0);
         LatLng dest = markerPoints.get(1);
+        MarkerOptions options = new MarkerOptions();
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
+        for (Marker c : mapMarkers) {
+            Log.d(TAG, "Ismapmarker  " );
+            builder.include(c.getPosition());
+
+            if (dest.latitude==c.getPosition().latitude && dest.longitude==c.getPosition().longitude){
+                c.remove();
+                Log.d(TAG, "Ismapmarkerrunning  " );
+                //break causes for to not run completely, need to change that to show all waypotinst/markers
+               //    break;
+            }
+        }
+
+
+        LatLngBounds bounds = builder.build();
+        int padding = 150; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        mMap.animateCamera(cu);
+
+
+
+
+        MarkerOptions markerOptions=new MarkerOptions();
+        markerOptions.position(dest);
+
+        mMap.addMarker(markerOptions);
+        //Default
+
+        //move map camera
+     //   mMap.moveCamera(CameraUpdateFactory.newLatLng(dest));
+       // mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
         // Getting URL to the Google Directions API
         String url = getDirectionsUrl(origin, dest);
 //Doing this, should... easiest way is to get a variable here to change color...
@@ -578,27 +704,27 @@ newcolor=true;
     }
 
     //Pressed twice to quit
-    boolean doubleBackToExitPressedOnce = false;
-    @Override
-    public void onBackPressed() {
-
-        if (doubleBackToExitPressedOnce) {
-            super.onBackPressed();
-            return;
-        }
-
-        this.doubleBackToExitPressedOnce = true;
-        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
-
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                doubleBackToExitPressedOnce=false;
-            }
-        }, 2000);
-
-    }
+//    boolean doubleBackToExitPressedOnce = false;
+//    @Override
+//    public void onBackPressed() {
+//
+//        if (doubleBackToExitPressedOnce) {
+//            super.onBackPressed();
+//            return;
+//        }
+//
+//        this.doubleBackToExitPressedOnce = true;
+//        Toast.makeText(this, "Please click BACK again to exit", Toast.LENGTH_SHORT).show();
+//
+//        new Handler().postDelayed(new Runnable() {
+//
+//            @Override
+//            public void run() {
+//                doubleBackToExitPressedOnce=false;
+//            }
+//        }, 2000);
+//
+//    }
 
 
     private String getDirectionsUrl(LatLng origin, LatLng dest) {
@@ -995,10 +1121,10 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
         // selecting appropriate nav menu item
 
         // set toolbar title
-
+getChildFragmentManager();
         // if user select the current navigation menu again, don't do anything
         // just close the navigation drawer
-        if (getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
+        if (getActivity().getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
             //  drawer.closeDrawers();
 
             // show or hide the fab button
@@ -1013,7 +1139,7 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
             @Override
             public void run() {
                 // update the main content by replacing fragments
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
                 fragmentTransaction.setCustomAnimations(android.R.anim.fade_in,
                         android.R.anim.fade_out);
                 //  fragmentTransaction.replace(R.id.frame, fragment, CURRENT_TAG);
@@ -1032,7 +1158,8 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
         //  drawer.closeDrawers();
 
         // refresh toolbar menu
-        invalidateOptionsMenu();
+        //TODO:Check what is this
+        //invalidateOptionsMenu();
     }
 
 
@@ -1065,13 +1192,13 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
 
 
         // Get the location manager
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
         // Define the criteria how to select the locatioin provider -> use
         // default
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "This is Currentlocationcheckinginsideif");
 
@@ -1087,7 +1214,6 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
         return CurrentLocation;
     }
 
-
     public StringBuilder sbMethod() {
 
         Location location = CurrentLocation();
@@ -1101,7 +1227,12 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
 
             StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
             sb.append("location=" + mLatitude + "," + mLongitude);
-            sb.append("&radius=5000");
+            //TODO: Set radius to be controllable
+
+            int radius= numberpicker.getMaxValue();
+            radius=radius *1000;
+            Log.d("CheckBit",numberpicker.toString());
+            sb.append("&radius="+Integer.toString(radius));
             sb.append("&types=" + LocationType);
             sb.append("&sensor=true");
             sb.append("&key=AIzaSyDkIa12Y9nXORou_xCnwS09K53kbJabKHo");
@@ -1111,6 +1242,7 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
             return sb;
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Fail");
+            Log.d("CheckBit",e.toString());
 
             return sb.append("Test");
         }
@@ -1176,7 +1308,10 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
             Log.d("GooglePlacesReadTask", "theheckis" + nearbyPlacesList);
 
             //This use locationadapter to put in listview?
-            Locationadapter = new LocationListViewAdapter(MapsActivity.this, nearbyPlacesList);
+            Locationadapter = new LocationListViewAdapter(getActivity(), nearbyPlacesList);
+
+
+
             listView.setAdapter(Locationadapter);
 
 
@@ -1198,11 +1333,12 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
 
 
     // Executed after the complete execution of doInBackground() method
+    private ConstraintLayout view;
+    private FragmentActivity fa;
+
+
 
 }
-
-
-
 
 
 

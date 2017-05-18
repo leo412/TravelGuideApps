@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -66,9 +67,10 @@ public class LocationListViewAdapter extends BaseAdapter {
                 (TextView) rowView.findViewById(R.id.vicinity);
 
 // Get detail element
+        //TODO:Remove rating when not needed. or change to other String (Need it for "No rating")?
         TextView ratingTextView =
                 (TextView) rowView.findViewById(R.id.rating);
-
+        RatingBar ratingBar=(RatingBar) rowView.findViewById((R.id.ratingBar));
         TextView latTextView =
                 (TextView) rowView.findViewById(R.id.lat);
         TextView lngTextView =
@@ -135,8 +137,9 @@ String singlephotoreference=mDataSource.get(position).get("photo_reference").toS
         //Log.d("ADAPTER", mDataSource.get(position).get("photo_reference").toString() );
     Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference="+list
             +"&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().into(thumbnailImageView);
-
-
+if(mDataSource.get(position).get("rating").toString()!="No Rating") {
+    ratingBar.setRating(Float.parseFloat(mDataSource.get(position).get("rating").toString()));
+}
         titleTextView.setText(mDataSource.get(position).get("place_name").toString());
         vicinityTextView.setText(mDataSource.get(position).get("vicinity").toString());
         place_idTextView.setText(mDataSource.get(position).get("place_id").toString());
