@@ -34,7 +34,8 @@
 
         >
 
-        <ImageButton
+        <Button
+            android:text="LALALLA"
             android:id="@+id/main_Menu_Search_Button"
             android:layout_width="0dp"
             android:layout_height="match_parent"
@@ -66,7 +67,7 @@
         >
 
         <ImageButton
-            android:id="@+id/main_Menu_Search_Button"
+            android:id="@+id/main_Menu_Search_Button2"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"

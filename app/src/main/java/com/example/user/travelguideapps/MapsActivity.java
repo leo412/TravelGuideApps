@@ -14,7 +14,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
-import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -23,6 +22,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -38,17 +38,15 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.NumberPicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.drive.Drive;
 import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -63,6 +61,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.hrules.horizontalnumberpicker.HorizontalNumberPicker;
 
 import org.json.JSONObject;
 
@@ -94,7 +93,7 @@ import static com.example.user.travelguideapps.R.id.map;
 //TODO:prevent same location to be set? (Also, change set to place -> Uncheck etc
 //TODO: that freakin disable View Details from other listview item  problem........ (And Checked listview
 
-public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.OnConnectionFailedListener {
+public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener {
     private static final String TAG = "tag";
     ArrayList<LatLng> markerPoints;
     private static final String TAG_HOME = "home";
@@ -106,20 +105,23 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     private String LocationType = "bar";
     private View mProgressView;
     private View mMapFormView;
+    private View horizontal_scroll_view;
+
     private TextView mDurationView;
     private TextView mDistanceView;
     private LocationListViewAdapter Locationadapter;
     private ArrayList Waypoint = new ArrayList();
     private Boolean newcolor=false;
-private NumberPicker numberpicker;
-private Location CurrentLocation;
+private HorizontalNumberPicker numberpicker;
+private Location CurrentLocation=BaseActivity.getCurrentLocation();
+
+
     private Polyline TempPoly;
     List<LinkedHashMap<String, String>> nearbyPlacesList = null;
     ProgressDialog pd;
 
     int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
     private GoogleMap mMap;
-    GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest = new LocationRequest();
     ArrayList<Marker> mapMarkers;
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -131,27 +133,38 @@ private Location CurrentLocation;
         pd = new ProgressDialog(getActivity());
         pd.setMessage("Loading Path...");
         pd.setCancelable(false);
-
-numberpicker=(NumberPicker)view.findViewById(R.id.radiusPicker);
+        numberpicker=(HorizontalNumberPicker)view.findViewById(R.id.radiusPicker);
         numberpicker.setMaxValue(10);
         numberpicker.setMinValue(1);
         numberpicker.setValue(1);
-        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-
-                .addApi(Drive.API)
-                .addScope(Drive.SCOPE_FILE)
-                .addApi(LocationServices.API)
-                .addApi(AppIndex.API).build();
-        if (mGoogleApiClient == null) {
-
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) this)
-                    .addOnConnectionFailedListener(this)
-                    .addApi(LocationServices.API)
-                    .build();
 
 
-        }
+
+
+
+
+
+//        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+//                .enableAutoManage(getActivity(),this)
+//                .addApi(Drive.API)
+//                .addScope(Drive.SCOPE_FILE)
+//
+//                .addApi(AppIndex.API)
+//                .addApi(LocationServices.API)
+//
+//                .build();
+
+//
+//        if (mGoogleApiClient == null) {
+//
+//            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+//                    .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) this)
+//                    .addOnConnectionFailedListener(this)
+//                    .addApi(LocationServices.API)
+//                    .build();
+//
+//
+//        }
 
 
 
@@ -505,20 +518,7 @@ newcolor=false;
         }
     }
 
-    public void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.start(mGoogleApiClient, getIndexApiAction());
-    }
 
-    public void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();// ATTENTION: This was auto-generated to implement the App Indexing API.
-// See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(mGoogleApiClient, getIndexApiAction());
-    }
 
     /**
      * Manipulates the map once available.
@@ -602,7 +602,7 @@ newcolor=false;
         }
 
         markerPoints.clear();
-        Location location = CurrentLocation();
+        Location location = CurrentLocation;
         LatLng currentLatlng = new LatLng(location.getLatitude(), location.getLongitude());
         markerPoints.add(currentLatlng);
 
@@ -696,6 +696,7 @@ newcolor=true;
                 }
             });
         } else {
+
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
@@ -814,6 +815,22 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
     }
 
 
@@ -1111,7 +1128,7 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
 
-        Log.d(TAG, "Connection fail");
+        Log.d(TAG, "Connection fail"+connectionResult);
 
 
     }
@@ -1181,42 +1198,10 @@ getChildFragmentManager();
 
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
 
-    public Location CurrentLocation() {
-
-        mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(5000);
-        mLocationRequest.setNumUpdates(1);
-        mLocationRequest.setFastestInterval(1000);
-
-
-
-        // Get the location manager
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-        // Define the criteria how to select the locatioin provider -> use
-        // default
-        Criteria criteria = new Criteria();
-        provider = locationManager.getBestProvider(criteria, false);
-        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) !=
-                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "This is Currentlocationcheckinginsideif");
-
-        }
-        Log.d(TAG, "This is mGoogleApiClient" + mGoogleApiClient);
-
-         CurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-
-        // Location location = locationManager.getLastKnownLocation(provider);
-        Log.d(TAG, "This is Currentlocationchecking" + CurrentLocation);
-
-        // LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-        return CurrentLocation;
-    }
 
     public StringBuilder sbMethod() {
 
-        Location location = CurrentLocation();
+        Location location = CurrentLocation;
 
         Log.d("Map", "Locationnow=" + location);
 
@@ -1229,9 +1214,11 @@ getChildFragmentManager();
             sb.append("location=" + mLatitude + "," + mLongitude);
             //TODO: Set radius to be controllable
 
-            int radius= numberpicker.getMaxValue();
+            int radius= numberpicker.getValue();
             radius=radius *1000;
             Log.d("CheckBit",numberpicker.toString());
+           // sb.append("&radius=5000");
+
             sb.append("&radius="+Integer.toString(radius));
             sb.append("&types=" + LocationType);
             sb.append("&sensor=true");

@@ -11,7 +11,7 @@ public class MainMenuActivity extends BaseActivity {
 
         Log.d("MainMenu", "Baserunni");
 
-        setContentView(R.layout.activity_main_menu);
+      setContentView(R.layout.activity_main_menu);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
 

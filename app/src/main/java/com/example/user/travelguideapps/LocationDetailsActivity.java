@@ -1,18 +1,19 @@
 package com.example.user.travelguideapps;
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
+import android.support.design.widget.CoordinatorLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -32,7 +33,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class LocationDetailsActivity extends BaseActivity{
+public class LocationDetailsActivity extends Fragment{
 String TAG="tag";
     private TextView place_name;
     private View place_location;
@@ -41,62 +42,83 @@ String TAG="tag";
     //CUrrently not using, see if needed anyime
  //   private LocationDetailsAdapter LocationDetailsAdapter;
 //View content_place_details = findViewById(R.id.content_place_details);
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_place_details);
-      //  Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    private CoordinatorLayout view;
 
-     //   setSupportActionBar(toolbar);
-        place_location=(TextView)findViewById(R.id.place_location);
-        place_name=(TextView)findViewById(R.id.details_place_name);
-      //  imageView1=(ImageView)findViewById(R.id.imageView1);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        view = (CoordinatorLayout) inflater.inflate(R.layout.activity_place_details, container, false);
+
+        //   setSupportActionBar(toolbar);
+        place_location=(TextView)view.findViewById(R.id.place_location);
+        place_name=(TextView)view.findViewById(R.id.details_place_name);
+        //  imageView1=(ImageView)findViewById(R.id.imageView1);
         //imageView2=(ImageView)findViewById(R.id.imageView2);
-        recyclerView=(RecyclerView)findViewById((R.id.recycleviewphoto));
+        recyclerView=(RecyclerView)view.findViewById((R.id.recycleviewphoto));
 
         //TODO: is this placeid correct??? Seems to have a lot of problem in it?
-        final String place_id=getIntent().getStringExtra("place_id");
+        //final String place_id=getIntent().getStringExtra("place_id");
 
-          Toast.makeText(getApplicationContext(),place_id, Toast.LENGTH_SHORT).show();
+        Bundle b = this.getArguments();
+
+
+        final String place_id = b.getString("place_id");
+
+
+
+        //Toast.makeText(getApplicationContext(),place_id, Toast.LENGTH_SHORT).show();
         //How to use this url?
         //"https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key=AIzaSyBSjyuGzRqI8WZ3Vdil99Dp2sTfwQI2-to"
         String data="ASD";
         MapsActivity a=new MapsActivity();
-String takethistotest="https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
-        "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA";
+        String takethistotest="https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
+                "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA";
         Log.d(TAG, "takethistotest"+takethistotest);
 
         try {
 
-           new DownloadTask().execute(("https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
-                   "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA"));
+            new DownloadTask().execute(("https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
+                    "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA"));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Log.d(TAG, "Latest is"+data);
 
-Button setplacebutton=(Button) findViewById(R.id.setplacebutton);
+        Button setplacebutton=(Button) view.findViewById(R.id.setplacebutton);
 
-setplacebutton.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
+        setplacebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
 
-        Intent intent = new Intent(LocationDetailsActivity.this, MapsActivity.class);
-        //intent without restarting activities
-          intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        intent.putExtra("place_id",place_id);
-        NavUtils.navigateUpTo(LocationDetailsActivity.this, intent);
+            //    Intent intent = new Intent(getActivity(), MapsActivity.class);
+                //intent without restarting activities
+        //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+           //     intent.putExtra("place_id",place_id);
+         //       NavUtils.navigateUpTo(LocationDetailsActivity.this, intent);
 
+                Bundle args = new Bundle();
+                args.putString("place_id",place_id);
+                MapsActivity newFragment = new MapsActivity ();
+                newFragment.setArguments(args);
 
-        Toast.makeText(getApplicationContext(), "Location is set!", Toast.LENGTH_SHORT).show();
+     //           Toast.makeText(getApplicationContext(), "Location is set!", Toast.LENGTH_SHORT).show();
 
+            }
+        });
 
+return view;
     }
-});
 
+//        @Override
+//    protected void onCreate(Bundle savedInstanceState) {
+//        super.onCreate(savedInstanceState);
+//        setContentView(R.layout.activity_place_details);
+//      //  Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//
+//
+//    }
+//
 
-    }public  class DownloadTask extends AsyncTask<String, Void, String> {
+    public  class DownloadTask extends AsyncTask<String, Void, String> {
         protected void onPreExecute() {
             //set message of the dialog
             //show dialog
@@ -142,7 +164,7 @@ setplacebutton.setOnClickListener(new View.OnClickListener() {
             JSONArray jsonArray = null;
             JSONObject jsonObject;
             DataParser dataParser=new DataParser();
-
+        //Comment for single list to parse result
           placedetails=  dataParser.parse(result);
 //            try {
 //                Log.d("Places", "parse");
@@ -213,11 +235,11 @@ for(int i=0;i<photoList.size();i++){
 
 
 
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,false);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setHasFixedSize(true);
 
-            pictureadapter = new LocationDetailsAdapter(getApplicationContext(), photoList);
+            pictureadapter = new LocationDetailsAdapter(getActivity(), photoList);
 
             recyclerView.setAdapter(pictureadapter);
 
@@ -229,7 +251,7 @@ for(int i=0;i<photoList.size();i++){
 
 
 
-            Picasso.with(getApplicationContext()).setLoggingEnabled(true);
+            Picasso.with(getActivity()).setLoggingEnabled(true);
 
 
 

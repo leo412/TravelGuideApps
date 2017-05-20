@@ -70,14 +70,13 @@
             app:layout_constraintVertical_bias="0.987">
 <LinearLayout
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    >
-            <NumberPicker
-                android:id="@+id/radiusPicker"
-                android:orientation="horizontal"
-
-                android:layout_width="91dp"
-                android:layout_height="wrap_content"/>
+    android:layout_height="97dp"
+    android:orientation="vertical">
+    <com.hrules.horizontalnumberpicker.HorizontalNumberPicker
+        android:id="@+id/radiusPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
 
             <TextView
                 android:id="@+id/duration_label"

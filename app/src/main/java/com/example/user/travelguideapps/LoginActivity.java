@@ -50,7 +50,6 @@ import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.READ_CONTACTS;
-
 /**
  * A login screen that offers login via email/password.
  */
@@ -106,8 +105,9 @@ private FrameLayout frame;
             }
         };
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        //setContentView(R.layout.activity_login);
 
+        setContentView(R.layout.activity_login_page);
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -125,6 +125,7 @@ private FrameLayout frame;
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
+
                     attemptLogin();
                     return true;
                 }
@@ -132,7 +133,7 @@ private FrameLayout frame;
             }
         });
 //TODO: Put Access for location access,else just plain stop user from logging in
-        Button mEmailSignInButton = (Button) findViewById(R.id.signin_button);
+        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
 //        boolean connected = false;
 //        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
 //        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
@@ -190,7 +191,9 @@ private FrameLayout frame;
 
                         }
                     }else{
-                    //If permission is accepted.
+                        pd.show();
+
+                        //If permission is accepted.
                     attemptLogin();
 
                     }
@@ -340,6 +343,7 @@ private FrameLayout frame;
      */
     private void attemptLogin() {
         pd.show();
+
         if (mAuthTask != null) {
             return;
         }
@@ -387,7 +391,6 @@ private FrameLayout frame;
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             //showProgress(true);
-            pd.show();
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
@@ -626,9 +629,9 @@ pd.dismiss();
 
                                     Log.w(TAG, "signInCompleted");
                                   //  showProgress(false);
-pd.dismiss();
+                                    pd.dismiss();
 
-                                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainMenuActivity.class));
+                                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, BaseActivity.class));
                                     //finish();
                                 }
                             }

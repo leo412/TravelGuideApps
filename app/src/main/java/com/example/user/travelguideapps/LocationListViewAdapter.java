@@ -2,6 +2,10 @@ package com.example.user.travelguideapps;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,11 +115,35 @@ public class LocationListViewAdapter extends BaseAdapter {
             //    String place_id = ((TextView) v.findViewById(R.id.place_id)).getText().toString();
 
               //  String place_id=listView.getItemAtPosition(position).toString();
+
+
                String message = getItem(position).toString();
                 Log.d("bbbbbbbb ", place_id_text);
                 //Send place id to placeDretails Activity
-                   intent.putExtra("place_id", place_id_text);
-                mContext.startActivity(intent);
+                //   intent.putExtra("place_id", place_id_text);
+             //   mContext.startActivity(intent);
+
+
+
+                Fragment fragment = null;
+                Class fragmentClass=null;
+                fragmentClass = LocationDetailsActivity.class;
+                try {
+
+                    Bundle args = new Bundle();
+                    args.putString("place_id",place_id_text);
+              //      LocationDetailsActivity newFragment = new LocationDetailsActivity ();
+                    fragment = (Fragment) fragmentClass.newInstance();
+                    fragment.setArguments(args);
+
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+
+                FragmentManager fragmentManager = ((FragmentActivity)mContext).getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
             }
         });
