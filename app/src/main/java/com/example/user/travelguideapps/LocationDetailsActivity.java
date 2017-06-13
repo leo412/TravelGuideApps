@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
@@ -34,8 +36,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 public class LocationDetailsActivity extends Fragment{
-String TAG="tag";
-    private TextView place_name;
+static String TAG="tag";
+    private static TextView place_name;
     private View place_location;
     private LocationDetailsAdapter pictureadapter;
     private RecyclerView recyclerView;
@@ -43,13 +45,14 @@ String TAG="tag";
  //   private LocationDetailsAdapter LocationDetailsAdapter;
 //View content_place_details = findViewById(R.id.content_place_details);
     private CoordinatorLayout view;
+    BaseActivity b=new BaseActivity();
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = (CoordinatorLayout) inflater.inflate(R.layout.activity_place_details, container, false);
 
         //   setSupportActionBar(toolbar);
-        place_location=(TextView)view.findViewById(R.id.place_location);
-        place_name=(TextView)view.findViewById(R.id.details_place_name);
+        place_location=(TextView)view.findViewById(R.id.textViewAdress);
+        place_name=(TextView)view.findViewById(R.id.textViewPlaceName);
         //  imageView1=(ImageView)findViewById(R.id.imageView1);
         //imageView2=(ImageView)findViewById(R.id.imageView2);
         recyclerView=(RecyclerView)view.findViewById((R.id.recycleviewphoto));
@@ -57,11 +60,12 @@ String TAG="tag";
         //TODO: is this placeid correct??? Seems to have a lot of problem in it?
         //final String place_id=getIntent().getStringExtra("place_id");
 
-        Bundle b = this.getArguments();
+     //   Bundle bundle = this.getArguments();
 
+        String _data = DataHolderClass.getInstance().getDistributor_id();
+        Button removeplacebutton=(Button) view.findViewById(R.id.removeLocation);
 
-        final String place_id = b.getString("place_id");
-
+        final String place_id = _data;
 
 
         //Toast.makeText(getApplicationContext(),place_id, Toast.LENGTH_SHORT).show();
@@ -71,7 +75,7 @@ String TAG="tag";
         MapsActivity a=new MapsActivity();
         String takethistotest="https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
                 "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA";
-        Log.d(TAG, "takethistotest"+takethistotest);
+        Log.d(TAG, "fortestingurl"+takethistotest);
 
         try {
 
@@ -81,30 +85,116 @@ String TAG="tag";
             e.printStackTrace();
         }
 
-        Log.d(TAG, "Latest is"+data);
 
-        Button setplacebutton=(Button) view.findViewById(R.id.setplacebutton);
 
-        setplacebutton.setOnClickListener(new View.OnClickListener() {
+
+
+        Button setplacebutton=(Button) view.findViewById(R.id.addLocation);
+        ArrayList waypoint=MapsActivity.getWaypoint();
+        if(waypoint.contains(place_id)){
+
+            removeplacebutton.setVisibility(View.VISIBLE);
+            setplacebutton.setVisibility(View.GONE);
+
+        }
+
+
+        removeplacebutton.setOnClickListener(new View.OnClickListener() {
+
+
             @Override
             public void onClick(View v) {
+                DataHolderClass.getInstance2().setDistributor_id2("isselected");
 
-            //    Intent intent = new Intent(getActivity(), MapsActivity.class);
-                //intent without restarting activities
-        //        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-           //     intent.putExtra("place_id",place_id);
-         //       NavUtils.navigateUpTo(LocationDetailsActivity.this, intent);
+                DataHolderClass.getInstance().setDistributor_id(place_id);
+                FragmentManager fragmentManager = LocationDetailsActivity.this.getActivity().getSupportFragmentManager();
+                if(fragmentManager.getBackStackEntryCount()>0) {
+                    Log.d(TAG, "popbackrunning");
 
-                Bundle args = new Bundle();
-                args.putString("place_id",place_id);
-                MapsActivity newFragment = new MapsActivity ();
-                newFragment.setArguments(args);
+                    fragmentManager.popBackStack();
+                    Log.d(TAG, "popbackrunning2");
 
-     //           Toast.makeText(getApplicationContext(), "Location is set!", Toast.LENGTH_SHORT).show();
+
+                }
+                Toast.makeText(getActivity(), "Location removed....!", Toast.LENGTH_SHORT).show();
+
+
 
             }
         });
 
+        setplacebutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+           //     Log.d(TAG, "uhhhhhhhzero"+b.getPlace_id());
+
+             //   ArrayList place_idarray=null;
+//if(b.getPlace_id()!=null) {
+//    //Getplaceid contain an array,
+//    place_idarray = b.getPlace_id();
+//    Log.d(TAG, "uhhhhhhhfirst"+place_idarray);
+//
+//    place_idarray.add(place_id);
+//    b.setPlace_id(place_idarray);
+//    Log.d(TAG, "uhhhhhhhfirst"+place_idarray);
+//
+//}else{
+//    ArrayList test=new ArrayList();
+//    test.add(place_id);
+//b.setPlace_id(test);
+//    Log.d(TAG, "uhhhhhhhsecond");
+//
+//
+//
+//}
+////2 choice, check if selected or in waypoint?
+////TODO: if selected, changed the button...(VIsibility )
+//
+//                Log.d(TAG, "uhhhhhhh"+b.getPlace_id());
+
+
+//                Fragment newFragment = null;
+//
+//                Class fragmentClass=null;
+//                fragmentClass = MapsActivity.class;
+
+//                try {
+//                    Log.d(TAG, "sendatafromsuccess");
+//
+//                    newFragment = (Fragment) fragmentClass.newInstance();
+//                } catch (java.lang.InstantiationException e) {
+//                    Log.d(TAG, "sendatafrom"+e);
+//
+//                    e.printStackTrace();
+//                } catch (IllegalAccessException e) {
+//                    Log.d(TAG, "sendatafrom"+e);
+//
+//                    e.printStackTrace();
+//                }
+       //         newFragment.setArguments(args);
+                DataHolderClass.getInstance().setDistributor_id(place_id);
+                DataHolderClass.getInstance2().setDistributor_id2("unselected");
+
+                FragmentManager fragmentManager = LocationDetailsActivity.this.getActivity().getSupportFragmentManager();
+                if(fragmentManager.getBackStackEntryCount()>0) {
+                    Log.d(TAG, "popbackrunning");
+
+                    fragmentManager.popBackStack();
+                    Log.d(TAG, "popbackrunning2");
+
+
+                }
+                Toast.makeText(getActivity(), "Location set....!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), place_id.toString(), Toast.LENGTH_SHORT).show();
+
+
+
+
+
+
+
+            }
+        });
 return view;
     }
 
@@ -116,9 +206,7 @@ return view;
 //
 //
 //    }
-//
-
-    public  class DownloadTask extends AsyncTask<String, Void, String> {
+    public class DownloadTask extends AsyncTask<String, Void, String> {
         protected void onPreExecute() {
             //set message of the dialog
             //show dialog
@@ -129,8 +217,6 @@ return view;
         // Downloading data in non-ui thread
         @Override
         protected String doInBackground(String... url) {
-            Log.d(TAG, url[0]);
-            Log.d(TAG, "DoinBackTest");
 
             // For storing data from web service
             String data = "";
@@ -146,7 +232,9 @@ return view;
 
             return data;
         }
- //This is commented because its not known whether its needead
+
+
+ //This is commented because its not known whether its needed
         @TargetApi(Build.VERSION_CODES.KITKAT)
         @Override
         protected void onPostExecute(String result) {
@@ -166,36 +254,6 @@ return view;
             DataParser dataParser=new DataParser();
         //Comment for single list to parse result
           placedetails=  dataParser.parse(result);
-//            try {
-//                Log.d("Places", "parse");
-//                jsonObject = new JSONObject((String) result);
-//                jsonArray = jsonObject.getJSONArray("results");
-//            } catch (JSONException e) {
-//                Log.d("Places", "parse error");
-//                e.printStackTrace();
-//            }
-//            Log.d("DetailsResultCheck", jsonObj.toString());
-//
-//            try {
-//                 jsonArray = jsonObj.getJSONObject("result");
-//
-//                for (int i = 0; i < jsonArray.length(); i++){
-//                    Log.d("DetailsResultCheck","DIDitrun"+i);
-//
-//                    jsonObjectItem = jsonArray.getJSONObject(i);
-//                    Log.d("jsonObjectItem","DIDitrun"+jsonObjectItem);
-//
-//
-//
-//        }
-//
-//        //
-//                placename=jsonObjectItem.toString();
-//            } catch (JSONException e) {
-//                e.printStackTrace();
-//            }
-
-
 
             //This is needed to insert data into the page it self
             //Name places list ?
@@ -204,6 +262,10 @@ return view;
             LinkedHashMap<String,String> placedetail=placedetails.get(0);
 
             place_name.setText( placedetail.get("place_name"));
+
+
+
+
 // TODO: Commented and used hardcode, check if able to soft code
 //int photoindex=placedetails.indexOf("photo_reference");
             //Doing this
@@ -234,8 +296,8 @@ for(int i=0;i<photoList.size();i++){
 }
 
 
-
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager.HORIZONTAL,false);
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager
+                    .HORIZONTAL,false);
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setHasFixedSize(true);
 
@@ -255,49 +317,11 @@ for(int i=0;i<photoList.size();i++){
 
 
 
-
-//            for(int i=0;i<photoList.size();i++) {
-//
-//                String imageview="imageView"+(i+1);
-//
-//                Picasso.with(getApplicationContext()).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + photoList.get(0).trim()
-//
-//                        .toString()
-//                        + "&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").into(imageView1);
-//
-//                Picasso.with(getApplicationContext()).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + photoList.get(1)
-//                        .trim()
-//                        .toString()
-//                        + "&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").into(imageView2);
-//
-//
-//            }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-            //LocationDetailsAdapter = new LocationDetailsAdapter(LocationDetailsActivity.this, placedetails);
-        //    content_place_details.setAdapter(LocationDetailsAdapter);
-         //   MapsActivity.ParserTask parserTask = new MapsActivity.ParserTask();
-            // Invokes the thread for parsing the JSON data
-         //
-            //   parserTask.execute(result);
-         //   pd.dismiss();
         }
 
 
-    }
+
+}
     public static LinkedHashMap<String, String> toMap(JSONObject object) throws JSONException {
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
@@ -333,7 +357,7 @@ for(int i=0;i<photoList.size();i++){
         return list;
     }
     //TODO: Maps activity has this too, try and see if it can be use from there.
-    private String downloadUrl(String strUrl) throws IOException {
+    private static String downloadUrl(String strUrl) throws IOException {
         String data = "";
         InputStream iStream = null;
         HttpURLConnection urlConnection = null;

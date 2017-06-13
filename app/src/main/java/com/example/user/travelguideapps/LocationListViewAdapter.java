@@ -2,10 +2,10 @@ package com.example.user.travelguideapps;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -111,7 +111,6 @@ public class LocationListViewAdapter extends BaseAdapter {
                 String place_id_text= place_id.getText().toString();
 
 
-
             //    String place_id = ((TextView) v.findViewById(R.id.place_id)).getText().toString();
 
               //  String place_id=listView.getItemAtPosition(position).toString();
@@ -129,12 +128,13 @@ public class LocationListViewAdapter extends BaseAdapter {
                 Class fragmentClass=null;
                 fragmentClass = LocationDetailsActivity.class;
                 try {
+                    DataHolderClass.getInstance().setDistributor_id(place_id_text);
 
-                    Bundle args = new Bundle();
-                    args.putString("place_id",place_id_text);
+              //      Bundle args = new Bundle();
+                 //   args.putString("place_id",place_id_text);
               //      LocationDetailsActivity newFragment = new LocationDetailsActivity ();
                     fragment = (Fragment) fragmentClass.newInstance();
-                    fragment.setArguments(args);
+                    //fragment.setArguments(args);
 
                 } catch (InstantiationException e) {
                     e.printStackTrace();
@@ -142,8 +142,18 @@ public class LocationListViewAdapter extends BaseAdapter {
                     e.printStackTrace();
                 }
 
-                FragmentManager fragmentManager = ((FragmentActivity)mContext).getSupportFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
+
+
+
+             FragmentManager fragmentManager = ((FragmentActivity)mContext).getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flContent2, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+
+
+
+             //   fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
             }
         });
@@ -168,7 +178,9 @@ String singlephotoreference=mDataSource.get(position).get("photo_reference").toS
 if(mDataSource.get(position).get("rating").toString()!="No Rating") {
     ratingBar.setRating(Float.parseFloat(mDataSource.get(position).get("rating").toString()));
 }
-        titleTextView.setText(mDataSource.get(position).get("place_name").toString());
+
+String titles=position+mDataSource.get(position).get("place_name").toString();
+        titleTextView.setText(titles);
         vicinityTextView.setText(mDataSource.get(position).get("vicinity").toString());
         place_idTextView.setText(mDataSource.get(position).get("place_id").toString());
 

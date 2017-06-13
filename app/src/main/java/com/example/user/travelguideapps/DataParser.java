@@ -19,11 +19,13 @@ import static android.content.ContentValues.TAG;
 
 public class DataParser {
 //TODO: Make it obtain all data available?
+    //TODO:seems to run twice when clicking view deatails and set places, possible to made it directly obtain previous data?
 //This is where Data is obtain from the internet
+    //False.... pretty sure its used to parse String to json (LInked hashmap
     public List<LinkedHashMap<String, String>> parse(String jsonData) {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject;
-        //placenumber 0 = single 1= many
+        //placenumber 0 = many 1= single
 
         int placenumber=0;
         try {
@@ -80,6 +82,8 @@ public class DataParser {
         return placesList;
     }
 
+    //TODO: separate details (1) and summaries(0)
+//Isn't this overcomplicated things...?
     private LinkedHashMap<String, String> getPlace(JSONObject jPlace,int placenumber) {
 
         LinkedHashMap<String, String> place = new LinkedHashMap<String, String>();
@@ -139,7 +143,12 @@ public class DataParser {
             if (!jPlace.isNull("vicinity")) {
                 vicinity = jPlace.getString("vicinity");
             }
-            Log.d(TAG, "Testing " );
+
+
+
+
+
+
 try {
     if (jPlace.getJSONArray("photos").getJSONObject(0).getString("photo_reference") != null) {
         int i=jPlace.getJSONArray("photos").length();

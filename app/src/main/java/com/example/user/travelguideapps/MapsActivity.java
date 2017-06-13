@@ -1,9 +1,6 @@
 package com.example.user.travelguideapps;
 
 import android.Manifest;
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -21,26 +18,35 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.appyvet.rangebar.RangeBar;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
@@ -63,6 +69,8 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.hrules.horizontalnumberpicker.HorizontalNumberPicker;
 
+import net.cachapa.expandablelayout.ExpandableLayout;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -75,6 +83,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Vector;
+
+import layout.Location_RecyclerView;
+import layout.Location_RecyclerView_2;
 
 import static com.example.user.travelguideapps.R.id.map;
 
@@ -93,52 +105,206 @@ import static com.example.user.travelguideapps.R.id.map;
 //TODO:prevent same location to be set? (Also, change set to place -> Uncheck etc
 //TODO: that freakin disable View Details from other listview item  problem........ (And Checked listview
 
+
+
 public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener {
     private static final String TAG = "tag";
-    ArrayList<LatLng> markerPoints;
+    static ArrayList<LatLng> markerPoints;
     private static final String TAG_HOME = "home";
     public static String CURRENT_TAG = TAG_HOME;
     public static int navItemIndex = 0;
     private FloatingActionButton fab;
     private Handler mHandler;
-    private ListView listView;
-    private String LocationType = "bar";
+    private RecyclerView recyclerView;
+    private StringBuilder LocationType;
     private View mProgressView;
     private View mMapFormView;
     private View horizontal_scroll_view;
+    private  View fragmentpoilist;
+    private   ViewPager pager;
+    private FragmentPagerAdapter recycleadapter;
 
-    private TextView mDurationView;
-    private TextView mDistanceView;
-    private LocationListViewAdapter Locationadapter;
-    private ArrayList Waypoint = new ArrayList();
-    private Boolean newcolor=false;
+
+
+    private static TextView mDurationView;
+    private static TextView mDistanceView;
+    private LocationListRecyclerViewAdapter Locationadapter;
+    private static ArrayList Waypoint = new ArrayList();
+    private static Boolean newcolor=false;
 private HorizontalNumberPicker numberpicker;
-private Location CurrentLocation=BaseActivity.getCurrentLocation();
+private static Location CurrentLocation=BaseActivity.getCurrentLocation();
+    private int minpriceint=-1;
+    private int maxpriceint =-1;
+
+    private static Polyline TempPoly;
+    private static List<LinkedHashMap<String, String>> nearbyPlacesList;
+    private static ArrayList<LinkedHashMap<String, String>> WayPointDetailsList=new ArrayList<LinkedHashMap<String, String>>();
 
 
-    private Polyline TempPoly;
-    List<LinkedHashMap<String, String>> nearbyPlacesList = null;
-    ProgressDialog pd;
+
+    static ProgressDialog pd;
+
 
     int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
-    private GoogleMap mMap;
+    private static GoogleMap mMap;
     LocationRequest mLocationRequest = new LocationRequest();
-    ArrayList<Marker> mapMarkers;
+    static ArrayList<Marker> mapMarkers;
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "cccccccccccYep");
+        //to get waypoints and save it
+        String b = DataHolderClass.getInstance().getDistributor_id();
+        //Getting args from others and insert it into waypoints...
+        // Update the second listview and remove/ chcked first listview?
+       // Bundle b= this.getArguments();
+//Check if later can use for the system
+
+
+
 
         fa = super.getActivity();
-        view = (ConstraintLayout) inflater.inflate(R.layout.activity_maps, container, false);
-        Log.d(TAG, "ccccccccccc"+view);
-        pd = new ProgressDialog(getActivity());
+//        if(view==null) {
+//            //Needed to allow popback...... need to check if there is any other problems... Yup has problem(need to fully destro it?
+//
+//            view = (ConstraintLayout) inflater.inflate(R.layout.activity_maps, container, false);
+//        }
+        if (view != null) {
+            ViewGroup parent = (ViewGroup) view.getParent();
+            if (parent != null)
+                parent.removeView(view);
+        }
+
+        try {
+            view = (ConstraintLayout)  inflater.inflate(R.layout.activity_maps, container, false);
+        } catch (InflateException e) {
+    /* map is already there, just return view as it is */
+
+            Log.d(TAG, "cccccccccccYep"+e);
+
+        }
+      //  Log.d(TAG, "ccccccccccc"+view);
+
+//There seems to be no point setting this locationadapter....... it is setted in location_RecyclerView..java
+       // Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
+
+        fragmentpoilist = (ConstraintLayout)  inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
+
+
+      //  recyclerView.setAdapter(Locationadapter);
+
+
+        if (b != null) {
+            //TODO:this currenyly only add waypoint, tryb remove it
+//b is waypoint placeid string
+
+          String isselected=  DataHolderClass.getInstance2().getDistributor_id2();
+            Log.d(TAG, "cccccccccccYAY"+isselected);
+
+            if(isselected=="isselected"){
+                Log.d(TAG, "cccccccccccYAYremoved");
+
+Waypoint.remove(b);
+                for(int i=0;i<WayPointDetailsList.size();i++) {
+                    LinkedHashMap<String,String>s=   WayPointDetailsList.get(i);
+                    Log.d(TAG, "cccccyay waydetails removed"+s);
+                    Log.d(TAG, "cccccyay waydetails removed"+b);
+
+if (s.containsValue(b)){
+    WayPointDetailsList.remove(i);
+    Log.d(TAG, "cccccyay waydetails removed");
+
+}
+
+                }
+}else {
+                Log.d(TAG, "cccccccccccYAYadded");
+                String returnedwaypointdetails="";
+                try {
+                    returnedwaypointdetails=   downloadUrl("https://maps.googleapis.com/maps/api/place/details/json?placeid="+b+"&key" +
+                            "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                DataParser dataParser=new DataParser();
+                try {
+                    WayPointDetailsList.add(dataParser.parse(returnedwaypointdetails).get(0));
+
+                }catch(Exception e){
+
+                    Toast.makeText(getActivity(), "Server is busy, Please try again!", Toast.LENGTH_SHORT).show();
+
+                }
+
+                Log.d(TAG, "WayPointDetailsListCHeckiiiing"+WayPointDetailsList.toString());
+    Waypoint.add(b);
+
+}
+            Toast.makeText(getActivity(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
+            //Use these waypoints to change all marker.
+
+
+
+if(!Waypoint.isEmpty()) {
+    //This draws path when returning to page
+    LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
+    String url = getDirectionsUrl(latlng, null);
+
+    DownloadTask downloadTask = new DownloadTask();
+    Log.d(TAG, "THE URL is IS 1st" + url);
+
+    // Start downloading json data from Google Directions API
+    downloadTask.execute(url);
+
+}
+        }
+        pager = (ViewPager) view.findViewById(R.id.vpPagerpoilist);
+
+        //TODO:has changed to child, use support if problem persist?
+        recycleadapter=new MyPagerAdapter(getChildFragmentManager());
+        pager.setAdapter(recycleadapter);
         pd.setMessage("Loading Path...");
         pd.setCancelable(false);
         numberpicker=(HorizontalNumberPicker)view.findViewById(R.id.radiusPicker);
         numberpicker.setMaxValue(10);
         numberpicker.setMinValue(1);
-        numberpicker.setValue(1);
+        numberpicker.setValue(5);
 
 
+
+        final ExpandableLayout expandableLayout
+                = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+        Button categories_expandable_layout=(Button)view.findViewById(R.id.opensetting);
+        //TODO:Not sure fixed or not
+     //    LinearLayout linearLayout = (LinearLayout)  view.findViewById(R.id.linearLayout);
+   //    final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) linearLayout.getLayoutParams();
+
+
+        categories_expandable_layout.setOnClickListener(new View.OnClickListener() {
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    @Override
+    public void onClick(View v) {
+
+        expandableLayout.toggle();
+        if (expandableLayout.isExpanded()) {
+     //       lp.verticalWeight = 1;
+        }else{
+          //  lp.verticalWeight = 2;
+        }
+    }
+});
+
+
+        RangeBar pricerangebar=(RangeBar) view.findViewById(R.id.pricerangebar);
+
+        pricerangebar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
+                                              int rightPinIndex,
+                                              String leftPinValue, String rightPinValue) {
+                minpriceint =leftPinIndex;
+                maxpriceint =rightPinIndex;
+                Log.d("checkrange",leftPinValue+rightPinValue);
+
+            }
+        });
 
 
 
@@ -167,7 +333,6 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
 //        }
 
 
-
         //   setContentView(R.layout.activity_maps);
         markerPoints = new ArrayList<LatLng>();
 //        LayoutInflater inflater = (LayoutInflater) this
@@ -183,7 +348,6 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
         // AutoCompleteTextView from = (AutoCompleteTextView) v.findViewById(R.id.from);
         //   AutoCompleteTextView to = (AutoCompleteTextView) v.findViewById(R.id.to);
         Button but = (Button)  view.findViewById(R.id.load_directions);
-
         Button SearchBar = (Button)  view.findViewById(R.id.Bar);
         Button SearchBank = (Button)  view.findViewById(R.id.Bank);
         Button SearchAmusement = (Button)  view.findViewById(R.id.amusement_park);
@@ -192,7 +356,132 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
         Button SearchNightCLub = (Button)  view.findViewById(R.id.night_club);
         mDurationView = (TextView)  view.findViewById(R.id.duration_label);
         mDistanceView = (TextView)  view.findViewById(R.id.distance_label);
+        Button SelectTypes = (Button)  view.findViewById(R.id.selecttypes);
+        Button opencategories = (Button)  view.findViewById(R.id.OpenCategoriesView);
 
+
+        final ExpandableLayout expandablecategories
+                = (ExpandableLayout) view.findViewById(R.id.categories_expandable_layout);
+
+        opencategories.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                expandablecategories.toggle();
+
+
+
+            }
+        });
+
+
+
+        final CheckBox barCheckBox=(CheckBox)        view.findViewById(R.id.barCheckBox);
+        final CheckBox restaurantCheckBox=(CheckBox)        view.findViewById(R.id.restaurantCheckBox);
+        final CheckBox amusement_parkCheckBox=(CheckBox)        view.findViewById(R.id.amusement_parkCheckBox);
+
+        final CheckBox libraryCheckBox=(CheckBox)        view.findViewById(R.id.libraryCheckBox);
+        final CheckBox shopping_mallCheckBox=(CheckBox)        view.findViewById(R.id.shopping_mallCheckBox);
+
+
+
+
+
+
+//TODO:For dialogbox
+//        SelectTypes.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//
+//                android.app.FragmentManager manager = getActivity().getFragmentManager();
+//                android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
+//                if (frag != null) {
+//                    manager.beginTransaction().remove(frag).commit();
+//                }
+//                Log.d("viewid",Integer.toString(view.getId()));
+//                Toast.makeText(getActivity(), "DUUUHH!"+Integer.toString(view.getId()), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "gah!"+Integer.toString(R.id.selecttypes), Toast.LENGTH_SHORT).show();
+//
+//
+//                switch (v.getId()) {
+////                    case R.id.selecttypes:
+////                        DialogCategoriesFragment editNameDialog = new DialogCategoriesFragment();
+////                        editNameDialog.show(manager, "fragment_edit_name");
+////                        break;
+//                    case R.id.selecttypes:
+//                        AlertDialogCategories alertDialogFragment = new AlertDialogCategories();
+//                        alertDialogFragment.show(manager, "fragment_edit_name");
+//                        break;
+//                }
+//
+//
+//
+//            }
+//        });
+
+        SelectTypes.setOnClickListener(new View.OnClickListener() {
+
+                                           @Override
+                                           public void onClick(View v) {
+LocationType=new StringBuilder();
+                                               if (!DetectConnection.checkInternetConnection(getActivity())) {
+                                                   Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
+                                               } else
+
+                                               {
+                                                   newcolor=false;
+                                                   mMap.clear();
+                                               if(barCheckBox.isChecked()){
+
+                                                   LocationType.append("bar|");
+
+                                               }
+                                                   if(restaurantCheckBox.isChecked()){
+
+                                                       LocationType.append("restaurant|");
+
+                                                   }
+
+                                                   if(amusement_parkCheckBox.isChecked()){
+
+                                                       LocationType.append("amusement_park|");
+
+                                                   }
+                                                   if(shopping_mallCheckBox.isChecked()){
+
+                                                       LocationType.append("shopping_mall|");
+
+                                                   }
+                                                   if(libraryCheckBox.isChecked()){
+
+                                                       LocationType.append("library|");
+
+                                                   }
+
+                                                   try {
+                                                       if(LocationType.toString()!="") {
+                                                           setRecyclerView(LocationType);
+
+                                                       }else{
+                                                                      Toast.makeText(getActivity(), "Please Select Types", Toast.LENGTH_SHORT).show();
+
+
+                                                       }
+
+                                                   } catch (IllegalAccessException e) {
+                                                       e.printStackTrace();
+                                                   } catch (java.lang.InstantiationException e) {
+                                                       e.printStackTrace();
+                                                   }
+                                               }
+
+
+
+
+
+                                           }
+                                       });
 
         SearchBar.setOnClickListener(onClickListener);
         SearchBank.setOnClickListener(onClickListener);
@@ -206,22 +495,43 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
         //  from.setText("Google is your friend.", TextView.BufferType.EDITABLE);
 
 
-        listView = (ListView)  view.findViewById(R.id.poilist);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 
-        final TextView emptyText = (TextView)  view.findViewById(android.R.id.empty);
-        listView.setEmptyView(emptyText);
+
+    //    nearbyPlacesList=  new ArrayList<LinkedHashMap<String, String>>();
+
+   //     Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
+
+    //   recyclerView.setAdapter(Locationadapter);
+
+
+         TextView emptyText = (TextView)  view.findViewById(android.R.id.empty);
+     //   recyclerView.setEmptyView(emptyText);
         // FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+       // Log.d("checkrange","qqqqqq"+emptyText.getText());
 
 
-        //Todo: Currently doing this
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        //TODO:uh what is this.
+     //   Vector<View> pages = new Vector<View>();
+       // pages.add(recyclerView);
+
+   //     pages.add(recyclerView);
+
+
+
+
+
+
+
+//Todo: Currently doing this.... error try filtering itemss first
+//        recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position,long arg3) {
 //                view.setSelected(true);
 //
 //
-//                Object itemobj =(listView.getItemAtPosition(position).toString());
+//                Object itemobj =(recyclerView.getItemAtPosition(position).toString());
 //                Toast.makeText(getApplicationContext(), itemobj.toString(), Toast.LENGTH_SHORT).show();
 //                Log.d(TAG, "abcdef checking for onoitem");
 //
@@ -230,76 +540,76 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
 //            }
 //        });
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-//TODO:Figure out how to reset others items
-
-
-//                listView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+//        recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //
-//                    @Override
-//                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int
-// oldBottom) {
-//                        listView.removeOnLayoutChangeListener(this);
-//                        Log.e(TAG, "updated");
+////TODO:Figure out how to reset others items
+//
+////                recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+////
+////                    @Override
+////                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int
+//// oldBottom) {
+////                        recyclerView.removeOnLayoutChangeListener(this);
+////                        Log.e(TAG, "updated");
+////                    }
+////                });
+////                Locationadapter.notifyDataSetChanged();
+//
+////TODO: Delete others's buttons
+////                for (int i = recyclerView.getCount() - 1; i >= 0; i--) {
+////
+////                    Button b=(Button)    view.findViewById(R.id.details_btn);
+////
+////                    b.setVisibility(View.GONE);
+////
+////
+////                }
+////               Button d=(Button) parent.findViewById(R.id.details_btn);
+////
+////                d.setVisibility(View.GONE);
+//                HashMap<String, Object> obj = (HashMap<String, Object>) recyclerView.getItemAtPosition(position);
+//                String lat = (String) obj.get("lat");
+//                String lng = (String) obj.get("lng");
+//                //TODO: the "Selected" refresh when finish loading / Check if Focused on item how to do "somthing"
+//
+//
+//
+//                view.setSelected(true);
+//
+//
+//
+//
+//                Button b = (Button) view.findViewById(R.id.details_btn);
+//                b.setVisibility(View.VISIBLE);
+//
+//
+//
+//
+//
+//
+//                Log.d("Yourtag", lat);
+//                //  Toast.makeText(getApplicationContext(), lat.toString(), Toast.LENGTH_SHORT).show();
+//                LatLng latlng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
+//                Marker result = null;
+//                //For each marker in the map...where the lat equals to the lat provided by the listview
+//                for (Marker c : mapMarkers) {
+//                    Log.d("Well", String.valueOf(c.getPosition().latitude));
+//
+//                    if (lat.equals(String.valueOf(c.getPosition().latitude)) && lng.equals(String.valueOf(c.getPosition().longitude))) {
+//                        Log.d("Its done ", lat);
+//                        showPath(c);
+//                        result = c;
+//                        //This should not be here... showpath is already up there.
+//                        //       mMap.moveCamera(CameraUpdateFactory.newLatLng(latxlng));
+//                        //      mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
+//
+//                        break;
 //                    }
-//                });
-//                Locationadapter.notifyDataSetChanged();
-
-//TODO: Delete others's buttons
-//                for (int i = listView.getCount() - 1; i >= 0; i--) {
-//
-//                    Button b=(Button)    view.findViewById(R.id.details_btn);
-//
-//                    b.setVisibility(View.GONE);
-//
-//
 //                }
-//               Button d=(Button) parent.findViewById(R.id.details_btn);
-//
-//                d.setVisibility(View.GONE);
-                HashMap<String, Object> obj = (HashMap<String, Object>) listView.getItemAtPosition(position);
-                String lat = (String) obj.get("lat");
-                String lng = (String) obj.get("lng");
-                //TODO: the "Selected" refresh when finish loading / Check if Focused on item how to do "somthing"
 
-
-
-                view.setSelected(true);
-
-
-
-
-                Button b = (Button) view.findViewById(R.id.details_btn);
-                b.setVisibility(View.VISIBLE);
-
-
-
-
-
-                Log.d("Yourtag", lat);
-                //  Toast.makeText(getApplicationContext(), lat.toString(), Toast.LENGTH_SHORT).show();
-                LatLng latlng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-                Marker result = null;
-                //For each marker in the map...where the lat equals to the lat provided by the listview
-                for (Marker c : mapMarkers) {
-                    Log.d("Well", String.valueOf(c.getPosition().latitude));
-
-                    if (lat.equals(String.valueOf(c.getPosition().latitude)) && lng.equals(String.valueOf(c.getPosition().longitude))) {
-                        Log.d("Its done ", lat);
-                        showPath(c);
-                        result = c;
-                        //This should not be here... showpath is already up there.
-                        //       mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));
-                        //      mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
-
-                        break;
-                    }
-                }
-
-            }
-        });
+       //     }
+   //     });
 
 
         //from.setAdapter(new LocationAutoCompleteAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line));
@@ -320,7 +630,7 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
         }
 
 
-        mMapFormView = view.findViewById(R.id.list_form);
+     //   mMapFormView = view.findViewById(R.id.list_form);
         mProgressView = view.findViewById(R.id.maps_progress);
 
         Log.d(TAG, "Visibibility checking if progess is showing" + mProgressView.getVisibility());
@@ -329,7 +639,7 @@ private Location CurrentLocation=BaseActivity.getCurrentLocation();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "Successfully Logged in");
-
+        pd = new ProgressDialog(getActivity());
         super.onCreate(savedInstanceState);
 
 
@@ -373,49 +683,84 @@ newcolor=false;
                 mMap.clear();
                 switch (v.getId()) {
                     case R.id.Bar:
-                        LocationType = "bar";
+                        //LocationType = "bar";
                         break;
                     case R.id.Bank:
-                        LocationType = "bank";
+                     //   LocationType = "bank";
                         break;
                     case R.id.amusement_park:
-                        LocationType = "amusement_park";
+                     //   LocationType = "amusement_park";
                         break;
                     case R.id.cafe:
-                        LocationType = "cafe";
+                  //      LocationType = "cafe";
                         break;
                     case R.id.casino:
-                        LocationType = "casino";
+                   //     LocationType = "casino";
                         break;
                     case R.id.night_club:
-                        LocationType = "night_club";
+                  //      LocationType = "night_club";
                         break;
                 }
-                setListView(LocationType);
+                try {
+                    setRecyclerView(LocationType);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (java.lang.InstantiationException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
     };
 
 
-    //todo: check whether to move "List" to another classes
-    private void setListView(String locationType) {
 
-        StringBuilder sbValue = new StringBuilder(sbMethod());
-        PlacesTask placesTask = new PlacesTask();
-        placesTask.execute(sbValue.toString());
-        //TODO:Find out how to add image to there
 
-        TextView emptyText = (TextView) view.findViewById(android.R.id.empty);
-        listView.setEmptyView(emptyText);
 
-        if (listView == null) {
+    //todo: check whether to move "List" to another classes (wtf i dont think locationtype is used.
+    private void setRecyclerView(StringBuilder locationType) throws IllegalAccessException, java.lang.InstantiationException {
+        try{
 
-            Log.d(TAG, "Listview is null");
+             StringBuilder sbValue = new StringBuilder(nearbyListBuilder());
+
+
+
+
+
+        if(sbValue.toString()!=null) {
+
+            PlacesTask placesTask = new PlacesTask();
+            placesTask.execute(sbValue.toString());
+
+            recycleadapter.notifyDataSetChanged();
+
+}else{
+// Temporary solution, make sure it does not (to refesth the page) Note:(Probably fixed but not sure)
+
+    Toast.makeText(getActivity(), "Some Error has occured, please try again later 1!", Toast.LENGTH_LONG).show();
+    Fragment fragment = null;
+    Class fragmentClass=null;
+    fragmentClass = MapsActivity.class;
+
+    fragment = (Fragment) fragmentClass.newInstance();
+    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+    fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
+
+
+}
+    }catch(Exception e){
+
+            Toast.makeText(getActivity(), "Exception:"+e.toString(), Toast.LENGTH_LONG).show();
+            Fragment fragment = null;
+            Class fragmentClass=null;
+            fragmentClass = MapsActivity.class;
+
+            fragment = (Fragment) fragmentClass.newInstance();
+            FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
+
 
         }
-
-
     }
     //Uses for text sizes in Marker
     public static int convertToPixels(Context context, int nDP)
@@ -459,10 +804,51 @@ newcolor=false;
         return  bm;
     }
 
-    //TODO:Currently Doing this, try to do a if else for 1 marker (select list)? or multiple marker
-    private void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
+    public static ArrayList<Marker> getMapMarkers(){
+        if (mapMarkers!=null) {
+            Log.d("onPostExecute", "markeristhisnow2");
+
+            return mapMarkers;
+        }else{
+
+            Log.d("onPostExecute", "markeristhisnow1");
+
+            return null;
+        }
+    }
+public static List<LinkedHashMap<String, String>> getNearbyPlacesList(){
 
 
+
+    return nearbyPlacesList;
+}
+
+    public static ArrayList<LinkedHashMap<String, String>> getWayPointDetailsList(){
+
+
+
+        return WayPointDetailsList;
+    }
+    public static ArrayList getWaypoint(){
+
+
+
+        return Waypoint;
+    }
+
+
+    public void setNearbyPlacesList(List<LinkedHashMap<String, String>> nearbyPlacesListFrom){
+
+        nearbyPlacesList=nearbyPlacesListFrom;
+
+    }
+      //TODO:Currently Doing this, try to do a if else for 1 marker (select list)? or multiple marker
+     private void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
+
+
+
+        //To let others get it
+        setNearbyPlacesList(nearbyPlacesList);
 
 
         mapMarkers = new ArrayList<Marker>();
@@ -496,8 +882,14 @@ newcolor=false;
 
 
             mapMarkers.add(mMap.addMarker(markerOptions));
+
+
+
             mMap.addMarker(markerOptions);
+            Log.d(TAG, "CheckinggggggggggggmarkerOptions 2" + markerOptions);
+
             //Default
+            Log.d("onPostExecute", "markeristhis" + mapMarkers.toString());
 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (Marker marker : mapMarkers) {
@@ -516,6 +908,11 @@ newcolor=false;
         //    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
          //   mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
         }
+
+
+        Log.d("onPostExecute", "markeristhisoutside" + getMapMarkers().toString());
+
+
     }
 
 
@@ -548,51 +945,63 @@ newcolor=false;
                     MY_PERMISSION_ACCESS_COURSE_LOCATION);
         }
 
+
+
+
+        //Top right symbol
         mMap.setMyLocationEnabled(true);
-        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker) {
-                DetectConnection check = new DetectConnection();
-                if (!DetectConnection.checkInternetConnection(getActivity())) {
-                    Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
-                    return false;
-                } else {
 
-                    Log.d("onMarkerCLick", marker.toString());
-                    ArrayList<View> children = new ArrayList<View>();
 
-                    for (int i = listView.getCount() - 1; i >= 0; i--) {
-                        HashMap<String, Object> obj = (HashMap<String, Object>) listView.getItemAtPosition(i);
 
-                        String lat = (String) obj.get("lat");
-                        String lng = (String) obj.get("lng");
-                        listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-                        //TODO : Highlight item when marker is clicked.
-                        if (lat.equals(String.valueOf(marker.getPosition().latitude)) && lng.equals(String.valueOf(marker.getPosition().longitude))) {
 
-                            listView.setItemChecked(i, true);
-                            //  listView.setSelection(i);
-                            listView.smoothScrollToPosition(i);
-                            break;
-                        }
-                        children.add(listView.getChildAt(i));
-                    }
-                    showPath(marker);
-                    //
-                    return true;
-                }
-            }
-        });
+//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+//            @Override
+//            public boolean onMarkerClick(Marker marker) {
+//                DetectConnection check = new DetectConnection();
+//                if (!DetectConnection.checkInternetConnection(getActivity())) {
+//                    Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
+//                    return false;
+//                } else {
+//
+//                    Log.d("onMarkerCLick", marker.toString());
+//                    ArrayList<View> children = new ArrayList<View>();
+//
+//                    for (int i = recyclerView.getItemCount() - 1; i >= 0; i--) {
+//                        HashMap<String, Object> obj = (HashMap<String, Object>) recyclerView.getItemAtPosition(i);
+//
+//                        String lat = (String) obj.get("lat");
+//                        String lng = (String) obj.get("lng");
+//                        recyclerView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+//                        //TODO : Highlight item when marker is clicked.
+//                        if (lat.equals(String.valueOf(marker.getPosition().latitude)) && lng.equals(String.valueOf(marker.getPosition().longitude))) {
+//
+//                            recyclerView.setItemChecked(i, true);
+//                            //  recyclerView.setSelection(i);
+//                            recyclerView.smoothScrollToPosition(i);
+//                            break;
+//                        }
+//                        children.add(recyclerView.getChildAt(i));
+//                    }
+//                    showPath(marker);
+//                    //
+//                    return true;
+//                }
+//            }
+//        });
 
     }
+private static Marker placeholdermarker;
 
     //TODO:How to use : different colour marker/path, retain 2 different path.
     //Done when item in listview is clicked
     //Also when marker is clicked
-    private void showPath(Marker marker) {
+    public static void showPath(Marker marker) {
 
-        Log.d(TAG, "showpath" + marker);
-        Log.d(TAG, "mapmarkers" + mapMarkers);
+
+        Log.d(TAG, "Checkinggggggggggggmarker" + marker);
+        Log.d(TAG, "Checkinggggggggggggmapmarkwrs" + mapMarkers);
+
+
 
 
         marker.showInfoWindow();
@@ -621,23 +1030,29 @@ newcolor=false;
 
         LatLng origin = markerPoints.get(0);
         LatLng dest = markerPoints.get(1);
-        MarkerOptions options = new MarkerOptions();
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
+        LatLngBounds bounds;
         for (Marker c : mapMarkers) {
             Log.d(TAG, "Ismapmarker  " );
-            builder.include(c.getPosition());
+            //builder.include(c.getPosition());
 
             if (dest.latitude==c.getPosition().latitude && dest.longitude==c.getPosition().longitude){
                 c.remove();
                 Log.d(TAG, "Ismapmarkerrunning  " );
+                builder.include(marker.getPosition());
+
+
+
                 //break causes for to not run completely, need to change that to show all waypotinst/markers
                //    break;
             }
         }
 
+        builder.include(currentLatlng);
+        bounds = builder.build();
 
-        LatLngBounds bounds = builder.build();
+
+
         int padding = 150; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
 
@@ -651,6 +1066,22 @@ newcolor=false;
 
         mMap.addMarker(markerOptions);
         //Default
+        Log.d(TAG, "CheckinggggggggggggmarkerOptions 1" + markerOptions);
+
+        if(placeholdermarker!=null) {
+            Log.d(TAG, "Checkingggggggggggg" + placeholdermarker.toString());
+            placeholdermarker.remove();
+            //TODO: Check how to remove the placeholdermarker....
+
+            placeholdermarker.remove();
+
+
+
+
+        }
+        placeholdermarker=marker;
+
+
 
         //move map camera
      //   mMap.moveCamera(CameraUpdateFactory.newLatLng(dest));
@@ -659,50 +1090,49 @@ newcolor=false;
         String url = getDirectionsUrl(origin, dest);
 //Doing this, should... easiest way is to get a variable here to change color...
         DownloadTask downloadTask = new DownloadTask();
-        Log.d(TAG, "THE URL is  IS " + url);
+        Log.d(TAG, "THE URL is  IS ...2nd " + url);
 newcolor=true;
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
 
 
     }
-
-
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
-    private void showProgress(final boolean show) {
-        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
-        // for very easy animations. If available, use these APIs to fade-in
-        // the progress spinner.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
-            Log.d(TAG, "Progress bar ");
-
-            mMapFormView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
-            mMapFormView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mMapFormView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
-                    Log.d(TAG, "Progress 2");
-
-                }
-            });
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mProgressView.animate().setDuration(shortAnimTime).alpha(
-                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-                }
-            });
-        } else {
-
-            // The ViewPropertyAnimator APIs are not available, so simply show
-            // and hide the relevant UI components.
-            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mMapFormView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
-        }
-    }
+    //Replaced with progress dialog ....**********
+//    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
+//    private void showProgress(final boolean show) {
+//        // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
+//        // for very easy animations. If available, use these APIs to fade-in
+//        // the progress spinner.
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+//            int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
+//            Log.d(TAG, "Progress bar ");
+//
+//            mMapFormView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+//            mMapFormView.animate().setDuration(shortAnimTime).alpha(
+//                    show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    mMapFormView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+//                    Log.d(TAG, "Progress 2");
+//
+//                }
+//            });
+//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+//            mProgressView.animate().setDuration(shortAnimTime).alpha(
+//                    show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+//                @Override
+//                public void onAnimationEnd(Animator animation) {
+//                    mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+//                }
+//            });
+//        } else {
+//
+//            // The ViewPropertyAnimator APIs are not available, so simply show
+//            // and hide the relevant UI components.
+//            mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+//            mMapFormView.setVisibility(show ? View.INVISIBLE : View.VISIBLE);
+//        }
+//    }
 
     //Pressed twice to quit
 //    boolean doubleBackToExitPressedOnce = false;
@@ -728,7 +1158,7 @@ newcolor=true;
 //    }
 
 
-    private String getDirectionsUrl(LatLng origin, LatLng dest) {
+    private static String getDirectionsUrl(LatLng origin, LatLng dest) {
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -837,7 +1267,7 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
     //Path Searching
     //Download URL ?
     //change to public for access from placedetail activity
-    public class DownloadTask extends AsyncTask<String, Void, String> {
+    public static class DownloadTask extends AsyncTask<String, Void, String> {
         protected void onPreExecute() {
             //set message of the dialog
             //show dialog
@@ -875,12 +1305,29 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
             ParserTask parserTask = new ParserTask();
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
+            Log.d("PTRESULTAFter", result);
+if(pd.isShowing()){
+
+    Log.d("PTRESULTAFte3nd", result);
+
+
+}
             pd.dismiss();
+            Log.d("PTRESULTAFte2nd", result);
+
         }
 
 
     }
-
+    //TODO: Use this in all ?
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage ( Message message )
+        {
+            pd.dismiss();
+        }
+    };
     /**
      * A class to parse the Google Places in JSON format
      */
@@ -965,7 +1412,7 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
     private int testing;
 
     //Click Marker and find path?
-    private class ParserTask extends AsyncTask<String, Integer, List<List<LinkedHashMap<String, String>>>> {
+    private static class ParserTask extends AsyncTask<String, Integer, List<List<LinkedHashMap<String, String>>>> {
 
         // Parsing the data in non-ui thread
         @Override
@@ -1052,7 +1499,7 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
                 mDistanceView.setText("Distance= " + distance);
                 mDurationView.setText("Duration= " + duration);
 
-                Log.d("onPostExecute", "onPostExecute lineoptions decoded");
+                Log.d("onPostExecute", "onPostExecute lineoptions decoded"+lineOptions);
             }
 
             // Drawing polyline in the Google Map for the i-th route
@@ -1067,8 +1514,8 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
         }
     }
 //Originally private, change it to public so LocationDetailsActivity can access it
-
-    private String downloadUrl(String strUrl) throws IOException {
+//Any url can be insert here and will return different kind of data
+    private static String downloadUrl(String strUrl) throws IOException {
         Log.d(TAG, "checkifone");
 
         String data = "";
@@ -1118,7 +1565,8 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
         } catch (Exception e) {
             Log.d("Exception url", e.toString());
         } finally {
-            iStream.close();
+            if(iStream!=null){
+            iStream.close();}
             urlConnection.disconnect();
         }
         return data;
@@ -1168,7 +1616,6 @@ getChildFragmentManager();
         if (mPendingRunnable != null) {
             mHandler.post(mPendingRunnable);
         }
-
         // show or hide the fab button
 
         //Closing drawer on item click
@@ -1199,37 +1646,63 @@ getChildFragmentManager();
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
 
 
-    public StringBuilder sbMethod() {
 
+    public StringBuilder nearbyListBuilder() {
+        //TODO:probably fixed... location null
         Location location = CurrentLocation;
 
-        Log.d("Map", "Locationnow=" + location);
-
         try {
-            //use your current location here
-            double mLatitude = location.getLatitude();
-            double mLongitude = location.getLongitude();
+            if (location!=null) {
+                //use your current location here
+                double mLatitude = location.getLatitude();
+                double mLongitude = location.getLongitude();
 
-            StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-            sb.append("location=" + mLatitude + "," + mLongitude);
-            //TODO: Set radius to be controllable
+                StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
+                sb.append("location=" + mLatitude + "," + mLongitude);
+                //TODO: Set radius to be controllable
 
-            int radius= numberpicker.getValue();
-            radius=radius *1000;
-            Log.d("CheckBit",numberpicker.toString());
-           // sb.append("&radius=5000");
+//Yep not using now.
 
-            sb.append("&radius="+Integer.toString(radius));
-            sb.append("&types=" + LocationType);
-            sb.append("&sensor=true");
-            sb.append("&key=AIzaSyDkIa12Y9nXORou_xCnwS09K53kbJabKHo");
-            ;
-            Log.d("Map", "api: " + sb.toString());
 
-            return sb;
+                int radius = numberpicker.getValue();
+                radius = radius * 1000;
+                Log.d("CheckBit", numberpicker.toString());
+                Log.d("CheckBit","1111111111111111");
+                LocationType.deleteCharAt(LocationType.length()-1);
+                Log.d("CheckBit","222gagag  2");
+
+                // sb.append("&radius=5000");
+                //Todo: figure out how to support multiple types (location)..........
+                sb.append("&radius=" + Integer.toString(radius));
+
+                sb.append("&types=" +LocationType);
+
+                //if -1 then anything.....TODO:problem of price cannot detect
+                if (minpriceint == 0) {
+                    minpriceint = -1;
+
+                }
+                if (maxpriceint == 4) {
+                    maxpriceint = -1;
+
+                }
+
+
+
+                sb.append("&minprice=" + minpriceint + "&maxprice=" + maxpriceint);
+                sb.append("&sensor=true");
+                sb.append("&key=AIzaSyDkIa12Y9nXORou_xCnwS09K53kbJabKHo");
+                ;
+                Log.d("Map", "api: " + sb.toString());
+
+                return sb;
+            }else{
+
+                return  null;
+            }
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Fail");
-            Log.d("CheckBit",e.toString());
+            Log.d("CheckBit", e.toString());
 
             return sb.append("Test");
         }
@@ -1295,20 +1768,18 @@ getChildFragmentManager();
             Log.d("GooglePlacesReadTask", "theheckis" + nearbyPlacesList);
 
             //This use locationadapter to put in listview?
-            Locationadapter = new LocationListViewAdapter(getActivity(), nearbyPlacesList);
 
 
 
-            listView.setAdapter(Locationadapter);
 
 
-            Log.d("GooglePlacesReadTask", "Well SHIT" + listView.toString());
 
             ShowNearbyPlaces(nearbyPlacesList);
             Log.d("GooglePlacesReadTask", "onPostExecute Exit");
-
-
+//Search list, user choose,
+            pager.invalidate();
             pd.dismiss();
+            recycleadapter.notifyDataSetChanged();
 
             // Start parsing the Google places in JSON format
             // Invokes the "doInBackground()" method of the class ParserTask
@@ -1320,9 +1791,114 @@ getChildFragmentManager();
 
 
     // Executed after the complete execution of doInBackground() method
-    private ConstraintLayout view;
+    public static ConstraintLayout view;
     private FragmentActivity fa;
 
+
+
+
+    public class CustomPagerAdapter extends PagerAdapter {
+
+        private Context mContext;
+        private Vector<View> pages;
+
+        public CustomPagerAdapter(Context context, Vector<View> pages) {
+            Log.d(TAG, "endhere1");
+
+            this.mContext=context;
+            this.pages=pages;
+        }
+
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Log.d(TAG, "endhere2a");
+
+            View page = pages.get(position);
+            container.addView(page);
+            Log.d(TAG, "endhere2b");
+
+            return page;
+        }
+
+        @Override
+        public int getCount() {
+            Log.d(TAG, "endhere3");
+
+            return pages.size();
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object object) {
+            Log.d(TAG, "endhere4");
+
+            return view.equals(object);
+        }
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            Log.d(TAG, "endhere5");
+
+            container.removeView((View) object);
+        }
+
+    }
+    private class MyPagerAdapter extends FragmentPagerAdapter {
+
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+            Log.d(TAG, "Dujjjjjjjcalled super");
+
+        }
+
+        @Override
+        public Fragment getItem(int pos) {
+            Log.d(TAG, "Dujjjjjjjcalled 2nd time....1");
+
+            switch(pos) {
+
+                case 0: return Location_RecyclerView.newInstance("FirstFragment","Ok yupe");
+                case 1: return Location_RecyclerView_2.newInstance("SecondFragment"," Instance 1");
+             //   case 2: return ThirdFragment.newInstance("ThirdFragment, Instance 1");
+         //       case 3: return ThirdFragment.newInstance("ThirdFragment, Instance 2");
+           //     case 4: return ThirdFragment.newInstance("ThirdFragment, Instance 3");
+                default: return Location_RecyclerView.newInstance("FirstFragmen","Ok yupe");
+
+
+            }
+        }
+
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            String title = null;
+            if (position == 0)
+            {
+                title = "Available Location";
+            }
+            else if (position == 1)
+            {
+                title = "Selected Location";
+            }
+
+            return title;
+        }
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemPosition(Object object){
+
+            Log.d(TAG, "DujjjjjjjRefresh....1");
+
+            Log.d(TAG, "DujjjjjjjRefresh....2");
+
+            return POSITION_NONE;
+        }
+
+
+    }
 
 
 }

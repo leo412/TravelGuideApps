@@ -10,7 +10,80 @@
     tools:context="com.example.user.travelguideapps.LocationDetailsActivity"
     tools:showIn="@layout/activity_place_details">
 
+
+    <Button
+        android:id="@+id/removeLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/cast_intro_overlay_button_background_color"
+        android:text="Remove this location"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
+
+    <Button
+        android:id="@+id/addLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
+        android:background="@color/cast_intro_overlay_button_background_color"
+        android:text="Add this location"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1"/>
+
+
+    <TextView
+        android:id="@+id/textViewPlaceName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_orange_light"
+        android:fontFamily="casual"
+        android:text="Place Name"
+
+
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:visibility="visible"
+        app:layout_constraintTop_toBottomOf="@+id/HorizontalScrollPhoto"
+        app:layout_gravity="fill_horizontal"
+        tools:layout_editor_absoluteX="0dp"/>
+
+    <TextView
+        android:id="@+id/textViewAddressText"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPlaceName"
+
+        android:background="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
+        android:text="Address"
+        tools:layout_editor_absoluteX="8dp"/>
+
+    <TextView
+        android:id="@+id/textViewAdress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+app:layout_constraintTop_toBottomOf="@+id/textViewAddressText"
+        android:text="Place Address "
+        android:textColor="?android:textColorSecondary"
+        android:visibility="visible"
+        app:layout_gravity="fill_horizontal"
+        tools:layout_editor_absoluteX="0dp"/>
+
     <HorizontalScrollView
+        android:id="@+id/HorizontalScrollPhoto"
+
         android:layout_width="wrap_content"
         android:layout_height="150dp"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -19,7 +92,7 @@
         tools:layout_constraintTop_creator="1">
 
 
-        <android.support.v7.widget.RecyclerView
+            <android.support.v7.widget.RecyclerView
             android:id="@+id/recycleviewphoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -31,90 +104,5 @@
 
 
     </HorizontalScrollView>
-
-    <LinearLayout
-        android:id="@+id/content_place_details"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="150dp"
-        android:orientation="vertical"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"
-        tools:layout_constraintTop_creator="1">
-
-
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:minHeight="176dp">
-
-                <TextView
-                    android:id="@+id/place_location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Place Address "
-                    android:textColor="?android:textColorSecondary"
-
-                    android:visibility="visible"
-                    app:layout_gravity="fill_horizontal"
-                    android:layout_below="@+id/textView3"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
-                    android:text="Address"
-                    android:layout_marginTop="11dp"
-                    android:layout_below="@+id/details_place_name"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
-
-                <TextView
-                    android:id="@+id/details_place_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Place Name"
-                    android:textColor="?android:textColorSecondary"
-                    android:visibility="visible"
-
-                    app:layout_gravity="fill_horizontal"
-                    android:layout_below="@+id/textView2"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"/>
-
-                <TextView
-                    android:id="@+id/textView2"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_alignParentTop="true"
-                    android:text="You have selected"
-                    tools:background="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"/>
-            </RelativeLayout>
-
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/setplacebutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:background="@color/cast_intro_overlay_button_background_color"
-        android:text="Set this place"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        tools:layout_constraintBottom_creator="1"
-        tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintRight_creator="1"/>
 
 </android.support.constraint.ConstraintLayout>

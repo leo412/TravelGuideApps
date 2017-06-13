@@ -31,6 +31,10 @@ public class MainMenuActivityFragment extends Fragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+       //       DrawerLayout  drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
+
+        //      FrameLayout  flContent = (FrameLayout) drawer.findViewById(R.id.flContent2);
+
 
                 Log.d("BaserActivity", "lakslu ");
 

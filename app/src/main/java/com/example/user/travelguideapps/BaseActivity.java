@@ -37,9 +37,13 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 
-public class BaseActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener
+import java.util.ArrayList;
+
+public class BaseActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener, NavigationView.OnNavigationItemSelectedListener
         {
-    private DrawerLayout drawer;
+            ArrayList place_idarray;
+
+            private DrawerLayout drawer;
     private Toolbar toolbar;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
@@ -48,7 +52,7 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
             private LocationManager locationManager;
             private String provider;
             private static Location CurrentLocation;
-
+        private    FrameLayout flContent;
             private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +95,8 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
 
                 drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
 
-
-
                 //flComtent 2 is in content_base
-                FrameLayout flContent = (FrameLayout) drawer.findViewById(R.id.flContent2);
+                 flContent = (FrameLayout) drawer.findViewById(R.id.flContent2);
 
                 getLayoutInflater().inflate(layoutResID, flContent, true);
 
@@ -104,7 +106,12 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
                 setSupportActionBar(toolbar);
                 setTitle("Activity Title");
                 navigationView = (NavigationView) findViewById(R.id.nav_view);
-                setupDrawerContent(navigationView);
+                if (navigationView != null) {
+
+                    Log.d("BaseActivity", "navigaterun");
+
+                    setupDrawerContent(navigationView);
+                }
                 Log.d("BaserActivity", "diditrun");
 
                 final ActionBar actionBar = getSupportActionBar();
@@ -155,12 +162,11 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private void setupDrawerContent(NavigationView navigationView) {
 
-
-
     navigationView.setNavigationItemSelectedListener(
             new NavigationView.OnNavigationItemSelectedListener() {
                 @Override
                 public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    Log.d("BaseActivity","navigaterunsetnavi");
 
                     selectDrawerItem(menuItem);
                     return true;
@@ -170,6 +176,12 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
+             @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+                selectDrawerItem(menuItem);
+                return true;
+            }
             public void selectDrawerItem(MenuItem menuItem) {
                 Log.d("BaserActivity", "isentercase1");
 
@@ -209,6 +221,10 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
 if (fragmentClass!=null) {
     // Insert the fragment by replacing any existing fragment
+        //...Its after calling that it will overlap, wtf?
+    //TODO: this probably is not really good since it required Views to be restart everytime...?
+//Usinf remove all views just destroy  ability to go back
+   // flContent.removeAllViews();
     FragmentManager fragmentManager = getSupportFragmentManager();
     fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 }
@@ -219,8 +235,17 @@ if (fragmentClass!=null) {
                 // Close the navigation drawer
                 drawer.closeDrawers();
             }
+            //TODO: uhhhh i dont think these things are being used....
+        public void setPlace_id(ArrayList a){
+            Log.d("BASE", "uhhhhhhhfirstsetplace"+a+"andalso"+place_idarray);
 
+    place_idarray=a;
+        }
+            public ArrayList getPlace_id(){
+                Log.d("BASE", "uhhhhhhhfirstgetplace"+place_idarray);
 
+            return place_idarray;
+            }
 
 //
 //    @Override
@@ -306,14 +331,22 @@ if (fragmentClass!=null) {
                         android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                 }
+                try {
                     //   CurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
                     LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+                    Log.d("BaseActivity", "Yerp. updating... ");
+
+                }catch (Exception e){
+
+                    Log.d("BaseActivity", "requestLocationUpdateError"+e);
+
+
+                }
 
 
 
-
-                //    CurrentLocation=fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
-                // Location location = locationManager.getLastKnownLocation(provider);
+                    CurrentLocation=fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
+              //   Location location = locationManager.getLastKnownLocation(provider);
             }
 
             @Override
@@ -330,6 +363,8 @@ if (fragmentClass!=null) {
 
             @Override
             public void onLocationChanged(Location location) {
+                Log.d("BaseActivity", "OnLocationChanged");
+
                 CurrentLocation=location;
 
             }

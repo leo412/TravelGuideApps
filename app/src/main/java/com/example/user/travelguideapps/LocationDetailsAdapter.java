@@ -73,9 +73,6 @@ public class LocationDetailsAdapter extends RecyclerView.Adapter<LocationDetails
         String changeddata = data.replace("[", "").replace("]", "").replace(" ", "").trim();
 //String data= Arrays.toString(mDataSource.toArray()).replace("[", "").replace("]", "").replace(" ","").trim();
         final String tested = changeddata;
-        Log.d("DetailsResult", "Diditfrea" + getItemCount());
-        Log.d("DetailsResult", "Thenumber" + i);
-        Log.d("DetailsResult", "Thenumber2" + viewHolder.getLayoutPosition());
 
 //      Picasso.with(context).load("https://maps.googleapis.com/maps/api/place/photo?photoreference="+mDataSource.get(0).toString().trim()
         //   Picasso.with(context).cancelRequest(viewHolder.imageView);
@@ -103,6 +100,13 @@ public class LocationDetailsAdapter extends RecyclerView.Adapter<LocationDetails
 
             imageView =
                     (ImageView) rowView.findViewById(R.id.list_image_horizontal);
+
+
+
+
+
+
+
         }
     }
 }

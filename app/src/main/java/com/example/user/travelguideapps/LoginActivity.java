@@ -87,7 +87,7 @@ private FrameLayout frame;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         pd = new ProgressDialog(this);
-        pd.setMessage("Logging in");
+        pd.setMessage("Logging in... ...");
         pd.setCancelable(false);
         mAuth = FirebaseAuth.getInstance();
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -116,7 +116,7 @@ private FrameLayout frame;
                 .setTitle("Delete entry")
                 .setMessage("Are you sure you want to delete this entry?");
         mPasswordView = (EditText) findViewById(R.id.password);
-
+        //TOdo:remove this when not needed/ add saved username/pass
         mEmailView.setText("leelapherng@hotmail.com");
         mPasswordView.setText("000000");
 
@@ -125,7 +125,8 @@ private FrameLayout frame;
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
                 if (id == R.id.login || id == EditorInfo.IME_NULL) {
-
+                    Log.d(TAG, "attempt login 1");
+                    //Wait when is this called?
                     attemptLogin();
                     return true;
                 }
@@ -192,6 +193,7 @@ private FrameLayout frame;
                         }
                     }else{
                         pd.show();
+                        Log.d(TAG, "attempt login 2");
 
                         //If permission is accepted.
                     attemptLogin();
@@ -341,7 +343,7 @@ private FrameLayout frame;
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void attemptLogin() {
+    private void  attemptLogin() {
         pd.show();
 
         if (mAuthTask != null) {
@@ -631,11 +633,11 @@ pd.dismiss();
                                   //  showProgress(false);
                                     pd.dismiss();
 
-                                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, BaseActivity.class));
+                                    LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainMenuActivity.class));
                                     //finish();
                                 }
                             }
-                            // ...
+                            // ..
                         }
                     })
                     .addOnFailureListener(LoginActivity.this, new OnFailureListener() {
