@@ -82,7 +82,7 @@
         android:layout_width="368dp"
         android:layout_height="wrap_content"
         map:el_duration="1000"
-        map:el_expanded="true"
+        map:el_expanded="false"
         map:el_parallax="0.5"
 
         app:layout_constraintTop_toBottomOf="@+id/map"

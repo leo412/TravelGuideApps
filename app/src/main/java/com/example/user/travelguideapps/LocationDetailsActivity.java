@@ -4,9 +4,12 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -35,24 +38,43 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import layout.*;
+
 public class LocationDetailsActivity extends Fragment{
 static String TAG="tag";
     private static TextView place_name;
+    private static TextView place_address;
+    private static TextView place_addressHere;
+    private List<LinkedHashMap<String, String>> placedetails = null;
     private View place_location;
-    private LocationDetailsAdapter pictureadapter;
+    private LocationDetailsPictureAdapter pictureadapter;
     private RecyclerView recyclerView;
+    private ViewPager pager;
+    private FragmentPagerAdapter viewpageradapter;
+    public static Button setplacebutton;
+    public static Button removeplacebutton;
+
+
+
     //CUrrently not using, see if needed anyime
- //   private LocationDetailsAdapter LocationDetailsAdapter;
+ //   private LocationDetailsPictureAdapter LocationDetailsPictureAdapter;
 //View content_place_details = findViewById(R.id.content_place_details);
     private CoordinatorLayout view;
+    private ConstraintLayout detailsview;
+
     BaseActivity b=new BaseActivity();
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = (CoordinatorLayout) inflater.inflate(R.layout.activity_place_details, container, false);
-
+        detailsview= (ConstraintLayout) inflater.inflate(R.layout.fragment_location_details, container, false);
         //   setSupportActionBar(toolbar);
         place_location=(TextView)view.findViewById(R.id.textViewAdress);
         place_name=(TextView)view.findViewById(R.id.textViewPlaceName);
+      //  place_address=(TextView)detailsview.findViewById(R.id.textViewAdress);
+      //  place_addressHere=(TextView)view.findViewById(R.id.textViewAdress);
+      //  Log.d(TAG, "Dqqqqqqqqq"+place_address.getText());
+
+
         //  imageView1=(ImageView)findViewById(R.id.imageView1);
         //imageView2=(ImageView)findViewById(R.id.imageView2);
         recyclerView=(RecyclerView)view.findViewById((R.id.recycleviewphoto));
@@ -63,7 +85,8 @@ static String TAG="tag";
      //   Bundle bundle = this.getArguments();
 
         String _data = DataHolderClass.getInstance().getDistributor_id();
-        Button removeplacebutton=(Button) view.findViewById(R.id.removeLocation);
+        removeplacebutton=(Button) view.findViewById(R.id.removeLocation);
+        DataHolderClass.getInstance().setDistributor_id(null);
 
         final String place_id = _data;
 
@@ -89,7 +112,7 @@ static String TAG="tag";
 
 
 
-        Button setplacebutton=(Button) view.findViewById(R.id.addLocation);
+      setplacebutton=(Button) view.findViewById(R.id.addLocation);
         ArrayList waypoint=MapsActivity.getWaypoint();
         if(waypoint.contains(place_id)){
 
@@ -119,58 +142,15 @@ static String TAG="tag";
                 Toast.makeText(getActivity(), "Location removed....!", Toast.LENGTH_SHORT).show();
 
 
-
             }
         });
+        setplacebutton.setEnabled(false);
+        removeplacebutton.setEnabled(false);
 
         setplacebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-           //     Log.d(TAG, "uhhhhhhhzero"+b.getPlace_id());
 
-             //   ArrayList place_idarray=null;
-//if(b.getPlace_id()!=null) {
-//    //Getplaceid contain an array,
-//    place_idarray = b.getPlace_id();
-//    Log.d(TAG, "uhhhhhhhfirst"+place_idarray);
-//
-//    place_idarray.add(place_id);
-//    b.setPlace_id(place_idarray);
-//    Log.d(TAG, "uhhhhhhhfirst"+place_idarray);
-//
-//}else{
-//    ArrayList test=new ArrayList();
-//    test.add(place_id);
-//b.setPlace_id(test);
-//    Log.d(TAG, "uhhhhhhhsecond");
-//
-//
-//
-//}
-////2 choice, check if selected or in waypoint?
-////TODO: if selected, changed the button...(VIsibility )
-//
-//                Log.d(TAG, "uhhhhhhh"+b.getPlace_id());
-
-
-//                Fragment newFragment = null;
-//
-//                Class fragmentClass=null;
-//                fragmentClass = MapsActivity.class;
-
-//                try {
-//                    Log.d(TAG, "sendatafromsuccess");
-//
-//                    newFragment = (Fragment) fragmentClass.newInstance();
-//                } catch (java.lang.InstantiationException e) {
-//                    Log.d(TAG, "sendatafrom"+e);
-//
-//                    e.printStackTrace();
-//                } catch (IllegalAccessException e) {
-//                    Log.d(TAG, "sendatafrom"+e);
-//
-//                    e.printStackTrace();
-//                }
        //         newFragment.setArguments(args);
                 DataHolderClass.getInstance().setDistributor_id(place_id);
                 DataHolderClass.getInstance2().setDistributor_id2("unselected");
@@ -247,7 +227,7 @@ return view;
             Log.d("DetailsResult", result);
 
             //NOTE: Is using "List" eventhough placedetails is singular to allow dataparser to work without needing another method
-            List<LinkedHashMap<String, String>> placedetails = null;
+
 
             JSONArray jsonArray = null;
             JSONObject jsonObject;
@@ -260,8 +240,10 @@ return view;
             //TODO: content_place_details: Create Content View to insert the data
             //Change List of placedetails back to normal
             LinkedHashMap<String,String> placedetail=placedetails.get(0);
+            Log.d("DetailsResult", placedetail.toString());
 
             place_name.setText( placedetail.get("place_name"));
+    //        place_addressHere.setText( placedetail.get("formatted_address"));
 
 
 
@@ -279,7 +261,7 @@ return view;
 if(test.containsKey("photo_reference"))
 {
 
-    Log.d("YesBitches", test.toString());
+    Log.d("Has photoreference ", test.toString());
 
 
 }
@@ -289,11 +271,7 @@ if(test.containsKey("photo_reference"))
 
             List<String> photoList = new ArrayList<String>(Arrays.asList(photo.split(",")));
 
-for(int i=0;i<photoList.size();i++){
 
-
-
-}
 
 
             RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager
@@ -301,12 +279,17 @@ for(int i=0;i<photoList.size();i++){
             recyclerView.setLayoutManager(layoutManager);
             recyclerView.setHasFixedSize(true);
 
-            pictureadapter = new LocationDetailsAdapter(getActivity(), photoList);
+
+
+            pictureadapter = new LocationDetailsPictureAdapter(getActivity(), photoList);
 
             recyclerView.setAdapter(pictureadapter);
 
+            pager = (ViewPager) view.findViewById(R.id.vpDetailsReviews);
 
-
+            //TODO:has changed to child, use support if problem persist?
+            viewpageradapter=new MyPagerAdapter(getChildFragmentManager());
+            pager.setAdapter(viewpageradapter);
 
 
 //Problem caused : empty space in front of something..........
@@ -315,7 +298,10 @@ for(int i=0;i<photoList.size();i++){
 
             Picasso.with(getActivity()).setLoggingEnabled(true);
 
+            //place_address.setText( placedetail.get("formatted_address"));
+viewpageradapter.notifyDataSetChanged();
 
+   //         Log.d(TAG, "Dqqqqqqqqq"+place_address.getText());
 
         }
 
@@ -399,6 +385,66 @@ for(int i=0;i<photoList.size();i++){
 //            urlConnection.disconnect();
         }
         return data;
+    }
+    private class MyPagerAdapter extends FragmentPagerAdapter {
+
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+
+        }
+
+        @Override
+        public Fragment getItem(int pos) {
+
+      //      Log.d(TAG, "Dujjjjjjjcalled 2nd time....1"+place_address.getText());
+
+            switch(pos) {
+
+                case 0: return layout.LocationDetails.newInstance(placedetails,"Ok yupe");
+                case 1: return LocationDetailsReviews.newInstance(placedetails," Instance 1");
+                //   case 2: return ThirdFragment.newInstance("ThirdFragment, Instance 1");
+                //       case 3: return ThirdFragment.newInstance("ThirdFragment, Instance 2");
+                //     case 4: return ThirdFragment.newInstance("ThirdFragment, Instance 3");
+                default: return Location_RecyclerView.newInstance("FirstFragmen","Ok yupe");
+
+
+            }
+
+
+
+        }
+
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            String title = null;
+            if (position == 0)
+            {
+                title = "Details";
+            }
+            else if (position == 1)
+            {
+                title = "Reviews";
+            }
+
+            return title;
+        }
+        @Override
+        public int getCount() {
+            return 2;
+        }
+
+        @Override
+        public int getItemPosition(Object object){
+
+            Log.d(TAG, "DujjjjjjjRefresh....1");
+
+            Log.d(TAG, "DujjjjjjjRefresh....2");
+
+            return POSITION_NONE;
+        }
+
+
     }
 }
 /////

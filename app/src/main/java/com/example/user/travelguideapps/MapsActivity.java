@@ -101,11 +101,11 @@ import static com.example.user.travelguideapps.R.id.map;
 //Make an "Selected places.page?, show all time/ location/ distance/ and arrangable
 //https://developer.android.com/guide/topics/ui/drag-drop.html use drag and drop is eariser...?
 //if drag and drop not working....
-//TODO:create checkbox in listview to update selected places?
-//TODO:prevent same location to be set? (Also, change set to place -> Uncheck etc
+//TODO:create checkbox in listview to update selected places? (Cancelled)
+//TODO:prevent same location to be set? (Also, change set to place -> Uncheck etc(Done)
 //TODO: that freakin disable View Details from other listview item  problem........ (And Checked listview
 
-
+//TODO: make different kind of marker for different "maps"
 
 public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener {
     private static final String TAG = "tag";
@@ -124,6 +124,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     private   ViewPager pager;
     private FragmentPagerAdapter recycleadapter;
 
+   private  ExpandableLayout expandableLayout;
 
 
     private static TextView mDurationView;
@@ -186,14 +187,36 @@ private static Location CurrentLocation=BaseActivity.getCurrentLocation();
        // Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
 
         fragmentpoilist = (ConstraintLayout)  inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
+        boolean isFirstTime = true;
 
 
       //  recyclerView.setAdapter(Locationadapter);
 
+        //Little hack
+        if(expandableLayout==null) {
+             isFirstTime = true;
+
+        }else{
+            isFirstTime = false;
+
+        }
+
+
+
+
+        expandableLayout    = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+
+
+
+        if(isFirstTime){
+
+             expandableLayout.expand();
+
+
+        }
+
 
         if (b != null) {
-            //TODO:this currenyly only add waypoint, tryb remove it
-//b is waypoint placeid string
 
           String isselected=  DataHolderClass.getInstance2().getDistributor_id2();
             Log.d(TAG, "cccccccccccYAY"+isselected);
@@ -201,7 +224,7 @@ private static Location CurrentLocation=BaseActivity.getCurrentLocation();
             if(isselected=="isselected"){
                 Log.d(TAG, "cccccccccccYAYremoved");
 
-Waypoint.remove(b);
+                Waypoint.remove(b);
                 for(int i=0;i<WayPointDetailsList.size();i++) {
                     LinkedHashMap<String,String>s=   WayPointDetailsList.get(i);
                     Log.d(TAG, "cccccyay waydetails removed"+s);
@@ -235,7 +258,7 @@ if (s.containsValue(b)){
 
                 Log.d(TAG, "WayPointDetailsListCHeckiiiing"+WayPointDetailsList.toString());
     Waypoint.add(b);
-
+                DataHolderClass.getInstance2().setDistributor_id2(null);
 }
             Toast.makeText(getActivity(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
             //Use these waypoints to change all marker.
@@ -255,6 +278,7 @@ if(!Waypoint.isEmpty()) {
 
 }
         }
+
         pager = (ViewPager) view.findViewById(R.id.vpPagerpoilist);
 
         //TODO:has changed to child, use support if problem persist?
@@ -269,8 +293,7 @@ if(!Waypoint.isEmpty()) {
 
 
 
-        final ExpandableLayout expandableLayout
-                = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+
         Button categories_expandable_layout=(Button)view.findViewById(R.id.opensetting);
         //TODO:Not sure fixed or not
      //    LinearLayout linearLayout = (LinearLayout)  view.findViewById(R.id.linearLayout);
@@ -476,8 +499,9 @@ LocationType=new StringBuilder();
                                                    }
                                                }
 
+                                               Log.d(TAG, "Runned hmmm ");
 
-
+                                                expandableLayout.collapse();
 
 
                                            }
@@ -885,7 +909,7 @@ public static List<LinkedHashMap<String, String>> getNearbyPlacesList(){
 
 
 
-            mMap.addMarker(markerOptions);
+            //mMap.addMarker(markerOptions);
             Log.d(TAG, "CheckinggggggggggggmarkerOptions 2" + markerOptions);
 
             //Default
@@ -1072,10 +1096,6 @@ private static Marker placeholdermarker;
             Log.d(TAG, "Checkingggggggggggg" + placeholdermarker.toString());
             placeholdermarker.remove();
             //TODO: Check how to remove the placeholdermarker....
-
-            placeholdermarker.remove();
-
-
 
 
         }
@@ -1748,13 +1768,15 @@ getChildFragmentManager();
             ParserTask parserTask = new ParserTask();
             Log.d(TAG, "On post execute 1st");
 
-            Log.d("GooglePlacesReadTask", "onPostExecute Entered");
             List<LinkedHashMap<String, String>> nearbyPlacesList = null;
             DataParser dataParser = new DataParser();
 
 
             //This is where its connected to DataParser and get the List of places wiyh ratings etc.
             nearbyPlacesList = dataParser.parse(result);
+            Log.d("Yeep", "dataparserresult1=="+result);
+
+            Log.d("Yeep", "dataparserresult2======="+nearbyPlacesList);
 
 //
 //            Log.d("GooglePlacesReadTask", nearbyPlacesList.toString());
@@ -1783,7 +1805,7 @@ getChildFragmentManager();
 
             // Start parsing the Google places in JSON format
             // Invokes the "doInBackground()" method of the class ParserTask
-            parserTask.execute(result);
+           // parserTask.execute(result);
 
             Log.d(TAG, "On post execute ENDNENDNEDNNEND");
         }

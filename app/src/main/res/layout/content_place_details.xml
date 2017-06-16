@@ -27,7 +27,7 @@
 
     <Button
         android:id="@+id/addLocation"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
         android:background="@color/cast_intro_overlay_button_background_color"
@@ -42,7 +42,7 @@
 
     <TextView
         android:id="@+id/textViewPlaceName"
-        android:layout_width="match_parent"
+        android:layout_width="368dp"
         android:layout_height="wrap_content"
         android:background="@android:color/holo_orange_light"
         android:fontFamily="casual"
@@ -54,32 +54,8 @@
         android:visibility="visible"
         app:layout_constraintTop_toBottomOf="@+id/HorizontalScrollPhoto"
         app:layout_gravity="fill_horizontal"
-        tools:layout_editor_absoluteX="0dp"/>
-
-    <TextView
-        android:id="@+id/textViewAddressText"
-        android:layout_width="368dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        app:layout_constraintTop_toBottomOf="@+id/textViewPlaceName"
-
-        android:background="@color/cast_libraries_material_featurehighlight_outer_highlight_default_color"
-        android:text="Address"
         tools:layout_editor_absoluteX="8dp"/>
 
-    <TextView
-        android:id="@+id/textViewAdress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-app:layout_constraintTop_toBottomOf="@+id/textViewAddressText"
-        android:text="Place Address "
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_editor_absoluteX="0dp"/>
 
     <HorizontalScrollView
         android:id="@+id/HorizontalScrollPhoto"
@@ -104,5 +80,32 @@ app:layout_constraintTop_toBottomOf="@+id/textViewAddressText"
 
 
     </HorizontalScrollView>
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tabs"
+        style="@style/amu_Bubble.TextAppearance.Light"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:tabGravity="fill"
+        app:tabMode="fixed"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="8dp"/>
 
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpDetailsReviews"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toBottomOf="@+id/textViewPlaceName"
+        app:layout_constraintLeft_toRightOf="parent">
+
+        <android.support.v4.view.PagerTabStrip
+            android:id="@+id/pager_header"
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:paddingBottom="4dp"
+            android:paddingTop="4dp" />
+
+    </android.support.v4.view.ViewPager>
 </android.support.constraint.ConstraintLayout>

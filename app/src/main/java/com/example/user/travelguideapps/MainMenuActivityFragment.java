@@ -3,6 +3,7 @@ package com.example.user.travelguideapps;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,9 +54,15 @@ public class MainMenuActivityFragment extends Fragment {
                 }
 
                 FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
             //    MainMenuActivityFragment.this.startActivity(new Intent(getContext(), MapsActivity.class));
+
+             //   FragmentManager fragmentManager = ((FragmentActivity)mContext).getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
+                fragmentTransaction.replace(R.id.flContent2, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
+           //     fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
 
 

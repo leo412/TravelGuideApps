@@ -94,7 +94,7 @@ public class Location_RecyclerView extends Fragment {
         //When button is clicked, recycler view is called and nearbyplaceslist is being inserted into the system
         Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
         recyclerView.setLayoutManager(linearLayoutManager); // set LayoutManager to RecyclerView
-
+            
         recyclerView.setAdapter(Locationadapter);
         Locationadapter.notifyDataSetChanged();
 
@@ -140,19 +140,20 @@ public class Location_RecyclerView extends Fragment {
 
                     System.out.println("Scrolled Downwards");
                 }
-//                else if(dy < 0)
-//                {
-//                    System.out.println("Scrolled Upwards");
-//                    expandableLayout.expand();
-//
-//                }
-                else   if (pastVisibleItems  == 0) {
+                else if(dy < 0)
+                {
+                       if (pastVisibleItems  == 0) {
 
-                //    expandableLayout.expand();
+                    expandableLayout.expand();
+
+                }
+                    System.out.println("Scrolled Upwards");
+                    //expandableLayout.expand();
 
                 }
 
-                  
+
+
                 else {
 
                     System.out.println("No Vertical Scrolled");

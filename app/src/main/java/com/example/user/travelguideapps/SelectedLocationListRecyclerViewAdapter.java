@@ -396,7 +396,7 @@ int add=position+1;
 //            recyclerView.setLayoutManager(layoutManager);
 //            recyclerView.setHasFixedSize(true);
 //
-//            pictureadapter = new LocationDetailsAdapter(getActivity(), photoList);
+//            pictureadapter = new LocationDetailsPictureAdapter(getActivity(), photoList);
 //
 //            recyclerView.setAdapter(pictureadapter);
 

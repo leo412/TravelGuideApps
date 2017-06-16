@@ -34,22 +34,12 @@ public class DataParser {
 
             if(jsonObject.has("results")){
                 //For Places List
-                Log.d("Places", "EnterResultSSSSSSS");
-
                 jsonArray= jsonObject.getJSONArray("results");
-                Log.d("Places", "AFterEnterResultSSSSSSS"+jsonArray);
                 placenumber=0;
             }else {
                 //For single location(Details
-                Log.d("Places", "EnterResult2"+jsonObject.getJSONObject("result"));
-
-             //   JSONObject jsonPlaceDetails = jsonObject.getJSONObject("result");
-
-                //check what is in json array
                 jsonArray.put(jsonObject.getJSONObject("result"));
-             //   jsonArray[0]=jsonPlaceDetails.getJSONObject("result");
 
-                Log.d("Places", "Afternormalenterresult"+jsonArray);
 
                 placenumber=1;
             }
@@ -92,13 +82,22 @@ public class DataParser {
         String latitude = "";
         String longitude = "";
         String reference = "";
-        List<String>photo_reference = new ArrayList<String>();
+        ArrayList<String>photo_reference = new ArrayList<String>();
+
+        ArrayList<String>review_author_name = new ArrayList<String>();
+        ArrayList<String>review_author_photo = new ArrayList<String>();
+        ArrayList<String>review_rating = new ArrayList<String>();
+        ArrayList<String>review_time_description = new ArrayList<String>();
+        ArrayList<String>review_text = new ArrayList<String>();
+
         String rating = "";
         String place_id="";
 
         //Below Single location only
         String formatted_address="";
         String formatted_phone_number="";
+        String website="";
+
         String icon ="";
         String opening_hours="";
         String multiple_photo_references="";
@@ -124,7 +123,18 @@ public class DataParser {
                 }
                 if (!jPlace.isNull("formatted_phone_number")) {
                     formatted_phone_number = jPlace.getString("formatted_phone_number");
+                }else{
+                    formatted_phone_number="This location has no phone number";
+
                 }
+
+                if (!jPlace.isNull("website")) {
+                    website = jPlace.getString("website");
+                }else{
+                    website="This location has no Website";
+
+                }
+
 
 
             }
@@ -170,6 +180,135 @@ try {
 
 
 }
+
+
+
+            try {
+                if (jPlace.getJSONArray("reviews").getJSONObject(0).getString("author_name") != null) {
+                    Log.d(TAG, "Well it did run here.... is ");
+
+                    int i=jPlace.getJSONArray("reviews").length();
+                    for (int j=0;j<i;j++) {
+                        Log.d(TAG, "Well it did run here.... again 1st "+j);
+
+                        //Trying to get multipole photo checking
+                        review_author_name.add(jPlace.getJSONArray("reviews").getJSONObject(j).getString("author_name"));
+
+                        Log.d(TAG, "Well it did run here.... again after"+j);
+
+                    }
+                } else {
+                    review_author_name.add("Empty");
+
+                }
+
+
+            }catch (Exception e){
+                Log.d(TAG, "Exception is "+e );
+
+
+            }
+
+            try {
+                if (jPlace.getJSONArray("reviews").getJSONObject(0).getString("relative_time_description") != null) {
+
+                    int i=jPlace.getJSONArray("reviews").length();
+                    for (int j=0;j<i;j++) {
+
+                        //Trying to get multipole photo checking
+                        review_time_description.add(jPlace.getJSONArray("reviews").getJSONObject(j).getString("relative_time_description"));
+
+
+                    }
+                } else {
+            //        review_time_description
+                }
+
+
+            }catch (Exception e){
+                Log.d(TAG, "Exception is "+e );
+
+
+            }
+
+            try {
+                if (jPlace.getJSONArray("reviews").getJSONObject(0).getString("rating") != null) {
+
+                    int i=jPlace.getJSONArray("reviews").length();
+                    for (int j=0;j<i;j++) {
+
+                        //Trying to get multipole photo checking
+                        review_rating.add(jPlace.getJSONArray("reviews").getJSONObject(j).getString("rating"));
+
+
+                    }
+                } else {
+                    review_rating.add("Empty");
+
+                }
+
+
+            }catch (Exception e){
+                Log.d(TAG, "Exception is "+e );
+
+
+            }
+
+            try {
+                if (jPlace.getJSONArray("reviews").getJSONObject(0).getString("profile_photo_url") != null) {
+
+                    int i=jPlace.getJSONArray("reviews").length();
+                    for (int j=0;j<i;j++) {
+
+                        //Trying to get multipole photo checking
+                        review_author_photo.add(jPlace.getJSONArray("reviews").getJSONObject(j).getString("profile_photo_url"));
+
+
+                    }
+                } else {
+                    review_author_photo.add("Empty");
+
+                }
+
+
+            }catch (Exception e){
+                Log.d(TAG, "Exception is "+e );
+
+
+            }
+            try {
+                if (jPlace.getJSONArray("reviews").getJSONObject(0).getString("text") != null) {
+                    int i=jPlace.getJSONArray("reviews").length();
+                    for (int j=0;j<i;j++) {
+                        //Trying to get multipole photo checking
+                        Log.d(TAG, "letscheckthis is "+jPlace.getJSONArray("reviews").getJSONObject(j).getString("text") );
+
+                        Log.d(TAG, "letscheckthis is "+jPlace );
+
+
+
+                        if(!jPlace.getJSONArray("reviews").getJSONObject(j).getString("text").equals("")) {
+                            review_text.add(jPlace.getJSONArray("reviews").getJSONObject(j).getString("text") + "Separator");
+                        }else{
+                            Log.d(TAG, "letscheckthis is nothing b" );
+
+                            review_text.add("This user wrote nothing Separator");
+                        }
+                        Log.d(TAG, "letscheckthis is "+review_text );
+
+                    }
+                } else {
+                    review_text.add("Empty");
+
+                }
+
+
+            }catch (Exception e){
+                Log.d(TAG, "Exception is "+e );
+
+
+            }
+
             if (!jPlace.isNull("rating")) {
                 rating = jPlace.getString("rating");
             }else{
@@ -192,7 +331,12 @@ try {
             place.put("lng", longitude);
             place.put("reference", reference);
             place.put("place_id", place_id);
-
+            place.put("review_author_name",review_author_name.toString());
+            place.put("review_text",review_text.toString());
+            place.put("review_author_photo",review_author_photo.toString());
+            place.put("review_time_description",review_time_description.toString());
+            place.put("review_rating",review_rating.toString());
+            place.put("website",website.toString());
 
 
             Log.d(TAG, "placeeee "+place.toString() );
@@ -201,6 +345,10 @@ try {
                 place.put("formatted_address", formatted_address);
 
                 place.put("formatted_phone_number", formatted_phone_number);
+
+
+
+
             }
 
 

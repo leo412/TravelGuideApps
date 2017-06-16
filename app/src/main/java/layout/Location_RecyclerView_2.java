@@ -139,18 +139,13 @@ public class Location_RecyclerView_2 extends Fragment {
 
                     System.out.println("Scrolled Downwards");
                 }
-//                else if(dy < 0)
-//                {
-//                    System.out.println("Scrolled Upwards");
-//                    expandableLayout.expand();
-//
-//                }
-                else   if (pastVisibleItems  == 0) {
+                else if(dy < 0) {
+                    if (pastVisibleItems == 0) {
 
-                    expandableLayout.expand();
+                        expandableLayout.expand();
 
+                    }
                 }
-
 
                 else {
 

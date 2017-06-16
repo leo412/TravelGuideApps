@@ -21,13 +21,13 @@ import static android.content.ContentValues.TAG;
  * Created by User on 3/18/2017.
  */
 //Put items into listview
-public class LocationDetailsAdapter extends RecyclerView.Adapter<LocationDetailsAdapter.ViewHolder> {
+public class LocationDetailsPictureAdapter extends RecyclerView.Adapter<LocationDetailsPictureAdapter.ViewHolder> {
     // private ArrayList<AndroidVersion> android_versions;
     private Context context;
     private RecyclerView.ViewHolder viewHolder2;
     private List mDataSource;
 
-    public LocationDetailsAdapter(Context context, List mDataSource) {
+    public LocationDetailsPictureAdapter(Context context, List mDataSource) {
         this.context = context;
         this.mDataSource = mDataSource;
         Log.d("isthislistor... ", mDataSource.toString());
@@ -35,7 +35,7 @@ public class LocationDetailsAdapter extends RecyclerView.Adapter<LocationDetails
     }
 
     @Override
-    public LocationDetailsAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public LocationDetailsPictureAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View rowView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.place_details_photo_horizontal, viewGroup, false);
         return new ViewHolder(rowView);
     }

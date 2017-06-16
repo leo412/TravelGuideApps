@@ -135,21 +135,7 @@ private FrameLayout frame;
         });
 //TODO: Put Access for location access,else just plain stop user from logging in
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
-//        boolean connected = false;
-//        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-//        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
-//                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
-//            //we are connected to a network
-//            connected = true;
-//            mEmailSignInButton.setEnabled(true);
-//
-//        }
-//        else {
-//            Toast.makeText(LoginActivity.this, "There is no Internet Connection",
-//                    Toast.LENGTH_SHORT).show();
-//             mEmailSignInButton.setEnabled(false);
-//
-//        }
+
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
 
             @Override
@@ -157,7 +143,6 @@ private FrameLayout frame;
                 if (!DetectConnection.checkInternetConnection(LoginActivity.this)) {
                     Toast.makeText(getApplicationContext(), "Internet is not connected!", Toast.LENGTH_SHORT).show();
                 } else
-//TODO:Check ifthis is working
                 {    int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
 //Check if there is permission, if yes login
                     Log.d(TAG, "inside this 1");
@@ -192,7 +177,6 @@ private FrameLayout frame;
 
                         }
                     }else{
-                        pd.show();
                         Log.d(TAG, "attempt login 2");
 
                         //If permission is accepted.
@@ -345,7 +329,6 @@ private FrameLayout frame;
      */
     private void  attemptLogin() {
         pd.show();
-
         if (mAuthTask != null) {
             return;
         }
@@ -396,7 +379,9 @@ private FrameLayout frame;
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
-        pd.dismiss();
+
+
+
     }
 
     private boolean isEmailValid(String email) {
@@ -540,7 +525,7 @@ private FrameLayout frame;
                 }
             }
 
-//todo: register the new system
+//todo: Test Password system plssss
             Log.d(TAG, "Before Testing" );
 
 //todo: show a confirmation box for registerting new account if the user cannot login and it is a new account name.
