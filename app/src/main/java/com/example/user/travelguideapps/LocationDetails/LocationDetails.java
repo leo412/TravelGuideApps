@@ -1,4 +1,4 @@
-package layout;
+package com.example.user.travelguideapps.LocationDetails;
 
 import android.content.Context;
 import android.net.Uri;
@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.example.user.travelguideapps.LocationDetailsActivity;
 import com.example.user.travelguideapps.R;
 
 import java.util.LinkedHashMap;

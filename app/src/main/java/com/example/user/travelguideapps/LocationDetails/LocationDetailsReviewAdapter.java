@@ -1,4 +1,4 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.LocationDetails;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.user.travelguideapps.R;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 

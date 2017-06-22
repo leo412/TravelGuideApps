@@ -1,4 +1,4 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.MainMenu;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.example.user.travelguideapps.EditLocation.EditLocation;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
+import com.example.user.travelguideapps.R;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -27,22 +31,17 @@ public class MainMenuActivityFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.d("BaserActivity", "fore main menu ");
 
-    View fragment=inflater.inflate(R.layout.fragment_main_menu, container, false);
-        Button searchButton=(Button)fragment.findViewById(R.id.main_Menu_Search_Button);
+        View v=inflater.inflate(R.layout.fragment_main_menu, container, false);
+        Button searchButton=(Button)v.findViewById(R.id.main_Menu_Search_Button);
+        Button editButton=(Button)v.findViewById(R.id.main_Menu_Edit_Button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-       //       DrawerLayout  drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
-
-        //      FrameLayout  flContent = (FrameLayout) drawer.findViewById(R.id.flContent2);
-
-
-                Log.d("BaserActivity", "lakslu ");
-
                 Fragment fragment = null;
-                Class fragmentClass=null;
-                fragmentClass = MapsActivity.class;
 
+                Class fragmentClass=null;
+
+                fragmentClass = MapsActivity.class;
 
                 try {
                     if(fragmentClass!=null) {
@@ -54,21 +53,50 @@ public class MainMenuActivityFragment extends Fragment {
                 }
 
                 FragmentManager fragmentManager = getFragmentManager();
+                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
 
-            //    MainMenuActivityFragment.this.startActivity(new Intent(getContext(), MapsActivity.class));
+                fragmentTransaction.replace(R.id.flContent2, fragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.commit();
 
-             //   FragmentManager fragmentManager = ((FragmentActivity)mContext).getSupportFragmentManager();
+
+
+            }
+        });
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment = null;
+
+                Class fragmentClass=null;
+
+                fragmentClass = EditLocation.class;
+
+                try {
+                    if(fragmentClass!=null) {
+                        Log.d("Mainmenu", "Gothere");
+
+                        fragment = (Fragment) fragmentClass.newInstance();
+                    }
+                } catch (Exception e) {
+                    Log.d("Mainmenu", "didnotGothere"+e);
+
+                    e.printStackTrace();
+                }
+
+                FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
                 fragmentTransaction.replace(R.id.flContent2, fragment);
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
-           //     fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
 
 
             }
         });
 
-        return fragment;
+
+
+        return v;
     }
 }

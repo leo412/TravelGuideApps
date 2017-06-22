@@ -61,7 +61,6 @@ public class DirectionsJSONParser {
                 for (int i = 0; i < jsonArray.length(); i++) {
                     //Creating LocationList model class object to store details
 
-                    LocationList result = new LocationList();
 
                     JSONObject object = jsonArray.getJSONObject(i);
                     String name = object.optString("name").toString();
@@ -81,13 +80,6 @@ public class DirectionsJSONParser {
                        // result.setid(object.getString("id"));
 
                        // jRoutes.(object.getString("id"));
-                    } else {
-                        result.setid("");
-                    }
-                    if (object.has("name")) {
-                        result.setname(object.getString("name"));
-                    } else {
-                        result.setname("");
                     }
 //                    if (object.has("vicinity")) {
 //                        result.setName(object.getString("vicinity"));

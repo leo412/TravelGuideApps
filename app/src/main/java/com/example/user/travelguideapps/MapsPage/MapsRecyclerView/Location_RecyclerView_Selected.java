@@ -1,4 +1,4 @@
-package layout;
+package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,10 +10,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
-import com.example.user.travelguideapps.LocationListRecyclerViewAdapter;
-import com.example.user.travelguideapps.MapsActivity;
+import com.example.user.travelguideapps.BaseActivity;
+import com.example.user.travelguideapps.LoginPage.LoginActivity;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -22,27 +30,29 @@ import java.util.ArrayList;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link Location_RecyclerView_2.OnFragmentInteractionListener} interface
+ * {@link Location_RecyclerView_Selected.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link Location_RecyclerView_2#newInstance} factory method to
+ * Use the {@link Location_RecyclerView_Selected#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Location_RecyclerView_2 extends Fragment {
+public class Location_RecyclerView_Selected extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "HI";
     private static final String ARG_PARAM2 = "First";
     private static final String TAG ="RecyclerVIew2" ;
+    private int scrollingtotop=1;
 
-    private LocationListRecyclerViewAdapter Locationadapter;
+    private SelectedLocationListRecyclerViewAdapter Locationadapter;
     private RecyclerView recyclerView;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private DatabaseReference mDatabase;
 
-    private OnFragmentInteractionListener mListener;
+    private Location_RecyclerView.OnFragmentInteractionListener mListener;
 
-    public Location_RecyclerView_2() {
+    public Location_RecyclerView_Selected() {
         // Required empty public constructor
     }
 
@@ -55,8 +65,8 @@ public class Location_RecyclerView_2 extends Fragment {
      * @return A new instance of fragment Location_RecyclerView.
      */
     // TODO: Rename and change types and number of parameters
-    public static Location_RecyclerView_2 newInstance(String param1, String param2) {
-        Location_RecyclerView_2 fragment = new Location_RecyclerView_2();
+    public static Location_RecyclerView_Selected newInstance(String param1, String param2) {
+        Location_RecyclerView_Selected fragment = new Location_RecyclerView_Selected();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -86,8 +96,62 @@ public class Location_RecyclerView_2 extends Fragment {
 
         recyclerView = (RecyclerView)  view.findViewById(R.id.poilistRecyclerView);
         //When button is clicked, recycler view is called and nearbyplaceslist is being inserted into the system
+        Button savefirebase = (Button) view.findViewById(R.id.save);
+        Button loadfirebase = (Button) view.findViewById(R.id.load);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), waypoint);
+        savefirebase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Location Saved!  ", Toast.LENGTH_SHORT).show();
+
+                //   final FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+
+                BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).setValue(MapsActivity.getWaypoint());
+
+            }
+        });
+        Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), waypoint);
+
+        loadfirebase.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                Toast.makeText(getActivity(), "Location Loaded!  ", Toast.LENGTH_SHORT).show();
+
+                                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                                                DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID());
+                                                ref.addValueEventListener(new ValueEventListener() {
+                                                    @Override
+                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                                        ArrayList post = (ArrayList) dataSnapshot.getValue();
+
+                                                        System.out.println("THIS IS IT" + post);
+                                                      //  System.out.println("THIS IS IT" + LoginActivity.getUserID());
+//
+//                                                        System.out.println("THIS IS IT" + post.username);
+//                                                        System.out.println("THIS IS IT" + post.waypoint);
+
+
+                                                        MapsActivity.setWaypoint(post);
+                                                        //Cannot directly update, findways to reset details,,,,
+                                                       Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), post);
+
+                                                        Locationadapter.notifyDataSetChanged();
+
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(DatabaseError databaseError) {
+                                                        System.out.println("The read failed: " + databaseError.getCode());
+                                                    }
+
+
+                                                });
+                                            }
+                                        });
+
+
 
         Log.d(TAG, "recyclerview2 ssssss"+waypoint);
 
@@ -116,6 +180,10 @@ public class Location_RecyclerView_2 extends Fragment {
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 int pastVisibleItems = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
 
+          //      Log.d(TAG, "Scrollllllll"+dy);
+                System.out.println("Scrollllllll"+dy);
+
+
                 if(dx>0)
                 {
 
@@ -137,20 +205,16 @@ public class Location_RecyclerView_2 extends Fragment {
                 {
                     expandableLayout.collapse();
 
-                    System.out.println("Scrolled Downwards");
                 }
                 else if(dy < 0) {
                     if (pastVisibleItems == 0) {
 
-                        expandableLayout.expand();
+                    //    expandableLayout.expand();
 
                     }
                 }
 
-                else {
 
-                    System.out.println("No Vertical Scrolled");
-                }
             }
 
 
@@ -158,7 +222,19 @@ public class Location_RecyclerView_2 extends Fragment {
 
         });
 
+        //TODO:Little hack.......
+        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            @Override
+            public boolean onFling(int velocityX, int velocityY) {
 
+
+                if(velocityY<-100&&scrollingtotop==1 ) {
+
+                    expandableLayout.expand();
+                }
+                return false;
+            }
+        });
 
 
 

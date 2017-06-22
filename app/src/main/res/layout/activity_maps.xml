@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginLeft="0dp"
+    android:background="@android:color/white"
     android:fitsSystemWindows="true"
     android:launchMode="singleTask"
     android:visibility="visible"
@@ -14,7 +15,6 @@
     app:layout_constraintLeft_toLeftOf="@+id/relativeLayout"
     tools:layout_editor_absoluteY="81dp"
     tools:openDrawer="start"
-    android:background="@android:color/white"
 
 
     >
@@ -30,8 +30,6 @@
         tools:layout_editor_absoluteY="7135dp"/>
 
 
-
-
     <TextView
         android:id="@+id/empty"
         android:layout_width="wrap_content"
@@ -42,23 +40,14 @@
         android:visibility="visible"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp"/>
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
-        style="@style/amu_Bubble.TextAppearance.Light"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpPagerpoilist"
-        android:layout_width="match_parent"
+        android:layout_width="368dp"
         android:layout_height="wrap_content"
-
-        app:layout_constraintTop_toBottomOf="@+id/expandable_layout"
-        app:layout_constraintLeft_toRightOf="parent">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:layout_constraintLeft_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expandable_layout">
 
         <android.support.v4.view.PagerTabStrip
             android:id="@+id/pager_header"
@@ -67,26 +56,21 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:paddingBottom="4dp"
-            android:paddingTop="4dp" />
+            android:paddingTop="4dp"/>
 
     </android.support.v4.view.ViewPager>
-
-
-
-
-
 
 
     <net.cachapa.expandablelayout.ExpandableLayout
         android:id="@+id/expandable_layout"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
-        map:el_duration="1000"
-        map:el_expanded="false"
-        map:el_parallax="0.5"
-
         app:layout_constraintTop_toBottomOf="@+id/map"
-        tools:layout_editor_absoluteX="8dp">
+        map:el_duration="1000"
+        map:el_expanded="true"
+
+        map:el_parallax="0.5"
+        tools:layout_editor_absoluteX="0dp">
 
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
@@ -98,21 +82,22 @@
 
             <TextView
                 android:id="@+id/duration_label"
+                style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Duration=?"
                 android:textColor="?android:textColorSecondary"
                 android:visibility="visible"
 
+                app:layout_constraintTop_toBottomOf="@+id/categories_expandable_layout"
+
                 map:layout_constraintLeft_toLeftOf="parent"
-
-                map:layout_constraintTop_toTopOf="parent"
-
                 />
 
 
             <TextView
                 android:id="@+id/distance_label"
+                style="@style/TextAppearance.AppCompat.Medium"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
@@ -158,7 +143,7 @@
                 android:visibility="visible"
                 map:layout_constraintTop_toBottomOf="@+id/distance_label"
                 map:layout_gravity="fill_horizontal"
-                tools:layout_editor_absoluteX="21dp"/>
+                tools:layout_editor_absoluteX="243dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -175,149 +160,281 @@
 
             <Button
                 android:id="@+id/selecttypes"
-                android:layout_width="wrap_content"
+                android:layout_width="352dp"
                 android:layout_height="wrap_content"
-                android:text="Go Go"
-                map:layout_gravity="fill_horizontal"
-                app:layout_constraintTop_toBottomOf="@+id/categories_expandable_layout"
-                tools:layout_editor_absoluteX="0dp"/>
+                android:text="Search!"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/radiusPicker"
 
+                map:layout_gravity="fill_horizontal"/>
 
-
-            <HorizontalScrollView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/HorizontalScroll"
-android:visibility="gone"
-                app:layout_constraintTop_toBottomOf="@+id/categories_expandable_layout"
-                tools:layout_editor_absoluteX="0dp">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-
-
-                    <Button
-                        android:id="@+id/Bar"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bar"
-                        map:layout_columnSpan="1"
-                        map:layout_gravity="fill_horizontal"/>
-
-                    <Button
-                        android:id="@+id/Bank"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bank"
-                        map:layout_columnSpan="1"
-                        map:layout_gravity="fill_horizontal"/>
-
-                    <Button
-                        android:id="@+id/amusement_park"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="amusement_park"
-                        map:layout_columnSpan="1"
-                        map:layout_gravity="fill_horizontal"/>
-
-                    <Button
-                        android:id="@+id/cafe"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="cafe"
-                        map:layout_columnSpan="1"
-                        map:layout_gravity="fill_horizontal"/>
-
-                    <Button
-                        android:id="@+id/casino"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="casino"
-                        map:layout_columnSpan="1"
-                        map:layout_gravity="fill_horizontal"/>
-
-                    <Button
-                        android:id="@+id/night_club"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="night_club"
-                        map:layout_columnSpan="1"
-                        map:layout_gravity="fill_horizontal"/>
-
-
-                </LinearLayout>
-
-            </HorizontalScrollView>
 
             <Button
-                android:text="Categories"
                 android:id="@+id/OpenCategoriesView"
+                style="@style/TextAppearance.AppCompat.Medium"
+                android:layout_width="352dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:background="#00b300"
                 android:src="@drawable/ic_menu_share"
-                app:layout_constraintTop_toBottomOf="@id/radiusPicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:text="Tap to select Location Types"
+                android:textColor="#fff"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+
             <net.cachapa.expandablelayout.ExpandableLayout
                 android:id="@+id/categories_expandable_layout"
-                android:layout_width="0dp"
+                android:layout_width="352dp"
                 android:layout_height="wrap_content"
-                map:el_duration="1000"
-                map:el_expanded="true"
-                map:el_parallax="0.5"
-
+                android:background="@android:color/white"
+                app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/OpenCategoriesView"
-                tools:layout_editor_absoluteX="0dp">
-<android.support.constraint.ConstraintLayout
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+                map:el_duration="1000"
 
-                <CheckBox android:id="@+id/barCheckBox"
-                          android:text="Bar"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
+                map:el_expanded="true"
+                map:el_parallax="0.5">
 
-                          tools:layout_editor_absoluteY="350dp"
-                          tools:layout_editor_absoluteX="0dp"/>
-                <CheckBox android:id="@+id/restaurantCheckBox"
-                          android:text="Restaurant"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-app:layout_constraintLeft_toRightOf="@+id/barCheckBox"
-                          tools:layout_editor_absoluteY="350dp"/>
-                <CheckBox android:id="@+id/amusement_parkCheckBox"
-                          android:text="Amusement Park"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content"
-                          app:layout_constraintLeft_toRightOf="@+id/restaurantCheckBox"
+                <android.support.constraint.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:layout_editor_absoluteX="0dp"
+                    tools:layout_editor_absoluteY="0dp">
 
-                          tools:layout_editor_absoluteY="350dp"/>
+                    <Button
+                        android:id="@+id/FoodButton"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="#00b300"
+                        android:src="@drawable/ic_menu_share"
+                        android:text="Food"
+                        android:textColor="#fff"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@+id/EntertainmentButton"
 
-    <CheckBox android:id="@+id/libraryCheckBox"
-              android:text="Library"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-app:layout_constraintTop_toBottomOf="@id/barCheckBox"
-              tools:layout_editor_absoluteY="350dp"/>
-    <CheckBox android:id="@+id/shopping_mallCheckBox"
-              android:text="Shopping Mall"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              app:layout_constraintLeft_toRightOf="@+id/libraryCheckBox"
-              app:layout_constraintTop_toBottomOf="@id/barCheckBox"
+                        app:layout_constraintTop_toTopOf="parent"/>
 
-              tools:layout_editor_absoluteY="350dp"/>
+                    <net.cachapa.expandablelayout.ExpandableLayout
+                        android:id="@+id/FoodExpandable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        map:el_duration="1000"
+                        map:el_expanded="true"
+                        map:el_parallax="0.5"
+
+                        map:layout_constraintLeft_toLeftOf="parent"
+                        map:layout_constraintTop_toBottomOf="@+id/FoodButton"
+
+                        >
+
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            >
+
+                            <CheckBox
+                                android:id="@+id/barCheckBox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Bar"
+
+                                map:layout_constraintTop_toTopOf="parent"
+                                tools:layout_editor_absoluteX="0dp"/>
+
+                            <CheckBox
+                                android:id="@+id/restaurantCheckBox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Restaurant"
+
+                                map:layout_constraintBottom_toBottomOf="parent"
+                                map:layout_constraintTop_toBottomOf="@+id/barCheckBox"
+
+                                tools:layout_editor_absoluteX="0dp"/>
 
 
+                        </android.support.constraint.ConstraintLayout>
 
 
+                    </net.cachapa.expandablelayout.ExpandableLayout>
+
+                    <Button
+                        android:id="@+id/EntertainmentButton"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/holo_blue_dark"
+                        android:src="@drawable/ic_menu_share"
+                        android:text="Entertainment"
+                        android:textColor="#fff"
+                        app:layout_constraintLeft_toRightOf="@+id/FoodButton"
+
+                        app:layout_constraintTop_toTopOf="parent"
+
+                        />
+
+                    <net.cachapa.expandablelayout.ExpandableLayout
+                        android:id="@+id/EntertainmentExpandable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        app:layout_constraintLeft_toLeftOf="@id/EntertainmentButton"
+                        map:el_duration="1000"
+                        map:el_expanded="true"
+
+                        map:el_parallax="0.5"
+                        map:layout_constraintTop_toBottomOf="@+id/EntertainmentButton"
+                        >
+
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+
+                            >
+
+                            <CheckBox
+                                android:id="@+id/amusement_parkCheckBox"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Amusement Park"
 
 
+                                app:layout_constraintTop_toBottomOf="parent"
+                                />
+
+                            <CheckBox
+                                android:id="@+id/aquariumCheckBox"
+                                android:layout_width="wrap_content"
+
+                                android:layout_height="wrap_content"
+                                android:text="Aquarium"
 
 
-</android.support.constraint.ConstraintLayout>
+                                app:layout_constraintTop_toBottomOf="@+id/amusement_parkCheckBox"
+                                />
+
+                            <CheckBox
+                                android:id="@+id/movietheaterCheckBox"
+                                android:layout_width="wrap_content"
+
+                                android:layout_height="wrap_content"
+                                android:text="Movie Theater"
+
+
+                                app:layout_constraintTop_toBottomOf="@+id/aquariumCheckBox"
+                                />
+                        </android.support.constraint.ConstraintLayout>
+                    </net.cachapa.expandablelayout.ExpandableLayout>
+
+                    <Button
+                        android:id="@+id/ShopButton"
+                        style="@style/TextAppearance.AppCompat.Medium"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/holo_blue_light"
+                        android:src="@drawable/ic_menu_share"
+                        android:text="Shop"
+                        android:textColor="#fff"
+                        app:layout_constraintLeft_toRightOf="@+id/EntertainmentButton"
+
+
+                        />
+
+                    <net.cachapa.expandablelayout.ExpandableLayout
+                        android:id="@+id/ShopExpandable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white"
+                        app:layout_constraintLeft_toLeftOf="@+id/ShopButton"
+                        map:el_duration="1000"
+                        map:el_expanded="true"
+                        map:el_parallax="0.5"
+                        map:layout_constraintTop_toBottomOf="@+id/ShopButton"
+
+
+                        >
+
+                        <android.support.constraint.ConstraintLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            >
+
+                            <CheckBox
+                                android:id="@+id/shopping_mallCheckBox"
+                                android:layout_width="wrap_content"
+
+                                android:layout_height="wrap_content"
+                                android:text="Shopping Mall"
+                                app:layout_constraintTop_toBottomOf="parent"
+
+
+                                />
+
+
+                            <CheckBox
+                                android:id="@+id/bookstoreCheckBox"
+                                android:layout_width="wrap_content"
+
+                                android:layout_height="wrap_content"
+                                android:text="Book Store"
+
+                                app:layout_constraintTop_toBottomOf="@+id/shopping_mallCheckBox"
+
+                                />
+                        </android.support.constraint.ConstraintLayout>
+                    </net.cachapa.expandablelayout.ExpandableLayout>
+
+
+                </android.support.constraint.ConstraintLayout>
 
 
             </net.cachapa.expandablelayout.ExpandableLayout>
+
+
+            <CheckBox
+                android:id="@+id/artgalleryCheckBox"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="Art Gallery"
+
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="3319dp"/>
+
+            <CheckBox
+                android:id="@+id/libraryCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Library"
+                tools:layout_editor_absoluteX="292dp"
+                tools:layout_editor_absoluteY="3319dp"/>
+
+            <CheckBox
+                android:id="@+id/busstationCheckBox"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="Bus Station"
+
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="3319dp"/>
+
+
+            <CheckBox
+                android:id="@+id/museumCheckBox"
+                android:layout_width="wrap_content"
+
+                android:layout_height="wrap_content"
+                android:text="Museum"
+
+                tools:layout_editor_absoluteX="60dp"
+                tools:layout_editor_absoluteY="3319dp"/>
+
+
         </android.support.constraint.ConstraintLayout>
 
 
@@ -332,19 +449,20 @@ app:layout_constraintTop_toBottomOf="@id/barCheckBox"
         android:text="Toggle"
 
         android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
         map:layout_columnSpan="1"
         map:layout_constraintBottom_toBottomOf="@+id/map"
-app:layout_constraintLeft_toLeftOf="parent"        map:layout_gravity="fill_horizontal"/>
+        map:layout_gravity="fill_horizontal"/>
 
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="150dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:context="com.example.user.travelguideapps.MapsActivity"
+        tools:context="com.example.user.travelguideapps.MapsPage.MapsActivity"
 
 
         tools:layout_constraintLeft_creator="1"

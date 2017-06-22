@@ -1,4 +1,4 @@
-package layout;
+package com.example.user.travelguideapps.LocationDetails;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -17,7 +17,6 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.user.travelguideapps.DataParser;
-import com.example.user.travelguideapps.LocationDetailsReviewAdapter;
 import com.example.user.travelguideapps.R;
 import com.squareup.picasso.Picasso;
 

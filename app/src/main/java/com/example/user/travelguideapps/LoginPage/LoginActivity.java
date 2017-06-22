@@ -1,4 +1,4 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.LoginPage;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -38,6 +38,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user.travelguideapps.DetectConnection;
+import com.example.user.travelguideapps.MainMenu.MainMenuActivity;
+import com.example.user.travelguideapps.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -82,6 +85,11 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private ImageView login_background;
 private FrameLayout frame;
     ProgressDialog pd;
+private static String userId;
+    public static  String getUserID(){
+
+        return userId;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
@@ -97,6 +105,7 @@ private FrameLayout frame;
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                    userId=user.getUid();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");

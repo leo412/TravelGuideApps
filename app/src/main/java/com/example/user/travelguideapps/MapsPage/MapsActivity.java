@@ -1,4 +1,4 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.MapsPage;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -15,13 +15,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -36,9 +34,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.InflateException;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -47,6 +47,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.appyvet.rangebar.RangeBar;
+import com.example.user.travelguideapps.BaseActivity;
+import com.example.user.travelguideapps.DataHolderClass;
+import com.example.user.travelguideapps.DataParser;
+import com.example.user.travelguideapps.DetectConnection;
+import com.example.user.travelguideapps.DirectionsFetcher;
+import com.example.user.travelguideapps.FirebaseDatabaseUser;
+import com.example.user.travelguideapps.LoginPage.LoginActivity;
+import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.LocationListRecyclerViewAdapter;
+import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.Location_RecyclerView;
+import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.Location_RecyclerView_Selected;
+import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.SelectedLocationListRecyclerViewAdapter;
+import com.example.user.travelguideapps.R;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
@@ -67,6 +79,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.hrules.horizontalnumberpicker.HorizontalNumberPicker;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -85,9 +102,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Vector;
 
-import layout.Location_RecyclerView;
-import layout.Location_RecyclerView_2;
-
 import static com.example.user.travelguideapps.R.id.map;
 
 //How should this works
@@ -101,13 +115,15 @@ import static com.example.user.travelguideapps.R.id.map;
 //Make an "Selected places.page?, show all time/ location/ distance/ and arrangable
 //https://developer.android.com/guide/topics/ui/drag-drop.html use drag and drop is eariser...?
 //if drag and drop not working....
-//TODO:create checkbox in listview to update selected places? (Cancelled)
-//TODO:prevent same location to be set? (Also, change set to place -> Uncheck etc(Done)
-//TODO: that freakin disable View Details from other listview item  problem........ (And Checked listview
 
-//TODO: make different kind of marker for different "maps"
+//TODO: that freakin disable View Details from other listview item  problem....
 
-public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener {
+//TODO: make different kind of marker for different "maps" (kinda?
+//TODO:Design interface
+//TODO:Sometimes picture not showing in selected
+//TODO: Add all place types
+public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient
+        .OnConnectionFailedListener, LocationListener {
     private static final String TAG = "tag";
     static ArrayList<LatLng> markerPoints;
     private static final String TAG_HOME = "home";
@@ -120,217 +136,359 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     private View mProgressView;
     private View mMapFormView;
     private View horizontal_scroll_view;
-    private  View fragmentpoilist;
-    private   ViewPager pager;
+    private View fragmentpoilist;
+    private ViewPager pager;
     private FragmentPagerAdapter recycleadapter;
 
-   private  ExpandableLayout expandableLayout;
+    private ExpandableLayout expandableLayout;
+    private ExpandableLayout FoodLayout;
+    private ExpandableLayout EntertainmentLayout;
 
+    private ExpandableLayout ShopLayout;
+    private ExpandableLayout expandablecategories;
 
     private static TextView mDurationView;
     private static TextView mDistanceView;
     private LocationListRecyclerViewAdapter Locationadapter;
     private static ArrayList Waypoint = new ArrayList();
-    private static Boolean newcolor=false;
-private HorizontalNumberPicker numberpicker;
-private static Location CurrentLocation=BaseActivity.getCurrentLocation();
-    private int minpriceint=-1;
-    private int maxpriceint =-1;
+    private static Boolean newcolor = false;
+    private HorizontalNumberPicker numberpicker;
+    private static Location CurrentLocation = BaseActivity.getCurrentLocation();
+    private int minpriceint = -1;
+    private int maxpriceint = -1;
 
     private static Polyline TempPoly;
     private static List<LinkedHashMap<String, String>> nearbyPlacesList;
-    private static ArrayList<LinkedHashMap<String, String>> WayPointDetailsList=new ArrayList<LinkedHashMap<String, String>>();
+    private static ArrayList<LinkedHashMap<String, String>> WayPointDetailsList = new ArrayList<LinkedHashMap<String, String>>();
 
-
+    private DatabaseReference mDatabase;
+// ...
 
     static ProgressDialog pd;
-
+    GestureDetector gestureDetector;
 
     int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
     private static GoogleMap mMap;
     LocationRequest mLocationRequest = new LocationRequest();
     static ArrayList<Marker> mapMarkers;
+    static ArrayList<Marker> mapMarkersForSelected = new ArrayList<Marker>();
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        //to get waypoints and save it
+        //Get waypoints from others
         String b = DataHolderClass.getInstance().getDistributor_id();
-        //Getting args from others and insert it into waypoints...
-        // Update the second listview and remove/ chcked first listview?
-       // Bundle b= this.getArguments();
-//Check if later can use for the system
+        //Needed?
+        //fa = super.getActivity();
 
-
-
-
-        fa = super.getActivity();
-//        if(view==null) {
-//            //Needed to allow popback...... need to check if there is any other problems... Yup has problem(need to fully destro it?
-//
-//            view = (ConstraintLayout) inflater.inflate(R.layout.activity_maps, container, false);
-//        }
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
                 parent.removeView(view);
         }
-
         try {
-            view = (ConstraintLayout)  inflater.inflate(R.layout.activity_maps, container, false);
+            view = (ConstraintLayout) inflater.inflate(R.layout.activity_maps, container, false);
         } catch (InflateException e) {
     /* map is already there, just return view as it is */
 
-            Log.d(TAG, "cccccccccccYep"+e);
-
         }
-      //  Log.d(TAG, "ccccccccccc"+view);
 
 //There seems to be no point setting this locationadapter....... it is setted in location_RecyclerView..java
-       // Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
+        // Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
 
-        fragmentpoilist = (ConstraintLayout)  inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
+        fragmentpoilist = (ConstraintLayout) inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
         boolean isFirstTime = true;
 
-
-      //  recyclerView.setAdapter(Locationadapter);
-
         //Little hack
-        if(expandableLayout==null) {
-             isFirstTime = true;
+        if (expandableLayout == null) {
+            isFirstTime = true;
 
-        }else{
+        } else {
             isFirstTime = false;
 
         }
+        expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+
+        gestureDetector = new GestureDetector(getActivity(), new GestureDetector.OnGestureListener() {
+            private static final int SWIPE_MIN_DISTANCE = 150;
+            private static final int SWIPE_MAX_OFF_PATH = 100;
+
+            private static final int SWIPE_THRESHOLD_VELOCITY = 100;
+            // private final Activity activity;
+            protected MotionEvent mLastOnDownEvent = null;
+
+            @Override
+            public boolean onDown(MotionEvent e) {
+                return true;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
 
 
+                return false;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            //TODO: Some specific details might be add?(like only bottom, some signal etc
+
+                System.err.println("onFling");
+                System.out.println(e1 + " " + e2);
+                if (e1 == null)
+                    e1 = mLastOnDownEvent;
+                if (e1 == null || e2 == null)
+                    return false;
+
+                float dX = e2.getX() - e1.getX();
+                float dY = e2.getY() - e1.getY();
+
+                if (Math.abs(dX) < SWIPE_MAX_OFF_PATH && Math.abs(velocityX) >= SWIPE_THRESHOLD_VELOCITY && Math.abs(dY) >= SWIPE_MIN_DISTANCE) {
+
+                    if (dY > 0) {
+                        // Toast.makeText(getContext(),"Uh s", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "onfling");
+
+                        expandableLayout.expand();
+
+                        // activity.fetchPrevious();
+                    } else {
+                        // activity.fetchNext();
+                        Log.d(TAG, "onflingnot");
+
+                        expandableLayout.collapse();
+
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        expandableLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
 
 
-        expandableLayout    = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
+                return gestureDetector.onTouchEvent(event);
+
+            }
+        });
 
 
+        if (isFirstTime) {
+            Log.d(TAG, "isfirsttime");
 
-        if(isFirstTime){
-
-             expandableLayout.expand();
+            expandableLayout.expand();
 
 
         }
 
 
         if (b != null) {
+            //Is the clicked existing...
+            String isselected = DataHolderClass.getInstance2().getDistributor_id2();
 
-          String isselected=  DataHolderClass.getInstance2().getDistributor_id2();
-            Log.d(TAG, "cccccccccccYAY"+isselected);
-
-            if(isselected=="isselected"){
-                Log.d(TAG, "cccccccccccYAYremoved");
-
+            if (isselected == "isselected") {
+                //Check b cus b not run
+//When trying to delete waypoint selected
                 Waypoint.remove(b);
-                for(int i=0;i<WayPointDetailsList.size();i++) {
-                    LinkedHashMap<String,String>s=   WayPointDetailsList.get(i);
-                    Log.d(TAG, "cccccyay waydetails removed"+s);
-                    Log.d(TAG, "cccccyay waydetails removed"+b);
+                for (int i = 0; i < WayPointDetailsList.size(); i++) {
+                    LinkedHashMap<String, String> s = WayPointDetailsList.get(i);
+                    Log.d(TAG, "cccccyay waydetails removed" + s);
 
-if (s.containsValue(b)){
-    WayPointDetailsList.remove(i);
-    Log.d(TAG, "cccccyay waydetails removed");
+                    if (s.containsValue(b)) {
+                        WayPointDetailsList.remove(i);
+                        Log.d(TAG, "cccccyay waydetails removed");
 
-}
+                    }
 
-                }
-}else {
-                Log.d(TAG, "cccccccccccYAYadded");
-                String returnedwaypointdetails="";
-                try {
-                    returnedwaypointdetails=   downloadUrl("https://maps.googleapis.com/maps/api/place/details/json?placeid="+b+"&key" +
-                            "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                DataParser dataParser=new DataParser();
-                try {
-                    WayPointDetailsList.add(dataParser.parse(returnedwaypointdetails).get(0));
-
-                }catch(Exception e){
-
-                    Toast.makeText(getActivity(), "Server is busy, Please try again!", Toast.LENGTH_SHORT).show();
 
                 }
+            } else {
 
-                Log.d(TAG, "WayPointDetailsListCHeckiiiing"+WayPointDetailsList.toString());
-    Waypoint.add(b);
-                DataHolderClass.getInstance2().setDistributor_id2(null);
-}
+                //Adding waypoints slected, try to add multike??
+                Waypoint.add(b);
+                Log.d(TAG, "WayPointssssss1" + Waypoint.toString());
+
+                for (int i = 0; i < Waypoint.size(); i++) {
+                    Log.d(TAG, "WayPointssssss222" + Waypoint.toString());
+                    if (WayPointDetailsList == null) {
+
+                        if (WayPointDetailsList.get(i) == null) {
+//Waypint -5, waypont  detals =0
+                            Log.d(TAG, "WayPointssssss333" + Waypoint.toString());
+
+                            String returnedwaypointdetails = "";
+                            try {
+                                returnedwaypointdetails = downloadUrl("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + Waypoint.get
+
+                                        (i) +
+                                        "&key" +
+                                        "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            DataParser dataParser = new DataParser();
+                            try {
+                                WayPointDetailsList.add(dataParser.parse(returnedwaypointdetails).get(0));
+
+                            } catch (Exception e) {
+
+                                Toast.makeText(getActivity(), "Server is busy, Please try again!", Toast.LENGTH_SHORT).show();
+
+                            }
+
+                            Log.d(TAG, "WayPointDetailsListCHeckiiiing" + WayPointDetailsList.toString());
+                            DataHolderClass.getInstance2().setDistributor_id2(null);
+                        }
+                    }
+                }
+            }
             Toast.makeText(getActivity(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
             //Use these waypoints to change all marker.
 
+            if (mapMarkersForSelected != null) {
+
+                //Is empty first time runt
+                Log.d("onPostExecute", "BeforeFirsttimechecked" + mapMarkersForSelected);
 
 
-if(!Waypoint.isEmpty()) {
-    //This draws path when returning to page
-    LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
-    String url = getDirectionsUrl(latlng, null);
+            }
+//Nurse: If I walk away from the computer, sometimes when I come back there is a picture of a man riding a scooter on it.
+            try {
+                int j = mapMarkersForSelected.size();
+                for (int i = 0; i < j; i++) {
+                    // i=0, j=0 no run
+                    //i=0 j=1 run once delete first...
+                    //i=0 j=2
 
-    DownloadTask downloadTask = new DownloadTask();
-    Log.d(TAG, "THE URL is IS 1st" + url);
+                    //This remove all markers, welll should (Seems to be becausee all is different,
+                    Marker test = mapMarkersForSelected.get(0);
+                    test.remove();
+                    mapMarkersForSelected.remove(0);
 
-    // Start downloading json data from Google Directions API
-    downloadTask.execute(url);
 
-}
+                }
+            } catch (Exception e) {
+                Log.d("onPostExecute", "WeirdOperation6Exception" + e);
+
+
+            }
+            if (mapMarkersForSelected != null) {
+
+
+                Log.d("onPostExecute", "Firsttimechecked" + mapMarkersForSelected);
+
+            }
+            List<LinkedHashMap<String, String>> o = SelectedLocationListRecyclerViewAdapter.getItem();
+
+            Log.d("onPostExecute", "WeirdOperation7 Object SIze" + o.size());
+            Log.d("onPostExecute", "WeirdOperation7 Object SIze" + o.toString());
+
+
+
+            if (o != null) {
+                Log.d("onPostExecute", "Tried to remove marker Size" + mapMarkersForSelected.size());
+
+                Log.d("onPostExecute", "Tried to remove marker Size What" + mapMarkersForSelected);
+
+
+                for (int i = 0; i < o.size(); i++) {
+                    Log.d("onPostExecute", "We have entered here " + o.toString());
+                    Log.d("onPostExecute", "We have entered here " + o.size());
+
+                    String waypointlat = (String) o.get(i).get("lat").toString();
+
+                    String waypointlng = (String) o.get(i).get("lng").toString();
+                    LatLng waypointlatLng = new LatLng(Double.parseDouble(waypointlat), Double.parseDouble(waypointlng));
+                    MarkerOptions wayPointmarkerOptions = new MarkerOptions();
+                    wayPointmarkerOptions.position(waypointlatLng);
+                    wayPointmarkerOptions.title("Clicked!");
+                    wayPointmarkerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.yellowmarker, Integer.toString(i + 1)
+                    )));
+                    wayPointmarkerOptions.zIndex(10);
+                    Log.d("onPostExecute", "Tried to remove markeoptions" + wayPointmarkerOptions);
+
+                    mapMarkersForSelected.add(mMap.addMarker(wayPointmarkerOptions));
+
+                }
+            }
+            if (mapMarkersForSelected != null) {
+
+
+                Log.d("onPostExecute", "secondtimechecked" + mapMarkersForSelected);
+
+            }
+
+            if (!Waypoint.isEmpty()) {
+                //This draws path when returning to page
+                LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
+                String url = getDirectionsUrl(latlng, null);
+
+                DownloadTask downloadTask = new DownloadTask();
+                Log.d(TAG, "THE URL is IS 1st" + url);
+
+                // Start downloading json data from Google Directions API
+                downloadTask.execute(url);
+
+            }
         }
 
         pager = (ViewPager) view.findViewById(R.id.vpPagerpoilist);
 
         //TODO:has changed to child, use support if problem persist?
-        recycleadapter=new MyPagerAdapter(getChildFragmentManager());
-        pager.setAdapter(recycleadapter);
+        recycleadapter = new MyPagerAdapter(getChildFragmentManager());
+        try {
+            pager.setAdapter(recycleadapter);
+        }catch(Exception e){
+            //TODO:java.lang.NullPointerException: Attempt to invoke virtual method 'android.os.Handler android.support.v4.app.FragmentHostCallback.getHandler()' on a null object reference
+                           Toast.makeText(getActivity(), "Uh oh! Some error has occured  ", Toast.LENGTH_SHORT).show();
+
+
+        }
+
         pd.setMessage("Loading Path...");
         pd.setCancelable(false);
-        numberpicker=(HorizontalNumberPicker)view.findViewById(R.id.radiusPicker);
+        numberpicker = (HorizontalNumberPicker) view.findViewById(R.id.radiusPicker);
         numberpicker.setMaxValue(10);
         numberpicker.setMinValue(1);
         numberpicker.setValue(5);
 
 
-
-
-        Button categories_expandable_layout=(Button)view.findViewById(R.id.opensetting);
         //TODO:Not sure fixed or not
-     //    LinearLayout linearLayout = (LinearLayout)  view.findViewById(R.id.linearLayout);
-   //    final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) linearLayout.getLayoutParams();
+        //    LinearLayout linearLayout = (LinearLayout)  view.findViewById(R.id.linearLayout);
+        //    final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) linearLayout.getLayoutParams();
 
 
-        categories_expandable_layout.setOnClickListener(new View.OnClickListener() {
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    public void onClick(View v) {
-
-        expandableLayout.toggle();
-        if (expandableLayout.isExpanded()) {
-     //       lp.verticalWeight = 1;
-        }else{
-          //  lp.verticalWeight = 2;
-        }
-    }
-});
-
-
-        RangeBar pricerangebar=(RangeBar) view.findViewById(R.id.pricerangebar);
+        RangeBar pricerangebar = (RangeBar) view.findViewById(R.id.pricerangebar);
 
         pricerangebar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onRangeChangeListener(RangeBar rangeBar, int leftPinIndex,
                                               int rightPinIndex,
                                               String leftPinValue, String rightPinValue) {
-                minpriceint =leftPinIndex;
-                maxpriceint =rightPinIndex;
-                Log.d("checkrange",leftPinValue+rightPinValue);
+                minpriceint = leftPinIndex;
+                maxpriceint = rightPinIndex;
+                Log.d("checkrange", leftPinValue + rightPinValue);
 
             }
         });
-
-
-
 
 
 //        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
@@ -370,45 +528,95 @@ if(!Waypoint.isEmpty()) {
 
         // AutoCompleteTextView from = (AutoCompleteTextView) v.findViewById(R.id.from);
         //   AutoCompleteTextView to = (AutoCompleteTextView) v.findViewById(R.id.to);
-        Button but = (Button)  view.findViewById(R.id.load_directions);
-        Button SearchBar = (Button)  view.findViewById(R.id.Bar);
-        Button SearchBank = (Button)  view.findViewById(R.id.Bank);
-        Button SearchAmusement = (Button)  view.findViewById(R.id.amusement_park);
-        Button SearchCafe = (Button)  view.findViewById(R.id.cafe);
-        Button SearchCasino = (Button)  view.findViewById(R.id.casino);
-        Button SearchNightCLub = (Button)  view.findViewById(R.id.night_club);
-        mDurationView = (TextView)  view.findViewById(R.id.duration_label);
-        mDistanceView = (TextView)  view.findViewById(R.id.distance_label);
-        Button SelectTypes = (Button)  view.findViewById(R.id.selecttypes);
-        Button opencategories = (Button)  view.findViewById(R.id.OpenCategoriesView);
+        Button but = (Button) view.findViewById(R.id.load_directions);
+//        Button SearchBar = (Button)  view.findViewById(R.id.Bar);
+//        Button SearchBank = (Button)  view.findViewById(R.id.Bank);
+//        Button SearchAmusement = (Button)  view.findViewById(R.id.amusement_park);
+//        Button SearchCafe = (Button)  view.findViewById(R.id.cafe);
+//        Button SearchCasino = (Button)  view.findViewById(R.id.casino);
+//        Button SearchNightCLub = (Button)  view.findViewById(R.id.night_club);
+        mDurationView = (TextView) view.findViewById(R.id.duration_label);
+        mDistanceView = (TextView) view.findViewById(R.id.distance_label);
+        Button SelectTypes = (Button) view.findViewById(R.id.selecttypes);
 
 
-        final ExpandableLayout expandablecategories
-                = (ExpandableLayout) view.findViewById(R.id.categories_expandable_layout);
+        Button opencategories = (Button) view.findViewById(R.id.OpenCategoriesView);
+        Button openFoodLayout = (Button) view.findViewById(R.id.FoodButton);
+        Button openEntertainmentLayout = (Button) view.findViewById(R.id.EntertainmentButton);
+        Button openShopLayout = (Button) view.findViewById(R.id.ShopButton);
+        Button categories_expandable_layout = (Button) view.findViewById(R.id.opensetting);
+        ConstraintLayout Selectedview = (ConstraintLayout) inflater.inflate(R.layout.fragment_location__recycler_view2, container, false);
 
-        opencategories.setOnClickListener(new View.OnClickListener() {
+        Button savefirebase = (Button) Selectedview.findViewById(R.id.save);
+        Button loadfirebase = (Button) Selectedview.findViewById(R.id.load);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+
+        savefirebase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Toast.makeText(getActivity(), "Location Saved!  ", Toast.LENGTH_SHORT).show();
 
-                expandablecategories.toggle();
+             //   final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
 
+                BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).setValue(Waypoint);
 
             }
         });
 
+        loadfirebase.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getActivity(), "Location Loaded!  ", Toast.LENGTH_SHORT).show();
+
+                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference ref = database.getReference("users");
+                ref.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        FirebaseDatabaseUser post = dataSnapshot.getValue(FirebaseDatabaseUser.class);
+
+                        System.out.println("THIS IS IT"+post);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        System.out.println("The read failed: " + databaseError.getCode());
+                    }
 
 
-        final CheckBox barCheckBox=(CheckBox)        view.findViewById(R.id.barCheckBox);
-        final CheckBox restaurantCheckBox=(CheckBox)        view.findViewById(R.id.restaurantCheckBox);
-        final CheckBox amusement_parkCheckBox=(CheckBox)        view.findViewById(R.id.amusement_parkCheckBox);
 
-        final CheckBox libraryCheckBox=(CheckBox)        view.findViewById(R.id.libraryCheckBox);
-        final CheckBox shopping_mallCheckBox=(CheckBox)        view.findViewById(R.id.shopping_mallCheckBox);
+            });
+            }
+        });
+        opencategories.setOnClickListener(onClickListener);
+        openFoodLayout.setOnClickListener(onClickListener);
+        openEntertainmentLayout.setOnClickListener(onClickListener);
+        openShopLayout.setOnClickListener(onClickListener);
+        categories_expandable_layout.setOnClickListener(onClickListener);
+        //  ex.setOnClickListener(onClickListener);
+
+        expandablecategories = (ExpandableLayout) view.findViewById(R.id.categories_expandable_layout);
+
+        FoodLayout = (ExpandableLayout) view.findViewById(R.id.FoodExpandable);
+
+        EntertainmentLayout = (ExpandableLayout) view.findViewById(R.id.EntertainmentExpandable);
+
+        ShopLayout = (ExpandableLayout) view.findViewById(R.id.ShopExpandable);
 
 
+        final CheckBox barCheckBox = (CheckBox) view.findViewById(R.id.barCheckBox);
+        final CheckBox restaurantCheckBox = (CheckBox) view.findViewById(R.id.restaurantCheckBox);
+        final CheckBox amusement_parkCheckBox = (CheckBox) view.findViewById(R.id.amusement_parkCheckBox);
+
+        final CheckBox libraryCheckBox = (CheckBox) view.findViewById(R.id.libraryCheckBox);
+        final CheckBox shopping_mallCheckBox = (CheckBox) view.findViewById(R.id.shopping_mallCheckBox);
 
 
+        final CheckBox aquarium_CheckBox = (CheckBox) view.findViewById(R.id.aquariumCheckBox);
+        final CheckBox book_Store_CheckBox = (CheckBox) view.findViewById(R.id.bookstoreCheckBox);
+
+        final CheckBox movie_theater_CheckBox = (CheckBox) view.findViewById(R.id.movietheaterCheckBox);
+        //  final CheckBox shopping_mallCheckBox=(CheckBox)        view.findViewById(R.id.shopping_mallCheckBox);
 
 
 //TODO:For dialogbox
@@ -445,74 +653,91 @@ if(!Waypoint.isEmpty()) {
 
         SelectTypes.setOnClickListener(new View.OnClickListener() {
 
-                                           @Override
-                                           public void onClick(View v) {
-LocationType=new StringBuilder();
-                                               if (!DetectConnection.checkInternetConnection(getActivity())) {
-                                                   Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
-                                               } else
+            @Override
+            public void onClick(View v) {
+                LocationType = new StringBuilder();
+                if (!DetectConnection.checkInternetConnection(getActivity())) {
+                    Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
+                } else
 
-                                               {
-                                                   newcolor=false;
-                                                   mMap.clear();
-                                               if(barCheckBox.isChecked()){
-
-                                                   LocationType.append("bar|");
-
-                                               }
-                                                   if(restaurantCheckBox.isChecked()){
-
-                                                       LocationType.append("restaurant|");
-
-                                                   }
-
-                                                   if(amusement_parkCheckBox.isChecked()){
-
-                                                       LocationType.append("amusement_park|");
-
-                                                   }
-                                                   if(shopping_mallCheckBox.isChecked()){
-
-                                                       LocationType.append("shopping_mall|");
-
-                                                   }
-                                                   if(libraryCheckBox.isChecked()){
-
-                                                       LocationType.append("library|");
-
-                                                   }
-
-                                                   try {
-                                                       if(LocationType.toString()!="") {
-                                                           setRecyclerView(LocationType);
-
-                                                       }else{
-                                                                      Toast.makeText(getActivity(), "Please Select Types", Toast.LENGTH_SHORT).show();
+                {
 
 
-                                                       }
+                    newcolor = false;
+                    mMap.clear();
+                    if (barCheckBox.isChecked()) {
 
-                                                   } catch (IllegalAccessException e) {
-                                                       e.printStackTrace();
-                                                   } catch (java.lang.InstantiationException e) {
-                                                       e.printStackTrace();
-                                                   }
-                                               }
+                        LocationType.append("bar|");
 
-                                               Log.d(TAG, "Runned hmmm ");
+                    }
+                    if (restaurantCheckBox.isChecked()) {
 
-                                                expandableLayout.collapse();
+                        LocationType.append("restaurant|");
+
+                    }
+
+                    if (amusement_parkCheckBox.isChecked()) {
+
+                        LocationType.append("amusement_park|");
+
+                    }
+                    if (shopping_mallCheckBox.isChecked()) {
+
+                        LocationType.append("shopping_mall|");
+
+                    }
+                    if (aquarium_CheckBox.isChecked()) {
+
+                        LocationType.append("aquarium|");
+
+                    }
+                    if (movie_theater_CheckBox.isChecked()) {
+
+                        LocationType.append("movie_theater|");
+
+                    }
+                    if (libraryCheckBox.isChecked()) {
+
+                        LocationType.append("library|");
+
+                    }
+                    if (book_Store_CheckBox.isChecked()) {
+
+                        LocationType.append("library|");
+
+                    }
+
+                    try {
+                        if (LocationType.toString() != "") {
+                            expandableLayout.collapse();
+
+                            setRecyclerView(LocationType);
+
+                        } else {
+                            Toast.makeText(getActivity(), "Please Select Types", Toast.LENGTH_SHORT).show();
 
 
-                                           }
-                                       });
+                        }
 
-        SearchBar.setOnClickListener(onClickListener);
-        SearchBank.setOnClickListener(onClickListener);
-        SearchAmusement.setOnClickListener(onClickListener);
-        SearchCafe.setOnClickListener(onClickListener);
-        SearchCasino.setOnClickListener(onClickListener);
-        SearchNightCLub.setOnClickListener(onClickListener);
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (java.lang.InstantiationException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                Log.d(TAG, "Runned hmmm ");
+
+
+            }
+        });
+
+//        SearchBar.setOnClickListener(onClickListener);
+//        SearchBank.setOnClickListener(onClickListener);
+//        SearchAmusement.setOnClickListener(onClickListener);
+//        SearchCafe.setOnClickListener(onClickListener);
+//        SearchCasino.setOnClickListener(onClickListener);
+//        SearchNightCLub.setOnClickListener(onClickListener);
 
         //Testing Purpose, delete later
         // List<String> data=new List<String>()      {"abc"};
@@ -522,29 +747,24 @@ LocationType=new StringBuilder();
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 
 
-    //    nearbyPlacesList=  new ArrayList<LinkedHashMap<String, String>>();
+        //    nearbyPlacesList=  new ArrayList<LinkedHashMap<String, String>>();
 
-   //     Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
+        //     Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
 
-    //   recyclerView.setAdapter(Locationadapter);
+        //   recyclerView.setAdapter(Locationadapter);
 
 
-         TextView emptyText = (TextView)  view.findViewById(android.R.id.empty);
-     //   recyclerView.setEmptyView(emptyText);
+        TextView emptyText = (TextView) view.findViewById(android.R.id.empty);
+        //   recyclerView.setEmptyView(emptyText);
         // FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-       // Log.d("checkrange","qqqqqq"+emptyText.getText());
+        // Log.d("checkrange","qqqqqq"+emptyText.getText());
 
 
         //TODO:uh what is this.
-     //   Vector<View> pages = new Vector<View>();
-       // pages.add(recyclerView);
+        //   Vector<View> pages = new Vector<View>();
+        // pages.add(recyclerView);
 
-   //     pages.add(recyclerView);
-
-
-
-
-
+        //     pages.add(recyclerView);
 
 
 //Todo: Currently doing this.... error try filtering itemss first
@@ -632,8 +852,8 @@ LocationType=new StringBuilder();
 //                    }
 //                }
 
-       //     }
-   //     });
+        //     }
+        //     });
 
 
         //from.setAdapter(new LocationAutoCompleteAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line));
@@ -643,7 +863,7 @@ LocationType=new StringBuilder();
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(map);
 
-                  mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);
         // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing
         // API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -654,12 +874,13 @@ LocationType=new StringBuilder();
         }
 
 
-     //   mMapFormView = view.findViewById(R.id.list_form);
+        //   mMapFormView = view.findViewById(R.id.list_form);
         mProgressView = view.findViewById(R.id.maps_progress);
 
         Log.d(TAG, "Visibibility checking if progess is showing" + mProgressView.getVisibility());
         return view;
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "Successfully Logged in");
@@ -694,6 +915,49 @@ LocationType=new StringBuilder();
 //        }
 //
 //    }
+//STORE
+//jewelry_store
+//liquor_store
+    //pharmacy
+    //            electronics_store
+//    shoe_store
+//            convenience_store
+//            clothing_store
+//                    store
+
+//                    department_store
+
+    //SERVICES
+//beauty_salon
+////    doctor
+
+    //FOOD
+    ////    cafe
+    //bakery
+
+
+//ENTERTAIN
+    //    spa
+//            gym
+
+//bowling_alley
+//        campground
+
+    //TRAVEL
+//    car_rental
+    //            parking
+//    subway_station
+//            bus_station
+//    transit_station
+//            train_station
+//    taxi_stand
+
+    //RELIGIONS
+//            church
+//    hindu_temple
+//            mosque
+//
+
 
     private View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
@@ -703,80 +967,68 @@ LocationType=new StringBuilder();
             } else
 
             {
-newcolor=false;
-                mMap.clear();
                 switch (v.getId()) {
-                    case R.id.Bar:
+                    case R.id.FoodButton:
+                        FoodLayout.toggle();
                         //LocationType = "bar";
                         break;
-                    case R.id.Bank:
-                     //   LocationType = "bank";
+                    case R.id.EntertainmentButton:
+                        EntertainmentLayout.toggle();
                         break;
-                    case R.id.amusement_park:
-                     //   LocationType = "amusement_park";
+                    case R.id.ShopButton:
+                        ShopLayout.toggle();
                         break;
-                    case R.id.cafe:
-                  //      LocationType = "cafe";
+                    case R.id.OpenCategoriesView:
+                        expandablecategories.toggle();
+
                         break;
-                    case R.id.casino:
-                   //     LocationType = "casino";
+
+                    case R.id.opensetting:
+
+                        expandableLayout.toggle();
                         break;
-                    case R.id.night_club:
-                  //      LocationType = "night_club";
-                        break;
+
                 }
-                try {
-                    setRecyclerView(LocationType);
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (java.lang.InstantiationException e) {
-                    e.printStackTrace();
-                }
+
             }
         }
 
     };
 
 
-
-
-
     //todo: check whether to move "List" to another classes (wtf i dont think locationtype is used.
     private void setRecyclerView(StringBuilder locationType) throws IllegalAccessException, java.lang.InstantiationException {
-        try{
+        try {
 
-             StringBuilder sbValue = new StringBuilder(nearbyListBuilder());
-
-
+            StringBuilder sbValue = new StringBuilder(nearbyListBuilder());
 
 
+            if (sbValue.toString() != null) {
 
-        if(sbValue.toString()!=null) {
+                PlacesTask placesTask = new PlacesTask();
+                placesTask.execute(sbValue.toString());
 
-            PlacesTask placesTask = new PlacesTask();
-            placesTask.execute(sbValue.toString());
+                recycleadapter.notifyDataSetChanged();
 
-            recycleadapter.notifyDataSetChanged();
-
-}else{
+            } else {
 // Temporary solution, make sure it does not (to refesth the page) Note:(Probably fixed but not sure)
 
-    Toast.makeText(getActivity(), "Some Error has occured, please try again later 1!", Toast.LENGTH_LONG).show();
-    Fragment fragment = null;
-    Class fragmentClass=null;
-    fragmentClass = MapsActivity.class;
+                Toast.makeText(getActivity(), "Some Error has occured, please try again later 1!", Toast.LENGTH_LONG).show();
+                Fragment fragment = null;
+                Class fragmentClass = null;
+                fragmentClass = MapsActivity.class;
 
-    fragment = (Fragment) fragmentClass.newInstance();
-    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-    fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
+                fragment = (Fragment) fragmentClass.newInstance();
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
 
-}
-    }catch(Exception e){
+            }
+        } catch (Exception e) {
 
-            Toast.makeText(getActivity(), "Exception:"+e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), "Exception:" + e.toString(), Toast.LENGTH_LONG).show();
             Fragment fragment = null;
-            Class fragmentClass=null;
+            Class fragmentClass = null;
             fragmentClass = MapsActivity.class;
 
             fragment = (Fragment) fragmentClass.newInstance();
@@ -786,24 +1038,33 @@ newcolor=false;
 
         }
     }
+
     //Uses for text sizes in Marker
-    public static int convertToPixels(Context context, int nDP)
-    {
+    public static int convertToPixels(Context context, int nDP) {
         final float conversionScale = context.getResources().getDisplayMetrics().density;
 
-        return (int) ((nDP * conversionScale) + 0.5f) ;
+        return (int) ((nDP * conversionScale) + 0.5f);
 
     }
+
     private Bitmap writeTextOnDrawable(int drawableId, String text) {
 
         Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId)
                 .copy(Bitmap.Config.ARGB_8888, true);
-      bm=  Bitmap.createScaledBitmap(bm, 100, 100, false);
+        bm = Bitmap.createScaledBitmap(bm, 100, 100, false);
         Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
 
         Paint paint = new Paint();
         paint.setStyle(Paint.Style.FILL);
-        paint.setColor(Color.WHITE);
+        if (drawableId == R.drawable.yellowmarker) {
+
+            paint.setColor(Color.BLACK);
+
+        } else {
+            paint.setColor(Color.WHITE);
+
+
+        }
         paint.setTypeface(tf);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setTextSize(convertToPixels(getActivity(), 11));
@@ -814,70 +1075,76 @@ newcolor=false;
         Canvas canvas = new Canvas(bm);
 
         //If the text is bigger than the canvas , reduce the font size
-        if(textRect.width() >= (canvas.getWidth() - 4))     //the padding on either sides is considered as 4, so as to appropriately fit in the text
+        if (textRect.width() >= (canvas.getWidth() - 4))     //the padding on either sides is considered as 4, so as to appropriately fit in the text
             paint.setTextSize(convertToPixels(getActivity(), 7));        //Scaling needs to be used for different dpi's
 
         //Calculate the positions
         int xPos = (canvas.getWidth() / 2) - 2;     //-2 is for regulating the x position offset
 
         //"- ((paint.descent() + paint.ascent()) / 2)" is the distance from the baseline to the center.
-        int yPos = (int) ((canvas.getHeight() / 2)) ;
+        int yPos = (int) ((canvas.getHeight() / 2));
 // - ((paint.descent() + paint.ascent()) / 2)
         canvas.drawText(text, xPos, yPos, paint);
 
-        return  bm;
+        return bm;
     }
 
-    public static ArrayList<Marker> getMapMarkers(){
-        if (mapMarkers!=null) {
+    public static ArrayList<Marker> getMapMarkers() {
+        if (mapMarkers != null) {
             Log.d("onPostExecute", "markeristhisnow2");
 
             return mapMarkers;
-        }else{
+        } else {
 
             Log.d("onPostExecute", "markeristhisnow1");
 
             return null;
         }
     }
-public static List<LinkedHashMap<String, String>> getNearbyPlacesList(){
+
+    public static List<LinkedHashMap<String, String>> getNearbyPlacesList() {
 
 
+        return nearbyPlacesList;
+    }
 
-    return nearbyPlacesList;
-}
-
-    public static ArrayList<LinkedHashMap<String, String>> getWayPointDetailsList(){
-
+    public static ArrayList<LinkedHashMap<String, String>> getWayPointDetailsList() {
 
 
         return WayPointDetailsList;
     }
-    public static ArrayList getWaypoint(){
 
+    public static ArrayList getWaypoint() {
 
 
         return Waypoint;
     }
+    public static void setWaypoint(ArrayList wayoint) {
 
+Waypoint=wayoint;
+    }
 
-    public void setNearbyPlacesList(List<LinkedHashMap<String, String>> nearbyPlacesListFrom){
+    public void setNearbyPlacesList(List<LinkedHashMap<String, String>> nearbyPlacesListFrom) {
 
-        nearbyPlacesList=nearbyPlacesListFrom;
+        nearbyPlacesList = nearbyPlacesListFrom;
 
     }
-      //TODO:Currently Doing this, try to do a if else for 1 marker (select list)? or multiple marker
-     private void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
 
+    //TODO:Currently Doing this, try to do a if else for 1 marker (select list)? or multiple marker
+    private void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
 
 
         //To let others get it
         setNearbyPlacesList(nearbyPlacesList);
 
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
 
         mapMarkers = new ArrayList<Marker>();
         for (int i = 0; i < nearbyPlacesList.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
+
+
             LinkedHashMap<String, String> googlePlace = nearbyPlacesList.get(i);
             Log.d("onPostExecute", "Entered into showing locations" + googlePlace.toString());
 
@@ -887,58 +1154,37 @@ public static List<LinkedHashMap<String, String>> getNearbyPlacesList(){
             double lat = Double.parseDouble(googlePlace.get("lat"));
 
 
-
-            String photo_reference = googlePlace.get("photo_reference");
-            //TODO:Doing this, must try Here it is, try to provide different markers.
             LatLng latLng = new LatLng(lat, lng);
             markerOptions.position(latLng);
             markerOptions.title(placeName + " : " + vicinity);
-
-
             //Run the provate function above to get special marker
-            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.marker,Integer.toString(i) )));
-
-
+            markerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.marker, Integer.toString(i + 1))));
+            markerOptions.zIndex(1);
 
             // markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
-       //     markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bmp));
-         //   Log.d("onPostExecute", "ooooooo" + bmp.toString());
+            //     markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bmp));
+            //   Log.d("onPostExecute", "ooooooo" + bmp.toString());
 
 
             mapMarkers.add(mMap.addMarker(markerOptions));
 
 
-
-            //mMap.addMarker(markerOptions);
-            Log.d(TAG, "CheckinggggggggggggmarkerOptions 2" + markerOptions);
-
-            //Default
-            Log.d("onPostExecute", "markeristhis" + mapMarkers.toString());
-
-            LatLngBounds.Builder builder = new LatLngBounds.Builder();
-            for (Marker marker : mapMarkers) {
-                builder.include(marker.getPosition());
-            }
-            LatLngBounds bounds = builder.build();
-            int padding = 150; // offset from edges of the map in pixels
-            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-           mMap.animateCamera(cu);
-        //    mMap.moveCamera(cu);
-
-
-
-            //move map camera
-        //    mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-         //   mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
         }
 
+        for (Marker marker : mapMarkers) {
+            builder.include(marker.getPosition());
+        }
+        LatLngBounds bounds = builder.build();
+
+        int padding = 150; // offset from edges of the map in pixels
+        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
+
+        mMap.animateCamera(cu);
 
         Log.d("onPostExecute", "markeristhisoutside" + getMapMarkers().toString());
 
 
     }
-
 
 
     /**
@@ -970,62 +1216,71 @@ public static List<LinkedHashMap<String, String>> getNearbyPlacesList(){
         }
 
 
-
-
         //Top right symbol
         mMap.setMyLocationEnabled(true);
 
 
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                DetectConnection check = new DetectConnection();
+                if (!DetectConnection.checkInternetConnection(getActivity())) {
+                    Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
+                    return false;
+                } else {
 
+                    recyclerView = (RecyclerView) view.findViewById(R.id.poilistRecyclerView);
 
-//        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-//            @Override
-//            public boolean onMarkerClick(Marker marker) {
-//                DetectConnection check = new DetectConnection();
-//                if (!DetectConnection.checkInternetConnection(getActivity())) {
-//                    Toast.makeText(getActivity(), "No Internet!", Toast.LENGTH_SHORT).show();
-//                    return false;
-//                } else {
-//
-//                    Log.d("onMarkerCLick", marker.toString());
-//                    ArrayList<View> children = new ArrayList<View>();
-//
-//                    for (int i = recyclerView.getItemCount() - 1; i >= 0; i--) {
-//                        HashMap<String, Object> obj = (HashMap<String, Object>) recyclerView.getItemAtPosition(i);
-//
-//                        String lat = (String) obj.get("lat");
-//                        String lng = (String) obj.get("lng");
-//                        recyclerView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
-//                        //TODO : Highlight item when marker is clicked.
-//                        if (lat.equals(String.valueOf(marker.getPosition().latitude)) && lng.equals(String.valueOf(marker.getPosition().longitude))) {
-//
-//                            recyclerView.setItemChecked(i, true);
-//                            //  recyclerView.setSelection(i);
-//                            recyclerView.smoothScrollToPosition(i);
-//                            break;
-//                        }
-//                        children.add(recyclerView.getChildAt(i));
-//                    }
-//                    showPath(marker);
-//                    //
-//                    return true;
-//                }
-//            }
-//        });
+                    //When clicked,have got marker lat and lng....how to compare
+                    Log.d("onMarkerCLick", marker.toString());
+                    ArrayList<View> children = new ArrayList<View>();
+
+                    for (int i = recyclerView.getAdapter().getItemCount() - 1; i >= 0; i--) {
+                        //     HashMap<String, Object> obj = (HashMap<String, Object>);
+                        List<LinkedHashMap<String, String>> o = LocationListRecyclerViewAdapter.getItem();
+
+                        String lat = (String) o.get(i).get("lat").toString();
+
+                        String lng = (String) o.get(i).get("lng").toString();
+
+                        // recyclerView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+                        //TODO : Highlight item when marker is clicked.
+                        if (lat.equals(String.valueOf(marker.getPosition().latitude)) && lng.equals(String.valueOf(marker.getPosition().longitude))) {
+//if same , then below will moves recyclerview
+
+                            RecyclerView.ViewHolder holder2 = LocationListRecyclerViewAdapter.getHolder2();
+
+                            //   recyclerView.getAdapter().setItemChecked(i, true);
+                            //  recyclerView.setSelection(i);
+                            Log.d("onBitch", holder2.itemView.toString());
+                            //   recyclerView.setSelected(true);
+                            holder2.itemView.setSelected(true);
+
+                            recyclerView.smoothScrollToPosition(i);
+                            break;
+                        }
+                        children.add(recyclerView.getChildAt(i));
+                    }
+                    showPath(marker);
+
+                    return true;
+                }
+            }
+        });
 
     }
-private static Marker placeholdermarker;
+
+    private static Marker placeholdermarker;
+    private static Marker placeholdermarker2;
 
     //TODO:How to use : different colour marker/path, retain 2 different path.
     //Done when item in listview is clicked
-    //Also when marker is clicked
+    //Also when marker is clicked (add a merker and show path)
     public static void showPath(Marker marker) {
-
-
+//marker is a oldmarker
+//When cliekd.show ptah and new marker, then delete if has ecisintg marker
         Log.d(TAG, "Checkinggggggggggggmarker" + marker);
         Log.d(TAG, "Checkinggggggggggggmapmarkwrs" + mapMarkers);
-
-
 
 
         marker.showInfoWindow();
@@ -1049,32 +1304,28 @@ private static Marker placeholdermarker;
         // Creating MarkerOptions
 
 
-
-
-
         LatLng origin = markerPoints.get(0);
         LatLng dest = markerPoints.get(1);
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         LatLngBounds bounds;
         for (Marker c : mapMarkers) {
-            Log.d(TAG, "Ismapmarker  " );
+            Log.d(TAG, "Ismapmarker  ");
             //builder.include(c.getPosition());
 
-            if (dest.latitude==c.getPosition().latitude && dest.longitude==c.getPosition().longitude){
-                c.remove();
-                Log.d(TAG, "Ismapmarkerrunning  " );
+            if (dest.latitude == c.getPosition().latitude && dest.longitude == c.getPosition().longitude) {
+                //  c.remove();
+                //c is the exisintg marker?
+                Log.d(TAG, "Ismapmarkerrunning  ");
                 builder.include(marker.getPosition());
 
 
-
                 //break causes for to not run completely, need to change that to show all waypotinst/markers
-               //    break;
+                //    break;
             }
         }
 
         builder.include(currentLatlng);
         bounds = builder.build();
-
 
 
         int padding = 150; // offset from edges of the map in pixels
@@ -1083,35 +1334,34 @@ private static Marker placeholdermarker;
         mMap.animateCamera(cu);
 
 
-
-
-        MarkerOptions markerOptions=new MarkerOptions();
+        MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(dest);
+        markerOptions.zIndex(8);
+        placeholdermarker2 = mMap.addMarker(markerOptions);
 
-        mMap.addMarker(markerOptions);
+
         //Default
         Log.d(TAG, "CheckinggggggggggggmarkerOptions 1" + markerOptions);
 
-        if(placeholdermarker!=null) {
+        if (placeholdermarker != null) {
             Log.d(TAG, "Checkingggggggggggg" + placeholdermarker.toString());
             placeholdermarker.remove();
+
             //TODO: Check how to remove the placeholdermarker....
-
-
+//Wait,,,,,,,, this replace the original?????
         }
-        placeholdermarker=marker;
-
+        placeholdermarker = placeholdermarker2;
 
 
         //move map camera
-     //   mMap.moveCamera(CameraUpdateFactory.newLatLng(dest));
-       // mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
+        //   mMap.moveCamera(CameraUpdateFactory.newLatLng(dest));
+        // mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
         // Getting URL to the Google Directions API
         String url = getDirectionsUrl(origin, dest);
 //Doing this, should... easiest way is to get a variable here to change color...
         DownloadTask downloadTask = new DownloadTask();
         Log.d(TAG, "THE URL is  IS ...2nd " + url);
-newcolor=true;
+        newcolor = true;
         // Start downloading json data from Google Directions API
         downloadTask.execute(url);
 
@@ -1183,16 +1433,16 @@ newcolor=true;
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
         // Destination of route
-        String str_dest="";
-        if (dest!=null) {
+        String str_dest = "";
+        if (dest != null) {
             Log.d(TAG, "whathasbeendone1");
 
             str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         }
 
         //TODO: fixed this pile of messy code.. Logic might become easier.
-        String waypoint=new String();
-        StringBuilder waypointsb=new StringBuilder();
+        String waypoint = new String();
+        StringBuilder waypointsb = new StringBuilder();
         if (!Waypoint.isEmpty()) {
             Log.d(TAG, "whathasbeendone2");
 
@@ -1200,39 +1450,39 @@ newcolor=true;
             waypointsb.append("optimize:true|");
 
 
-            if (dest!=null) {
+            if (dest != null) {
                 Log.d(TAG, "whathasbeendone3");
 
                 for (int i = 0; i < Waypoint.size(); i++) {
                     //TODO:Optimize =true should not be hard coded, require to change according to users choice,
                     //optimize:true|
-                    waypoint = (waypointsb.append("place_id:"+ Waypoint.get(i) + "|").toString());
+                    waypoint = (waypointsb.append("place_id:" + Waypoint.get(i) + "|").toString());
                     Log.d(TAG, "whathasbeendone4");
 
                 }
 
 
-            }else{
-str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
+            } else {
+                str_dest = "destination=place_id:" + Waypoint.get(Waypoint.size() - 1).toString();
                 //When waypoint has only 1 varible
-               if(Waypoint.size()!=1) {
-                   for (int i = 0; i < Waypoint.size() - 1; i++) {
-                       Log.d(TAG, "whathasbeendone5");
+                if (Waypoint.size() != 1) {
+                    for (int i = 0; i < Waypoint.size() - 1; i++) {
+                        Log.d(TAG, "whathasbeendone5");
 
-                       waypoint = (waypointsb.append( "place_id:"+Waypoint.get(i) + "|").toString());
+                        waypoint = (waypointsb.append("place_id:" + Waypoint.get(i) + "|").toString());
 
-                   }
-               }
+                    }
+                }
             }
 //To remove "|"
             if (!waypoint.isEmpty()) {
 
                 waypoint = waypoint.substring(0, waypoint.length() - 1);
             }
-        }else{
+        } else {
             Log.d(TAG, "whathasbeendone6");
 
-            waypoint="";
+            waypoint = "";
         }
         // Sensor enabled
         String sensor = "sensor=false";
@@ -1240,14 +1490,14 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
 
         Log.d(TAG, "whathasbeendone7");
 
-            parameters = str_origin + "&" + str_dest + waypoint + "&" + sensor + "&key=AIzaSyAQjMlUIxrybWWkko4AVHmE_Evr1I625cs";
+        parameters = str_origin + "&" + str_dest + waypoint + "&" + sensor + "&key=AIzaSyAQjMlUIxrybWWkko4AVHmE_Evr1I625cs";
 
         // Output format
         String output = "json";
 
         // Building the url to the web service
         String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters;
-        Log.d(TAG, "whathasbeendone8"+url);
+        Log.d(TAG, "whathasbeendone8" + url);
 
         return url;
     }
@@ -1326,12 +1576,12 @@ str_dest= "destination=place_id:" + Waypoint.get(Waypoint.size()-1).toString();
             // Invokes the thread for parsing the JSON data
             parserTask.execute(result);
             Log.d("PTRESULTAFter", result);
-if(pd.isShowing()){
+            if (pd.isShowing()) {
 
-    Log.d("PTRESULTAFte3nd", result);
+                Log.d("PTRESULTAFte3nd", result);
 
 
-}
+            }
             pd.dismiss();
             Log.d("PTRESULTAFte2nd", result);
 
@@ -1339,12 +1589,11 @@ if(pd.isShowing()){
 
 
     }
+
     //TODO: Use this in all ?
-    private Handler handler = new Handler()
-    {
+    private Handler handler = new Handler() {
         @Override
-        public void handleMessage ( Message message )
-        {
+        public void handleMessage(Message message) {
             pd.dismiss();
         }
     };
@@ -1485,11 +1734,10 @@ if(pd.isShowing()){
                         duration = (String) point.get("duration");
                         continue;
                     }
-                    Log.d("testhahanumber=",j+ point.toString());
+                    Log.d("testhahanumber=", j + point.toString());
 
-                  //  Log.d("wtfishahadistance", (String) point.get("distance"));
-                //    Log.d("wtfishahaduration", duration);
-
+                    //  Log.d("wtfishahadistance", (String) point.get("distance"));
+                    //    Log.d("wtfishahaduration", duration);
 
 
                     //getnullfrom point? WTF where does 7 came from
@@ -1506,10 +1754,10 @@ if(pd.isShowing()){
                 //TODO: Create a global variable For result
                 //TODO:DOing this , try to have dfifferent colours?
                 //Must do this first or else way too confusing when checking......
-                if(newcolor) {
+                if (newcolor) {
                     lineOptions.color(Color.BLUE);
 
-                }else{
+                } else {
 
                     lineOptions.color(Color.RED);
 
@@ -1519,7 +1767,7 @@ if(pd.isShowing()){
                 mDistanceView.setText("Distance= " + distance);
                 mDurationView.setText("Duration= " + duration);
 
-                Log.d("onPostExecute", "onPostExecute lineoptions decoded"+lineOptions);
+                Log.d("onPostExecute", "onPostExecute lineoptions decoded" + lineOptions);
             }
 
             // Drawing polyline in the Google Map for the i-th route
@@ -1533,7 +1781,8 @@ if(pd.isShowing()){
             }
         }
     }
-//Originally private, change it to public so LocationDetailsActivity can access it
+
+    //Originally private, change it to public so LocationDetailsActivity can access it
 //Any url can be insert here and will return different kind of data
     private static String downloadUrl(String strUrl) throws IOException {
         Log.d(TAG, "checkifone");
@@ -1585,9 +1834,15 @@ if(pd.isShowing()){
         } catch (Exception e) {
             Log.d("Exception url", e.toString());
         } finally {
-            if(iStream!=null){
-            iStream.close();}
-            urlConnection.disconnect();
+            if (iStream != null) {
+                iStream.close();
+            }try {
+                urlConnection.disconnect();
+            }catch (Exception e){
+                //NetworkOnMainThreadException
+                Log.d("Exception downLoadUrl", e.toString());
+
+            }
         }
         return data;
     }
@@ -1596,7 +1851,7 @@ if(pd.isShowing()){
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
 
 
-        Log.d(TAG, "Connection fail"+connectionResult);
+        Log.d(TAG, "Connection fail" + connectionResult);
 
 
     }
@@ -1606,7 +1861,7 @@ if(pd.isShowing()){
         // selecting appropriate nav menu item
 
         // set toolbar title
-getChildFragmentManager();
+        getChildFragmentManager();
         // if user select the current navigation menu again, don't do anything
         // just close the navigation drawer
         if (getActivity().getSupportFragmentManager().findFragmentByTag(CURRENT_TAG) != null) {
@@ -1666,13 +1921,12 @@ getChildFragmentManager();
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
 
 
-
     public StringBuilder nearbyListBuilder() {
         //TODO:probably fixed... location null
         Location location = CurrentLocation;
 
         try {
-            if (location!=null) {
+            if (location != null) {
                 //use your current location here
                 double mLatitude = location.getLatitude();
                 double mLongitude = location.getLongitude();
@@ -1687,15 +1941,15 @@ getChildFragmentManager();
                 int radius = numberpicker.getValue();
                 radius = radius * 1000;
                 Log.d("CheckBit", numberpicker.toString());
-                Log.d("CheckBit","1111111111111111");
-                LocationType.deleteCharAt(LocationType.length()-1);
-                Log.d("CheckBit","222gagag  2");
+                Log.d("CheckBit", "1111111111111111");
+                LocationType.deleteCharAt(LocationType.length() - 1);
+                Log.d("CheckBit", "222gagag  2");
 
                 // sb.append("&radius=5000");
                 //Todo: figure out how to support multiple types (location)..........
                 sb.append("&radius=" + Integer.toString(radius));
 
-                sb.append("&types=" +LocationType);
+                sb.append("&types=" + LocationType);
 
                 //if -1 then anything.....TODO:problem of price cannot detect
                 if (minpriceint == 0) {
@@ -1708,7 +1962,6 @@ getChildFragmentManager();
                 }
 
 
-
                 sb.append("&minprice=" + minpriceint + "&maxprice=" + maxpriceint);
                 sb.append("&sensor=true");
                 sb.append("&key=AIzaSyDkIa12Y9nXORou_xCnwS09K53kbJabKHo");
@@ -1716,9 +1969,9 @@ getChildFragmentManager();
                 Log.d("Map", "api: " + sb.toString());
 
                 return sb;
-            }else{
+            } else {
 
-                return  null;
+                return null;
             }
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Fail");
@@ -1774,9 +2027,9 @@ getChildFragmentManager();
 
             //This is where its connected to DataParser and get the List of places wiyh ratings etc.
             nearbyPlacesList = dataParser.parse(result);
-            Log.d("Yeep", "dataparserresult1=="+result);
+            Log.d("Yeep", "dataparserresult1==" + result);
 
-            Log.d("Yeep", "dataparserresult2======="+nearbyPlacesList);
+            Log.d("Yeep", "dataparserresult2=======" + nearbyPlacesList);
 
 //
 //            Log.d("GooglePlacesReadTask", nearbyPlacesList.toString());
@@ -1792,10 +2045,6 @@ getChildFragmentManager();
             //This use locationadapter to put in listview?
 
 
-
-
-
-
             ShowNearbyPlaces(nearbyPlacesList);
             Log.d("GooglePlacesReadTask", "onPostExecute Exit");
 //Search list, user choose,
@@ -1805,7 +2054,7 @@ getChildFragmentManager();
 
             // Start parsing the Google places in JSON format
             // Invokes the "doInBackground()" method of the class ParserTask
-           // parserTask.execute(result);
+            // parserTask.execute(result);
 
             Log.d(TAG, "On post execute ENDNENDNEDNNEND");
         }
@@ -1817,8 +2066,6 @@ getChildFragmentManager();
     private FragmentActivity fa;
 
 
-
-
     public class CustomPagerAdapter extends PagerAdapter {
 
         private Context mContext;
@@ -1827,8 +2074,8 @@ getChildFragmentManager();
         public CustomPagerAdapter(Context context, Vector<View> pages) {
             Log.d(TAG, "endhere1");
 
-            this.mContext=context;
-            this.pages=pages;
+            this.mContext = context;
+            this.pages = pages;
         }
 
         @Override
@@ -1864,6 +2111,7 @@ getChildFragmentManager();
         }
 
     }
+
     private class MyPagerAdapter extends FragmentPagerAdapter {
 
         public MyPagerAdapter(FragmentManager fm) {
@@ -1875,15 +2123,18 @@ getChildFragmentManager();
         @Override
         public Fragment getItem(int pos) {
             Log.d(TAG, "Dujjjjjjjcalled 2nd time....1");
+//TODO:well technically should just send the places trough here.
+            switch (pos) {
 
-            switch(pos) {
-
-                case 0: return Location_RecyclerView.newInstance("FirstFragment","Ok yupe");
-                case 1: return Location_RecyclerView_2.newInstance("SecondFragment"," Instance 1");
-             //   case 2: return ThirdFragment.newInstance("ThirdFragment, Instance 1");
-         //       case 3: return ThirdFragment.newInstance("ThirdFragment, Instance 2");
-           //     case 4: return ThirdFragment.newInstance("ThirdFragment, Instance 3");
-                default: return Location_RecyclerView.newInstance("FirstFragmen","Ok yupe");
+                case 0:
+                    return Location_RecyclerView.newInstance("FirstFragment", "Ok yupe");
+                case 1:
+                    return Location_RecyclerView_Selected.newInstance("SecondFragment", " Instance 1");
+                //   case 2: return ThirdFragment.newInstance("ThirdFragment, Instance 1");
+                //       case 3: return ThirdFragment.newInstance("ThirdFragment, Instance 2");
+                //     case 4: return ThirdFragment.newInstance("ThirdFragment, Instance 3");
+                default:
+                    return Location_RecyclerView.newInstance("FirstFragmen", "Ok yupe");
 
 
             }
@@ -1893,24 +2144,22 @@ getChildFragmentManager();
         @Override
         public CharSequence getPageTitle(int position) {
             String title = null;
-            if (position == 0)
-            {
+            if (position == 0) {
                 title = "Available Location";
-            }
-            else if (position == 1)
-            {
+            } else if (position == 1) {
                 title = "Selected Location";
             }
 
             return title;
         }
+
         @Override
         public int getCount() {
             return 2;
         }
 
         @Override
-        public int getItemPosition(Object object){
+        public int getItemPosition(Object object) {
 
             Log.d(TAG, "DujjjjjjjRefresh....1");
 

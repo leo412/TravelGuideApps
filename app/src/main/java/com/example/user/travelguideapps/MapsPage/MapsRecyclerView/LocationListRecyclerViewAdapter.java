@@ -1,17 +1,10 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,21 +16,14 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.example.user.travelguideapps.DataHolderClass;
+import com.example.user.travelguideapps.LocationDetails.LocationDetailsActivity;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
+import com.example.user.travelguideapps.R;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -46,18 +32,22 @@ import java.util.List;
 /**
  * Created by User on 6/2/2017.
  */
-//TODO: most probably this is not needed, change if only needed .... called from LocationRecyclerVIew1/2
-public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapter<SelectedLocationListRecyclerViewAdapter.MyViewHolder> implements
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-    private static final String TAG = "SelectedLocation";
+public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<LocationListRecyclerViewAdapter.MyViewHolder> {
     private Context mContext;
     private LayoutInflater mInflater;
-    private ArrayList<LinkedHashMap<String,String>> mDataSource;
-    public SelectedLocationListRecyclerViewAdapter(Context context, ArrayList<LinkedHashMap<String, String>> items) {
-        mContext = context;
-            Log.d("A", "DujjjjjjjNumberofitems(Selected)"+items);
+    private  List<LinkedHashMap<String,String>> mDataSource;
+    private static List<LinkedHashMap<String,String>> mDataSourceforSend;
 
+    private int Position;
+    private static RecyclerView.ViewHolder holder2;
+
+    public LocationListRecyclerViewAdapter(Context context, List<LinkedHashMap<String,String>> items) {
+        mContext = context;
+            Log.d("A", "DujjjjjjjNumberofitems(List)"+items);
+        mDataSourceforSend=items;
         mDataSource = items;
+        Log.d("A", "DujjjjjjjNumberofitems(List)Upperitemcount"+mDataSourceforSend);
+
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
@@ -80,12 +70,18 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
     }
 
 
+    public static List<LinkedHashMap<String,String>>  getItem() {
+        return mDataSourceforSend;
+    }
 
+    public static RecyclerView.ViewHolder getHolder2() {
+        return holder2;
+    }
 
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d("A", "DujjjjjjjViewholder");
+        Log.d("A", "DujjjjjjjViewholdertrying to find this ");
 
         // infalte the item Layout
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row, parent, false);
@@ -106,41 +102,25 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         // set the data in items
 
-//TODO:Either use mGOoglApiClient or use the URL way
-
-
-
-
-
-      String place_id = mDataSource.get(position).toString();
-
-
-
-        new DownloadTask().execute(("https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
-                "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA"));
-        Log.d("what is mdata", mDataSource.toString());
-
-
-
-
-
+        holder2=holder;
+        Log.d("A", "DujjjjjjjonbidViewholder"+holder2);
 
         String singlephotoreference=mDataSource.get(position).get("photo_reference").toString();
-//Well this helps when comning back from other page sooo....
+            //Well this helps when comning back from other page sooo....so that i didnt reset to old one or some shit
         if(position==globalPosition)
         {
             //change color like
 holder.itemView.setSelected(true);
 
-
         }
         else
         {
+
             //revert back to regular color
             holder.itemView.setSelected(false);
         }
 
-        ArrayList waypoint= MapsActivity.getWaypoint();
+       ArrayList waypoint= MapsActivity.getWaypoint();
         if(waypoint.contains(mDataSource.get(position).get("place_id"))){
 
             holder.Selected.setVisibility(View.VISIBLE);
@@ -150,6 +130,9 @@ holder.itemView.setSelected(true);
 
 
         }
+
+
+
         List<String> myList = new ArrayList<String>(Arrays.asList(singlephotoreference.split(",")));
 
         String list = Arrays.toString(myList.toArray()).replace("[", "").replace("]", "");
@@ -172,8 +155,6 @@ int add=position+1;
 
         Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference="+list
                 +"&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().into(holder.image);
-
-
         // implement setOnClickListener event on item view.
         final Button b = (Button) holder.itemView.findViewById(R.id.details_btn);
         b.setVisibility(View.VISIBLE);
@@ -249,7 +230,7 @@ int add=position+1;
                         // EditText editText = (EditText) findViewById(R.id.editText);
 
                         //String checking=(String) v.findViewById(R.id.lat).toString();
-                        //TODO:This is so wrong
+                        //TODO:This is so wrong / meh i dont know what is wrong damn it...
                         //Is this it??
                         TextView place_id=  (TextView) parentRow.findViewById(R.id.place_id);
                         String place_id_text= place_id.getText().toString();
@@ -300,194 +281,23 @@ int add=position+1;
 
 
 
-    public class DownloadTask extends AsyncTask<String, Void, String> {
-        protected void onPreExecute() {
-            //set message of the dialog
-            //show dialog
-
-            super.onPreExecute();
-        }
-
-        // Downloading data in non-ui thread
-        @Override
-        protected String doInBackground(String... url) {
-
-            // For storing data from web service
-            String data = "";
-
-            try {
-                // Fetching the data from web service
-                data = downloadUrl(url[0]);
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-
-            Log.d("qqqqqqqqqqqq", data);
-
-            return data;
-        }
 
 
-        //This is commented because its not known whether its needed
-        @TargetApi(Build.VERSION_CODES.KITKAT)
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            JSONObject jsonObj=null;
-            JSONArray jsonResult=null;
-            JSONObject jsonObjectItem=null;
-            String placename="ERROR PLACE NOT FOUND";
-            //Click Marker and find path? Probably this is
-            Log.d("DetailsResult", result);
-
-            //NOTE: Is using "List" eventhough placedetails is singular to allow dataparser to work without needing another method
-            List<LinkedHashMap<String, String>> placedetails = null;
-
-            JSONArray jsonArray = null;
-            JSONObject jsonObject;
-            DataParser dataParser=new DataParser();
-            //Comment for single list to parse result
-            placedetails=  dataParser.parse(result);
-
-            //This is needed to insert data into the page it self
-            //Name places list ?
-            //TODO: content_place_details: Create Content View to insert the data
-            //Change List of placedetails back to normal
-          //  LinkedHashMap<String,String> placedetail=placedetails.get(0);
-
-           // place_name.setText( placedetail.get("place_name"));
-// TODO: Commented and used hardcode, check if able to soft code
-//int photoindex=placedetails.indexOf("photo_reference");
-            //Doing this
-//            LinkedHashMap<String,String>test= placedetails.get(0);
-//
-//            Log.d("Followthisshit", placedetails.toString());
-//
-//            Log.d("Followthisshit", Integer.toString(2));
-//
-//            //      String photo=placedetails.get(0).get(2).toString();
-//            if(test.containsKey("photo_reference"))
-//            {
-//
-//                Log.d("YesBitches", test.toString());
-//
-//
-//            }
-//            if(test.containsKey("place_id"))
-//            {
-//
-//
-//
-//            }
-//            String  photo=test.get("photo_reference");
-
-
-         //   List<String> photoList = new ArrayList<String>(Arrays.asList(photo.split(",")));
-//
-//            for(int i=0;i<photoList.size();i++){
-//
-//
-//
-//            }
-
-
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(mContext,LinearLayoutManager
-                    .HORIZONTAL,false);
-//            recyclerView.setLayoutManager(layoutManager);
-//            recyclerView.setHasFixedSize(true);
-//
-//            pictureadapter = new LocationDetailsPictureAdapter(getActivity(), photoList);
-//
-//            recyclerView.setAdapter(pictureadapter);
-
-
-
-
-
-//Problem caused : empty space in front of something..........
-
-
-
-    //        Picasso.with(getActivity()).setLoggingEnabled(true);
-
-
-
-        }
-
-
-
-    }
-
-    //TODO: Maps activity has this too, try and see if it can be use from there.
-    //NOTE: this will get data for a single place
-    private static String downloadUrl(String strUrl) throws IOException {
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        Log.d(TAG, "Newdirectionurl" + strUrl);
-
-
-        try {
-
-            URL url = new URL(strUrl);
-
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
-
-            // Connecting to url
-            urlConnection.connect();
-
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-
-            BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
-
-            StringBuffer sb = new StringBuffer();
-
-            String line = "";
-            while ((line = br.readLine()) != null) {
-                sb.append(line);
-            }
-
-            data = sb.toString();
-            Log.d(TAG, "SelectedLocationList" + data);
-
-            br.close();
-
-        } catch (Exception e) {
-            Log.d("newexceptionurl", e.toString());
-        } finally {
-            // iStream.close();
-//            urlConnection.disconnect();
-        }
-        return data;
-    }
 
 
     @Override
     public int getItemCount() {
         if(mDataSource!=null) {
-            Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
+            Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT"+ mDataSource.size());
 
         return mDataSource.size();
         }
+        Log.d("A", "DujjjjjjjNumberofitems(List)  Nope COUNT");
+
         return 0;
     }
 
-    @Override
-    public void onConnected(@Nullable Bundle bundle) {
 
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-
-    }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         //NOTE:Add new items here to get
@@ -500,8 +310,7 @@ RatingBar ratingBar;
         TextView lat;
         TextView lng;
 
-        TextView Selected;
-
+TextView Selected;
 
         ImageView image;
         AdapterView.OnItemClickListener mItemClickListener;

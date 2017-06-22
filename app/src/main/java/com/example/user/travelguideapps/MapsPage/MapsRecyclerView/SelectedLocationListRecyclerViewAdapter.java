@@ -1,4 +1,4 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -16,6 +16,10 @@ import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 
+import com.example.user.travelguideapps.DataHolderClass;
+import com.example.user.travelguideapps.LocationDetails.LocationDetailsActivity;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
+import com.example.user.travelguideapps.R;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
@@ -28,15 +32,22 @@ import java.util.List;
 /**
  * Created by User on 6/2/2017.
  */
-public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<LocationListRecyclerViewAdapter.MyViewHolder> {
+//TODO: Edit2 Yeeeppp this is probably needed, because they need different function in finding setchecked..
+//TODO: most probably this is not needed, change if only needed .... called from LocationRecyclerVIew1/2
+public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapter<SelectedLocationListRecyclerViewAdapter.MyViewHolder> {
     private Context mContext;
     private LayoutInflater mInflater;
-    private List<LinkedHashMap<String,String>> mDataSource;
-    public LocationListRecyclerViewAdapter(Context context, List<LinkedHashMap<String,String>> items) {
-        mContext = context;
-            Log.d("A", "DujjjjjjjNumberofitems(List)"+items);
+    private  List<LinkedHashMap<String,String>> mDataSource;
+    private static List<LinkedHashMap<String,String>> mDataSourceforSend;
 
+    private int Position;
+    private static RecyclerView.ViewHolder holder2;
+    public SelectedLocationListRecyclerViewAdapter(Context context, ArrayList<LinkedHashMap<String, String>> items) {
+        mContext = context;
+
+        mDataSourceforSend=items;
         mDataSource = items;
+
         mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
@@ -58,13 +69,25 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         return position;
     }
 
+    public static List<LinkedHashMap<String,String>>  getItem() {
 
+
+            Log.d("onPostExecute", "Selectedtimechecked"+mDataSourceforSend );
+
+
+
+        return mDataSourceforSend;
+    }
+
+    public static RecyclerView.ViewHolder getHolder2() {
+        return holder2;
+    }
 
 
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d("A", "DujjjjjjjViewholdertrying to find this ");
+        Log.d("A", "DujjjjjjjViewholder");
 
         // infalte the item Layout
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_row, parent, false);
@@ -85,8 +108,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         // set the data in items
 
-
-        Log.d("A", "DujjjjjjjonbidViewholder");
+      String place_id = mDataSource.get(position).toString();
 
         String singlephotoreference=mDataSource.get(position).get("photo_reference").toString();
 //Well this helps when comning back from other page sooo....
@@ -99,12 +121,11 @@ holder.itemView.setSelected(true);
         }
         else
         {
-
             //revert back to regular color
             holder.itemView.setSelected(false);
         }
 
-       ArrayList waypoint= MapsActivity.getWaypoint();
+        ArrayList waypoint= MapsActivity.getWaypoint();
         if(waypoint.contains(mDataSource.get(position).get("place_id"))){
 
             holder.Selected.setVisibility(View.VISIBLE);
@@ -114,9 +135,6 @@ holder.itemView.setSelected(true);
 
 
         }
-
-
-
         List<String> myList = new ArrayList<String>(Arrays.asList(singlephotoreference.split(",")));
 
         String list = Arrays.toString(myList.toArray()).replace("[", "").replace("]", "");
@@ -139,6 +157,8 @@ int add=position+1;
 
         Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference="+list
                 +"&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().into(holder.image);
+
+
         // implement setOnClickListener event on item view.
         final Button b = (Button) holder.itemView.findViewById(R.id.details_btn);
         b.setVisibility(View.VISIBLE);
@@ -214,7 +234,7 @@ int add=position+1;
                         // EditText editText = (EditText) findViewById(R.id.editText);
 
                         //String checking=(String) v.findViewById(R.id.lat).toString();
-                        //TODO:This is so wrong / meh i dont know what is wrong damn it...
+                        //TODO:This is so wrong
                         //Is this it??
                         TextView place_id=  (TextView) parentRow.findViewById(R.id.place_id);
                         String place_id_text= place_id.getText().toString();
@@ -266,9 +286,6 @@ int add=position+1;
 
 
 
-
-
-
     @Override
     public int getItemCount() {
         if(mDataSource!=null) {
@@ -279,7 +296,11 @@ int add=position+1;
         return 0;
     }
 
-    public class MyViewHolder extends RecyclerView.ViewHolder {
+
+
+
+
+    class MyViewHolder extends RecyclerView.ViewHolder {
         //NOTE:Add new items here to get
         // init the item view's
         TextView name;
@@ -290,7 +311,8 @@ RatingBar ratingBar;
         TextView lat;
         TextView lng;
 
-TextView Selected;
+        TextView Selected;
+
 
         ImageView image;
         AdapterView.OnItemClickListener mItemClickListener;
@@ -324,5 +346,4 @@ TextView Selected;
 
 
         }
-    }
-}
+    }}

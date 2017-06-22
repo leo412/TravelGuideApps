@@ -1,4 +1,4 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.LocationDetails;
 
 import android.annotation.TargetApi;
 import android.os.AsyncTask;
@@ -20,6 +20,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user.travelguideapps.BaseActivity;
+import com.example.user.travelguideapps.DataHolderClass;
+import com.example.user.travelguideapps.DataParser;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
+import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.Location_RecyclerView;
+import com.example.user.travelguideapps.R;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -37,8 +43,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
-
-import layout.*;
 
 public class LocationDetailsActivity extends Fragment{
 static String TAG="tag";
@@ -239,67 +243,80 @@ return view;
             //Name places list ?
             //TODO: content_place_details: Create Content View to insert the data
             //Change List of placedetails back to normal
-            LinkedHashMap<String,String> placedetail=placedetails.get(0);
-            Log.d("DetailsResult", placedetail.toString());
 
-            place_name.setText( placedetail.get("place_name"));
-    //        place_addressHere.setText( placedetail.get("formatted_address"));
+            try {
+                LinkedHashMap<String, String> placedetail = placedetails.get(0);
+                Log.d("DetailsResult", placedetail.toString());
+
+                place_name.setText( placedetail.get("place_name"));
+                //        place_addressHere.setText( placedetail.get("formatted_address"));
 
 
 
 
 // TODO: Commented and used hardcode, check if able to soft code
 //int photoindex=placedetails.indexOf("photo_reference");
-            //Doing this
-            LinkedHashMap<String,String>test= placedetails.get(0);
+                //Doing this
+                LinkedHashMap<String,String>test= placedetails.get(0);
 
-            Log.d("Followthisshit", placedetails.toString());
+                Log.d("Followthisshit", placedetails.toString());
 
-            Log.d("Followthisshit", Integer.toString(2));
+                Log.d("Followthisshit", Integer.toString(2));
 
-      //      String photo=placedetails.get(0).get(2).toString();
-if(test.containsKey("photo_reference"))
-{
+                //      String photo=placedetails.get(0).get(2).toString();
+                if(test.containsKey("photo_reference"))
+                {
 
-    Log.d("Has photoreference ", test.toString());
-
-
-}
-
-          String  photo=test.get("photo_reference");
+                    Log.d("Has photoreference ", test.toString());
 
 
-            List<String> photoList = new ArrayList<String>(Arrays.asList(photo.split(",")));
+                }
+
+                String  photo=test.get("photo_reference");
 
 
-
-
-            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager
-                    .HORIZONTAL,false);
-            recyclerView.setLayoutManager(layoutManager);
-            recyclerView.setHasFixedSize(true);
+                List<String> photoList = new ArrayList<String>(Arrays.asList(photo.split(",")));
 
 
 
-            pictureadapter = new LocationDetailsPictureAdapter(getActivity(), photoList);
 
-            recyclerView.setAdapter(pictureadapter);
+                RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager
+                        .HORIZONTAL,false);
+                recyclerView.setLayoutManager(layoutManager);
+                recyclerView.setHasFixedSize(true);
 
-            pager = (ViewPager) view.findViewById(R.id.vpDetailsReviews);
 
-            //TODO:has changed to child, use support if problem persist?
-            viewpageradapter=new MyPagerAdapter(getChildFragmentManager());
-            pager.setAdapter(viewpageradapter);
+
+                pictureadapter = new LocationDetailsPictureAdapter(getActivity(), photoList);
+
+                recyclerView.setAdapter(pictureadapter);
+
+                pager = (ViewPager) view.findViewById(R.id.vpDetailsReviews);
+                if(!isAdded()) {
+                    return;
+                }
+                //TODO: set adapter somtimes :Android IllegalStateException: Fragment not attached to Activity webview (isadded used to see if problem
+
+                //TODO:has changed to child, use support if problem persist?
+                viewpageradapter=new MyPagerAdapter(getChildFragmentManager());
+                pager.setAdapter(viewpageradapter);
+
 
 
 //Problem caused : empty space in front of something..........
 
 
 
-            Picasso.with(getActivity()).setLoggingEnabled(true);
+                Picasso.with(getActivity()).setLoggingEnabled(true);
 
-            //place_address.setText( placedetail.get("formatted_address"));
-viewpageradapter.notifyDataSetChanged();
+                //place_address.setText( placedetail.get("formatted_address"));
+                viewpageradapter.notifyDataSetChanged();
+
+            }catch (Exception e){
+
+                Toast.makeText(getActivity(), "Some Error has occured, Please try again!", Toast.LENGTH_SHORT).show();
+
+            }
 
    //         Log.d(TAG, "Dqqqqqqqqq"+place_address.getText());
 
@@ -400,7 +417,7 @@ viewpageradapter.notifyDataSetChanged();
 
             switch(pos) {
 
-                case 0: return layout.LocationDetails.newInstance(placedetails,"Ok yupe");
+                case 0: return LocationDetails.newInstance(placedetails,"Ok yupe");
                 case 1: return LocationDetailsReviews.newInstance(placedetails," Instance 1");
                 //   case 2: return ThirdFragment.newInstance("ThirdFragment, Instance 1");
                 //       case 3: return ThirdFragment.newInstance("ThirdFragment, Instance 2");

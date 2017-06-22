@@ -1,23 +1,25 @@
-package com.example.user.travelguideapps;
+package com.example.user.travelguideapps.EditLocation;
 
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.user.travelguideapps.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link BlankFragment.OnFragmentInteractionListener} interface
+ * {@link EditLocation.OnFragmentInteractionListener} interface
  * to handle interaction events.
- * Use the {@link BlankFragment#newInstance} factory method to
+ * Use the {@link EditLocation#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MapsActivityFragment extends Fragment {
+public class EditLocation extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -28,8 +30,9 @@ public class MapsActivityFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    public static ConstraintLayout view;
 
-    public MapsActivityFragment() {
+    public EditLocation() {
         // Required empty public constructor
     }
 
@@ -39,11 +42,11 @@ public class MapsActivityFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment BlankFragment.
+     * @return A new instance of fragment EditLocation.
      */
     // TODO: Rename and change types and number of parameters
-    public static BlankFragment newInstance(String param1, String param2) {
-        BlankFragment fragment = new BlankFragment();
+    public static EditLocation newInstance(String param1, String param2) {
+        EditLocation fragment = new EditLocation();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -63,8 +66,10 @@ public class MapsActivityFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        view = (ConstraintLayout) inflater.inflate(R.layout.fragment_edit_location, container, false);
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_blank, container, false);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -77,12 +82,12 @@ public class MapsActivityFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
-        }
+//        if (context instanceof OnFragmentInteractionListener) {
+//            mListener = (OnFragmentInteractionListener) context;
+//        } else {
+//            throw new RuntimeException(context.toString()
+//                    + " must implement OnFragmentInteractionListener");
+//        }
     }
 
     @Override

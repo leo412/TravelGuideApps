@@ -1,4 +1,4 @@
-package layout;
+package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
 import android.content.Context;
 import android.net.Uri;
@@ -10,8 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.user.travelguideapps.LocationListRecyclerViewAdapter;
-import com.example.user.travelguideapps.MapsActivity;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
@@ -33,7 +32,7 @@ public class Location_RecyclerView extends Fragment {
     private static final String ARG_PARAM1 = "HI";
     private static final String ARG_PARAM2 = "First";
     private  View fragmentpoilist;
-
+private int scrollingtotop=1;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -109,13 +108,11 @@ public class Location_RecyclerView extends Fragment {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
 
-
-
-
             }
 
             public void onScrolled(RecyclerView recyclerView, int dx, int dy){
                 int pastVisibleItems = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+                System.out.println("Scrolled lllllllllUpwards"+dy);
 
                 if(dx>0)
                 {
@@ -142,17 +139,19 @@ public class Location_RecyclerView extends Fragment {
                 }
                 else if(dy < 0)
                 {
-                       if (pastVisibleItems  == 0) {
+                  //  recyclerView.smoothScrollBy(0,10);
 
-                    expandableLayout.expand();
+                    if (pastVisibleItems  == 0) {
+scrollingtotop=1;
 
-                }
-                    System.out.println("Scrolled Upwards");
+                }else{
+                        scrollingtotop=0;
+
+
+                    }
                     //expandableLayout.expand();
 
                 }
-
-
 
                 else {
 
@@ -160,16 +159,23 @@ public class Location_RecyclerView extends Fragment {
                 }
             }
 
-
-
-
         });
 
 
 
+            //TODO:Little hack.......
+        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            @Override
+            public boolean onFling(int velocityX, int velocityY) {
 
 
+                if(velocityY<-100&&scrollingtotop==1 ) {
 
+                    expandableLayout.expand();
+                }
+                return false;
+            }
+        });
 
 
 

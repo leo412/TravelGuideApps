@@ -143,6 +143,7 @@
         "when a user tries to pick up one of cards.\n\n"
     </string>
     <string name="title_activity_logintest">Sign in</string>
+    <string name="title_activity_edit_location">EditLocationActivity</string>
 
 
 </resources>

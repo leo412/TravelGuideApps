@@ -9,7 +9,7 @@
                                              android:weightSum="1"
                                              android:background="#CCffffff"
 
-                                             tools:context="com.example.user.travelguideapps.LoginActivity">
+                                             tools:context="com.example.user.travelguideapps.LoginPage.LoginActivity">
     <!-- Login progress -->
 
     <TextView

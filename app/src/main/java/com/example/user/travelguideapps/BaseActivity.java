@@ -26,6 +26,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.example.user.travelguideapps.MainMenu.MainMenuActivityFragment;
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.Thing;
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +38,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
@@ -283,7 +287,15 @@ if (fragmentClass!=null) {
             super.onBackPressed();
         }
     }
+            public static DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference();
 
+
+
+            public void writeNewUser(String userId, String name, ArrayList Waypoint) {
+                FirebaseDatabaseUser user = new FirebaseDatabaseUser(name, Waypoint);
+
+                mDatabase.child("users").child(userId).setValue(user);
+            }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
