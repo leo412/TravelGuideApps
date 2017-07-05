@@ -37,6 +37,7 @@ public class DataParser {
                 jsonArray= jsonObject.getJSONArray("results");
                 placenumber=0;
             }else {
+                //TODO:Details uses its own downloadurl etc, see if can combine
                 //For single location(Details
                 jsonArray.put(jsonObject.getJSONObject("result"));
 
@@ -62,13 +63,14 @@ public class DataParser {
                 placeMap = getPlace((JSONObject) jsonArray.get(i),placenumber);
                 placesList.add(placeMap);
                 Log.d("Places", "Adding places");
-                Log.d("Places", placesList.toString());
 
             } catch (JSONException e) {
                 Log.d("Places", "Error in Adding places");
                 e.printStackTrace();
             }
         }
+        Log.d("PlacesChecking", placesList.toString());
+
         return placesList;
     }
 
@@ -89,6 +91,9 @@ public class DataParser {
         ArrayList<String>review_rating = new ArrayList<String>();
         ArrayList<String>review_time_description = new ArrayList<String>();
         ArrayList<String>review_text = new ArrayList<String>();
+        ArrayList<Object>opening_hours_Text = new ArrayList<Object>();
+
+        ArrayList<Object>opening_hours = new ArrayList<Object>();
 
         String rating = "";
         String place_id="";
@@ -99,7 +104,8 @@ public class DataParser {
         String website="";
 
         String icon ="";
-        String opening_hours="";
+        String open_now="";
+
         String multiple_photo_references="";
         String review="";
 
@@ -156,9 +162,42 @@ public class DataParser {
 
 
 
+            if (!jPlace.isNull("opening_hours")) {
+              //  opening_hours = jPlace.getJSONArray("opening_hours").getJSONObject(0).getString("weekday_text");
+                try {
+                    open_now = jPlace.getJSONObject("opening_hours").getString("open_now");
+                    Log.d(TAG, "whatisopennow" + open_now);
+                }catch(Exception e){
+                    Log.d(TAG, "whatisopennow" + e);
 
 
+                }
+            }
 
+            try {
+                if (jPlace.getJSONObject("opening_hours").getString("periods")!=null) {
+
+                    int i=jPlace.getJSONObject("opening_hours").getString("weekday_text").length();
+                    for (int j=0;j<i;j++) {
+                        opening_hours_Text.add(jPlace.getJSONObject("opening_hours").getJSONArray("weekday_text").get(j));
+
+                       // opening_hours.add(jPlace.getJSONObject("opening_hours").getJSONArray("periods").get(j));
+
+                        Log.d(TAG, "Well it did run here.... again after"+j);
+                        Log.d(TAG, "Well it did run here.... again after"+opening_hours);
+
+                    }
+                } else {
+                    review_author_name.add("Empty");
+
+                }
+
+
+            }catch (Exception e){
+                Log.d(TAG, "Exception is "+e );
+
+
+            }
 try {
     if (jPlace.getJSONArray("photos").getJSONObject(0).getString("photo_reference") != null) {
         int i=jPlace.getJSONArray("photos").length();
@@ -169,6 +208,9 @@ try {
 
 
         }
+
+
+
     } else {
         photo_reference.add("Empty");
 
@@ -337,6 +379,9 @@ try {
             place.put("review_time_description",review_time_description.toString());
             place.put("review_rating",review_rating.toString());
             place.put("website",website.toString());
+            place.put("open_now",open_now.toString());
+            place.put("opening_hours",opening_hours.toString());
+            place.put("opening_hours_text",opening_hours_Text.toString());
 
 
             Log.d(TAG, "placeeee "+place.toString() );

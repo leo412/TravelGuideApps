@@ -109,18 +109,22 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
             //Well this helps when comning back from other page sooo....so that i didnt reset to old one or some shit
         if(position==globalPosition)
         {
+            Log.d("A", "Postitionchanges1"+holder.name.getText());
+
             //change color like
-holder.itemView.setSelected(true);
+            holder.itemView.setSelected(true);
 
         }
         else
         {
 
+            Log.d("A", "Postitionchanges2"+holder.name.getText());
+
             //revert back to regular color
             holder.itemView.setSelected(false);
         }
 
-       ArrayList waypoint= MapsActivity.getWaypoint();
+       ArrayList waypoint= MapsActivity.getWaypointwithDateList();
         if(waypoint.contains(mDataSource.get(position).get("place_id"))){
 
             holder.Selected.setVisibility(View.VISIBLE);
@@ -186,7 +190,9 @@ int add=position+1;
                                                    for (Marker c : mapMarkers) {
 
                                                        if (lat.equals(String.valueOf(c.getPosition().latitude)) && lng.equals(String.valueOf(c.getPosition().longitude))) {
-//MapsActivity m= new MapsActivity();
+                                                            //MapsActivity m= new MapsActivity();
+                                                           //If possible dont care about this now
+                                                           //TODO: Seems to be unsolvable , need little hack but not now (Triggering marker onclick
                                                            MapsActivity.showPath(c);
                                                            result = c;
                                                            //This should not be here... showpath is already up there.
@@ -222,26 +228,9 @@ int add=position+1;
 //TODO: Move data to there
                         View parentRow = (View) v.getParent();
 
-                  //      RecyclerView listView = (RecyclerView) parentRow.getParent();
 
-                 //       final int position = listView.getPositionForView(parentRow);
-
-                   //     Intent intent = new Intent(mContext, LocationDetailsActivity.class);
-                        // EditText editText = (EditText) findViewById(R.id.editText);
-
-                        //String checking=(String) v.findViewById(R.id.lat).toString();
-                        //TODO:This is so wrong / meh i dont know what is wrong damn it...
-                        //Is this it??
                         TextView place_id=  (TextView) parentRow.findViewById(R.id.place_id);
                         String place_id_text= place_id.getText().toString();
-
-                        //    String place_id = ((TextView) v.findViewById(R.id.place_id)).getText().toString();
-
-                        //  String place_id=listView.getItemAtPosition(position).toString();
-
-                        //Send place id to placeDretails Activity
-                        //   intent.putExtra("place_id", place_id_text);
-                        //   mContext.startActivity(intent);
 
                         Fragment fragment = null;
                         Class fragmentClass=null;
@@ -249,11 +238,7 @@ int add=position+1;
                         try {
                             DataHolderClass.getInstance().setDistributor_id(place_id_text);
 
-                            //      Bundle args = new Bundle();
-                            //   args.putString("place_id",place_id_text);
-                            //      LocationDetailsActivity newFragment = new LocationDetailsActivity ();
                             fragment = (Fragment) fragmentClass.newInstance();
-                            //fragment.setArguments(args);
 
                         } catch (InstantiationException e) {
                             e.printStackTrace();
@@ -269,7 +254,6 @@ int add=position+1;
 
 
 
-                        //   fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
                     }
                 });

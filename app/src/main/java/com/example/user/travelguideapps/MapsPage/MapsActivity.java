@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -29,7 +30,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -100,7 +100,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Vector;
 
 import static com.example.user.travelguideapps.R.id.map;
 
@@ -117,10 +116,10 @@ import static com.example.user.travelguideapps.R.id.map;
 //if drag and drop not working....
 
 //TODO: that freakin disable View Details from other listview item  problem....
-
+//TODO: marker does not show up for "Selected Location" required (Sometimes only)
 //TODO: make different kind of marker for different "maps" (kinda?
 //TODO:Design interface
-//TODO:Sometimes picture not showing in selected
+//TODO:Sometimes picture not showing in selected <-wtf?
 //TODO: Add all place types
 public class MapsActivity extends Fragment implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient
         .OnConnectionFailedListener, LocationListener {
@@ -137,8 +136,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     private View mMapFormView;
     private View horizontal_scroll_view;
     private View fragmentpoilist;
-    private ViewPager pager;
-    private FragmentPagerAdapter recycleadapter;
+    private static ViewPager pager;
+    private static FragmentPagerAdapter recycleadapter;
 
     private ExpandableLayout expandableLayout;
     private ExpandableLayout FoodLayout;
@@ -150,7 +149,11 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     private static TextView mDurationView;
     private static TextView mDistanceView;
     private LocationListRecyclerViewAdapter Locationadapter;
-    private static ArrayList Waypoint = new ArrayList();
+   // private static ArrayList WaypointwithDateList = new ArrayList();
+
+    private static ArrayList<ArrayList> WaypointwithDateList = new ArrayList<ArrayList>();
+
+
     private static Boolean newcolor = false;
     private HorizontalNumberPicker numberpicker;
     private static Location CurrentLocation = BaseActivity.getCurrentLocation();
@@ -162,7 +165,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     private static ArrayList<LinkedHashMap<String, String>> WayPointDetailsList = new ArrayList<LinkedHashMap<String, String>>();
 
     private DatabaseReference mDatabase;
-// ...
+    // ...
+    private static FragmentActivity mInstance;
+    private static Resources mGetResources;
 
     static ProgressDialog pd;
     GestureDetector gestureDetector;
@@ -175,9 +180,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //Get waypoints from others
+
         String b = DataHolderClass.getInstance().getDistributor_id();
-        //Needed?
-        //fa = super.getActivity();
+        mInstance = getActivity();
+        mGetResources = getResources();
 
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
@@ -191,8 +197,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
         }
 
-//There seems to be no point setting this locationadapter....... it is setted in location_RecyclerView..java
-        // Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
 
         fragmentpoilist = (ConstraintLayout) inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
         boolean isFirstTime = true;
@@ -207,6 +211,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         }
         expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
 
+        //For swipping on the "Selection"
         gestureDetector = new GestureDetector(getActivity(), new GestureDetector.OnGestureListener() {
             private static final int SWIPE_MIN_DISTANCE = 150;
             private static final int SWIPE_MAX_OFF_PATH = 100;
@@ -244,7 +249,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            //TODO: Some specific details might be add?(like only bottom, some signal etc
+                //TODO: Some specific details might be add?(like only bottom, some signal etc
 
                 System.err.println("onFling");
                 System.out.println(e1 + " " + e2);
@@ -279,7 +284,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                 return false;
             }
         });
-
+//Run the aboce code
         expandableLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -290,7 +295,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
             }
         });
 
-
+//Show layout,
         if (isFirstTime) {
             Log.d(TAG, "isfirsttime");
 
@@ -298,173 +303,185 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
 
         }
+        Log.d(TAG, "gogogo");
 
+//Must changed this, but to what?.
+        //Is the clicked existing...
+        //if b != start here
 
-        if (b != null) {
-            //Is the clicked existing...
-            String isselected = DataHolderClass.getInstance2().getDistributor_id2();
+        String isselected = DataHolderClass.getInstance2().getDistributor_id2();
 
-            if (isselected == "isselected") {
-                //Check b cus b not run
-//When trying to delete waypoint selected
-                Waypoint.remove(b);
-                for (int i = 0; i < WayPointDetailsList.size(); i++) {
-                    LinkedHashMap<String, String> s = WayPointDetailsList.get(i);
-                    Log.d(TAG, "cccccyay waydetails removed" + s);
+/////////////////////////////////////////////////
+//Will this just run from DetailsActivity?
+//            if (isselected == "isselected") {
+//                //Check b cus b not run
+////When trying to delete waypoint selected
+//                WaypointwithDateList.remove(b);
+//                Log.d(TAG, "cccccyay waydetails Entered");
+//
+//                for (int i = 0; i < WayPointDetailsList.size(); i++) {
+//                    LinkedHashMap<String, String> s = WayPointDetailsList.get(i);
+//                    Log.d(TAG, "cccccyay waydetails removed" + s);
+//                    Log.d(TAG, "cccccyay waydetails removedsize" + WayPointDetailsList.size());
+//                    Log.d(TAG, "cccccyay waydetails removedsize" + WaypointwithDateList.size());
+//
+//
+//                    if (s.containsValue(b)) {
+//                        WayPointDetailsList.remove(i);
+//                        Log.d(TAG, "cccccyay waydetails removed");
+//
+//                    }
+//
+//
+//                }
+//            } else {
+////////////////////////////////////////
+        //Adding waypoints slected, try to add multike??\
+//                if(b!=null) {
+//                    WaypointwithDateList.add(b);
+//                }
+        WayPointDetailsList.clear();
 
-                    if (s.containsValue(b)) {
-                        WayPointDetailsList.remove(i);
-                        Log.d(TAG, "cccccyay waydetails removed");
+        for (int i = 0; i < WaypointwithDateList.size(); i++) {
+            Log.d(TAG, "Numberwaypoint" + WaypointwithDateList + "ASDASD" + i);
+            Log.d(TAG, "Numberwaypoint" + WaypointwithDateList.size());
 
-                    }
+            if (WayPointDetailsList != null) {
+                Log.d(TAG, "Numberwaypoint" + WayPointDetailsList.size());
+            }
 
-
-                }
-            } else {
-
-                //Adding waypoints slected, try to add multike??
-                Waypoint.add(b);
-                Log.d(TAG, "WayPointssssss1" + Waypoint.toString());
-
-                for (int i = 0; i < Waypoint.size(); i++) {
-                    Log.d(TAG, "WayPointssssss222" + Waypoint.toString());
-                    if (WayPointDetailsList == null) {
-
-                        if (WayPointDetailsList.get(i) == null) {
 //Waypint -5, waypont  detals =0
-                            Log.d(TAG, "WayPointssssss333" + Waypoint.toString());
-
-                            String returnedwaypointdetails = "";
-                            try {
-                                returnedwaypointdetails = downloadUrl("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + Waypoint.get
-
-                                        (i) +
-                                        "&key" +
-                                        "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            DataParser dataParser = new DataParser();
-                            try {
-                                WayPointDetailsList.add(dataParser.parse(returnedwaypointdetails).get(0));
-
-                            } catch (Exception e) {
-
-                                Toast.makeText(getActivity(), "Server is busy, Please try again!", Toast.LENGTH_SHORT).show();
-
-                            }
-
-                            Log.d(TAG, "WayPointDetailsListCHeckiiiing" + WayPointDetailsList.toString());
-                            DataHolderClass.getInstance2().setDistributor_id2(null);
-                        }
-                    }
-                }
-            }
-            Toast.makeText(getActivity(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
-            //Use these waypoints to change all marker.
-
-            if (mapMarkersForSelected != null) {
-
-                //Is empty first time runt
-                Log.d("onPostExecute", "BeforeFirsttimechecked" + mapMarkersForSelected);
 
 
-            }
-//Nurse: If I walk away from the computer, sometimes when I come back there is a picture of a man riding a scooter on it.
+            String returnedwaypointdetails = "";
+//TODO: using clear everything and bedone with it way....
+            //Currently solved... any other ways?
+//Dataparser-> changejsonobject from downloadurl to readable linked hashmap
+            //Download url  Change url to data
+            DataParser dataParser = new DataParser();
             try {
-                int j = mapMarkersForSelected.size();
-                for (int i = 0; i < j; i++) {
-                    // i=0, j=0 no run
-                    //i=0 j=1 run once delete first...
-                    //i=0 j=2
-
-                    //This remove all markers, welll should (Seems to be becausee all is different,
-                    Marker test = mapMarkersForSelected.get(0);
-                    test.remove();
-                    mapMarkersForSelected.remove(0);
+                downloadUrl download = new downloadUrl();
+                //need to have ifelse..?
+                download.execute("https://maps.googleapis.com/maps/api/place/details/json?placeid=" + WaypointwithDateList.get(i).get(0) +
+                        "&key" +
+                        "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
 
 
-                }
             } catch (Exception e) {
-                Log.d("onPostExecute", "WeirdOperation6Exception" + e);
+                Log.d(TAG, "Server is busy, Please try agai" + e.toString());
 
-
-            }
-            if (mapMarkersForSelected != null) {
-
-
-                Log.d("onPostExecute", "Firsttimechecked" + mapMarkersForSelected);
-
-            }
-            List<LinkedHashMap<String, String>> o = SelectedLocationListRecyclerViewAdapter.getItem();
-
-            Log.d("onPostExecute", "WeirdOperation7 Object SIze" + o.size());
-            Log.d("onPostExecute", "WeirdOperation7 Object SIze" + o.toString());
-
-
-
-            if (o != null) {
-                Log.d("onPostExecute", "Tried to remove marker Size" + mapMarkersForSelected.size());
-
-                Log.d("onPostExecute", "Tried to remove marker Size What" + mapMarkersForSelected);
-
-
-                for (int i = 0; i < o.size(); i++) {
-                    Log.d("onPostExecute", "We have entered here " + o.toString());
-                    Log.d("onPostExecute", "We have entered here " + o.size());
-
-                    String waypointlat = (String) o.get(i).get("lat").toString();
-
-                    String waypointlng = (String) o.get(i).get("lng").toString();
-                    LatLng waypointlatLng = new LatLng(Double.parseDouble(waypointlat), Double.parseDouble(waypointlng));
-                    MarkerOptions wayPointmarkerOptions = new MarkerOptions();
-                    wayPointmarkerOptions.position(waypointlatLng);
-                    wayPointmarkerOptions.title("Clicked!");
-                    wayPointmarkerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.yellowmarker, Integer.toString(i + 1)
-                    )));
-                    wayPointmarkerOptions.zIndex(10);
-                    Log.d("onPostExecute", "Tried to remove markeoptions" + wayPointmarkerOptions);
-
-                    mapMarkersForSelected.add(mMap.addMarker(wayPointmarkerOptions));
-
-                }
-            }
-            if (mapMarkersForSelected != null) {
-
-
-                Log.d("onPostExecute", "secondtimechecked" + mapMarkersForSelected);
+                Toast.makeText(getActivity(), "Server is busy, Please try again!", Toast.LENGTH_SHORT).show();
 
             }
 
-            if (!Waypoint.isEmpty()) {
-                //This draws path when returning to page
-                LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
-                String url = getDirectionsUrl(latlng, null);
+            Log.d(TAG, "WayPointDetailsListCHeckiiiing" + WayPointDetailsList.toString());
+            DataHolderClass.getInstance2().setDistributor_id2(null);
+        }
+        //}
 
-                DownloadTask downloadTask = new DownloadTask();
-                Log.d(TAG, "THE URL is IS 1st" + url);
 
-                // Start downloading json data from Google Directions API
-                downloadTask.execute(url);
+        //Use these waypoints to change all marker.
+
+        if (mapMarkersForSelected != null) {
+
+            //Is empty first time runt
+            Log.d("onPostExecute", "BeforeFirsttimechecked" + mapMarkersForSelected);
+
+
+        }
+        try {
+            int j = mapMarkersForSelected.size();
+            for (int i = 0; i < j; i++) {
+                // i=0, j=0 no run
+                //i=0 j=1 run once delete first...
+                //i=0 j=2
+
+                //This remove all markers, welll should (Seems to be becausee all is different,
+                Marker test = mapMarkersForSelected.get(0);
+                test.remove();
+                mapMarkersForSelected.remove(0);
+
+
+            }
+        } catch (Exception e) {
+            Log.d("onPostExecute", "WeirdOperation6Exception" + e);
+
+
+        }
+        if (mapMarkersForSelected != null) {
+
+
+            Log.d("onPostExecute", "Firsttimechecked" + mapMarkersForSelected);
+
+        }
+        List<LinkedHashMap<String, String>> o = SelectedLocationListRecyclerViewAdapter.getItem();
+
+
+        if (o != null) {
+            Log.d("onPostExecute", "Tried to remove marker Size" + mapMarkersForSelected.size());
+
+            Log.d("onPostExecute", "Tried to remove marker Size What" + mapMarkersForSelected);
+
+
+            for (int i = 0; i < o.size(); i++) {
+                Log.d("onPostExecute", "We have entered here " + o.toString());
+                Log.d("onPostExecute", "We have entered here " + o.size());
+
+                String waypointlat = o.get(i).get("lat").toString();
+
+                String waypointlng = o.get(i).get("lng").toString();
+                LatLng waypointlatLng = new LatLng(Double.parseDouble(waypointlat), Double.parseDouble(waypointlng));
+                MarkerOptions wayPointmarkerOptions = new MarkerOptions();
+                wayPointmarkerOptions.position(waypointlatLng);
+                wayPointmarkerOptions.title("Clicked!");
+                wayPointmarkerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.yellowmarker, Integer.toString(i + 1)
+                )));
+                wayPointmarkerOptions.zIndex(10);
+                Log.d("onPostExecute", "Tried to remove markeoptions" + wayPointmarkerOptions);
+
+                mapMarkersForSelected.add(mMap.addMarker(wayPointmarkerOptions));
 
             }
         }
+        if (mapMarkersForSelected != null) {
+
+
+            Log.d("onPostExecute", "secondtimechecked" + mapMarkersForSelected);
+
+        }
+
+        if (!WaypointwithDateList.isEmpty()) {
+            //This draws path when returning to page
+            LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
+            String url = getDirectionsUrl(latlng, null);
+//ignore downloadtask changed to
+            //    DownloadTask downloadTask = new DownloadTask();
+            Log.d(TAG, "THE URL is IS 1st" + url);
+
+            // Start downloading json data from Google Directions API
+            // downloadTask.execute(url);
+            downloadUrl download = new downloadUrl();
+            download.execute(url);
+
+        }
 
         pager = (ViewPager) view.findViewById(R.id.vpPagerpoilist);
-
+        //TODO: whatrever is using this needto be changed
         //TODO:has changed to child, use support if problem persist?
         recycleadapter = new MyPagerAdapter(getChildFragmentManager());
         try {
             pager.setAdapter(recycleadapter);
-        }catch(Exception e){
-            //TODO:java.lang.NullPointerException: Attempt to invoke virtual method 'android.os.Handler android.support.v4.app.FragmentHostCallback.getHandler()' on a null object reference
-                           Toast.makeText(getActivity(), "Uh oh! Some error has occured  ", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            //TODO:java.lang.NullPointerException: Attempt to invoke virtual method 'android.os.Handler android.support.v4.app.FragmentHostCallback
+            // .getHandler()' on a null object reference
+            Toast.makeText(getActivity(), "Uh oh! Some error has occured  ", Toast.LENGTH_SHORT).show();
 
 
         }
 
         pd.setMessage("Loading Path...");
         pd.setCancelable(false);
+        //Number picker design needs to be changed
         numberpicker = (HorizontalNumberPicker) view.findViewById(R.id.radiusPicker);
         numberpicker.setMaxValue(10);
         numberpicker.setMinValue(1);
@@ -491,33 +508,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         });
 
 
-//        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-//                .enableAutoManage(getActivity(),this)
-//                .addApi(Drive.API)
-//                .addScope(Drive.SCOPE_FILE)
-//
-//                .addApi(AppIndex.API)
-//                .addApi(LocationServices.API)
-//
-//                .build();
-
-//
-//        if (mGoogleApiClient == null) {
-//
-//            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-//                    .addConnectionCallbacks((GoogleApiClient.ConnectionCallbacks) this)
-//                    .addOnConnectionFailedListener(this)
-//                    .addApi(LocationServices.API)
-//                    .build();
-//
-//
-//        }
-
-
         //   setContentView(R.layout.activity_maps);
         markerPoints = new ArrayList<LatLng>();
-//        LayoutInflater inflater = (LayoutInflater) this
-//                .getSystemService(this.LAYOUT_INFLATER_SERVICE);
 
 
         //    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -529,12 +521,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         // AutoCompleteTextView from = (AutoCompleteTextView) v.findViewById(R.id.from);
         //   AutoCompleteTextView to = (AutoCompleteTextView) v.findViewById(R.id.to);
         Button but = (Button) view.findViewById(R.id.load_directions);
-//        Button SearchBar = (Button)  view.findViewById(R.id.Bar);
-//        Button SearchBank = (Button)  view.findViewById(R.id.Bank);
-//        Button SearchAmusement = (Button)  view.findViewById(R.id.amusement_park);
-//        Button SearchCafe = (Button)  view.findViewById(R.id.cafe);
-//        Button SearchCasino = (Button)  view.findViewById(R.id.casino);
-//        Button SearchNightCLub = (Button)  view.findViewById(R.id.night_club);
+
         mDurationView = (TextView) view.findViewById(R.id.duration_label);
         mDistanceView = (TextView) view.findViewById(R.id.distance_label);
         Button SelectTypes = (Button) view.findViewById(R.id.selecttypes);
@@ -556,10 +543,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
             public void onClick(View v) {
                 Toast.makeText(getActivity(), "Location Saved!  ", Toast.LENGTH_SHORT).show();
 
-             //   final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-
-                BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).setValue(Waypoint);
+                BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).setValue(WaypointwithDateList);
 
             }
         });
@@ -576,16 +561,16 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         FirebaseDatabaseUser post = dataSnapshot.getValue(FirebaseDatabaseUser.class);
 
-                        System.out.println("THIS IS IT"+post);
+                        System.out.println("THIS IS IT" + post);
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                         System.out.println("The read failed: " + databaseError.getCode());
                     }
 
 
-
-            });
+                });
             }
         });
         opencategories.setOnClickListener(onClickListener);
@@ -710,7 +695,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                     try {
                         if (LocationType.toString() != "") {
                             expandableLayout.collapse();
-
+                            pd.show();
                             setRecyclerView(LocationType);
 
                         } else {
@@ -898,8 +883,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 //        String place_id = intent.getStringExtra("place_id");
 //        if (place_id != null) {
 //
-//            Waypoint.add(place_id);
-//            Toast.makeText(getApplicationContext(), Waypoint.toString(), Toast.LENGTH_SHORT).show();
+//            WaypointwithDateList.add(place_id);
+//            Toast.makeText(getApplicationContext(), WaypointwithDateList.toString(), Toast.LENGTH_SHORT).show();
 //            //Use these waypoints to change all marker.
 //
 //            LatLng latlng=new LatLng(CurrentLocation.getLatitude(),CurrentLocation.getLongitude());
@@ -1005,9 +990,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
             if (sbValue.toString() != null) {
 
-                PlacesTask placesTask = new PlacesTask();
-                placesTask.execute(sbValue.toString());
-
+                //  PlacesTask placesTask = new PlacesTask();
+                //    placesTask.execute(sbValue.toString());
+                downloadUrl download = new downloadUrl();
+                download.execute(sbValue.toString());
                 recycleadapter.notifyDataSetChanged();
 
             } else {
@@ -1047,9 +1033,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
     }
 
-    private Bitmap writeTextOnDrawable(int drawableId, String text) {
+    private static Bitmap writeTextOnDrawable(int drawableId, String text) {
 
-        Bitmap bm = BitmapFactory.decodeResource(getResources(), drawableId)
+        Bitmap bm = BitmapFactory.decodeResource(mGetResources, drawableId)
                 .copy(Bitmap.Config.ARGB_8888, true);
         bm = Bitmap.createScaledBitmap(bm, 100, 100, false);
         Typeface tf = Typeface.create("Helvetica", Typeface.BOLD);
@@ -1067,7 +1053,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         }
         paint.setTypeface(tf);
         paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(convertToPixels(getActivity(), 11));
+        paint.setTextSize(convertToPixels(mInstance, 11));
 
         Rect textRect = new Rect();
         paint.getTextBounds(text, 0, text.length(), textRect);
@@ -1076,7 +1062,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
         //If the text is bigger than the canvas , reduce the font size
         if (textRect.width() >= (canvas.getWidth() - 4))     //the padding on either sides is considered as 4, so as to appropriately fit in the text
-            paint.setTextSize(convertToPixels(getActivity(), 7));        //Scaling needs to be used for different dpi's
+            paint.setTextSize(convertToPixels(mInstance, 7));        //Scaling needs to be used for different dpi's
 
         //Calculate the positions
         int xPos = (canvas.getWidth() / 2) - 2;     //-2 is for regulating the x position offset
@@ -1114,28 +1100,40 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         return WayPointDetailsList;
     }
 
-    public static ArrayList getWaypoint() {
+    public static ArrayList getWaypointwithDateList() {
 
 
-        return Waypoint;
-    }
-    public static void setWaypoint(ArrayList wayoint) {
-
-Waypoint=wayoint;
+        return WaypointwithDateList;
     }
 
-    public void setNearbyPlacesList(List<LinkedHashMap<String, String>> nearbyPlacesListFrom) {
+    public static void addWaypointwithDateList(ArrayList wayoint) {
+
+        WaypointwithDateList.add(wayoint);
+    }
+
+    //TODO: need to make it into... array list?
+    public static void addWaypoint(String wayoint) {
+       // WaypointwithDateList.add(wayoint);
+    }
+
+    public static void removeWaypoint(String wayoint) {
+        WaypointwithDateList.remove(wayoint);
+    }
+
+    public static void setNearbyPlacesList(List<LinkedHashMap<String, String>> nearbyPlacesListFrom) {
 
         nearbyPlacesList = nearbyPlacesListFrom;
 
     }
 
     //TODO:Currently Doing this, try to do a if else for 1 marker (select list)? or multiple marker
-    private void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
+    private static void ShowNearbyPlaces(List<LinkedHashMap<String, String>> nearbyPlacesList) {
+        Log.d("onPostExecute", "whatisnearby" + nearbyPlacesList);
 
 
         //To let others get it
         setNearbyPlacesList(nearbyPlacesList);
+        Log.d("onPostExecute", "whatisnearby" + getNearbyPlacesList());
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
@@ -1146,7 +1144,6 @@ Waypoint=wayoint;
 
 
             LinkedHashMap<String, String> googlePlace = nearbyPlacesList.get(i);
-            Log.d("onPostExecute", "Entered into showing locations" + googlePlace.toString());
 
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
@@ -1158,6 +1155,7 @@ Waypoint=wayoint;
             markerOptions.position(latLng);
             markerOptions.title(placeName + " : " + vicinity);
             //Run the provate function above to get special marker
+
             markerOptions.icon(BitmapDescriptorFactory.fromBitmap(writeTextOnDrawable(R.drawable.marker, Integer.toString(i + 1))));
             markerOptions.zIndex(1);
 
@@ -1168,18 +1166,20 @@ Waypoint=wayoint;
 
             mapMarkers.add(mMap.addMarker(markerOptions));
 
+            Log.d("onPostExecute", "mapmarkersnumber" + mapMarkers.toString());
 
         }
 
         for (Marker marker : mapMarkers) {
             builder.include(marker.getPosition());
         }
+        builder.include(new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLatitude()));
         LatLngBounds bounds = builder.build();
 
         int padding = 150; // offset from edges of the map in pixels
         CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, padding);
-
-        mMap.animateCamera(cu);
+//TODO:For some reason this cause eveything to go ... somewhere
+        //      mMap.animateCamera(cu);
 
         Log.d("onPostExecute", "markeristhisoutside" + getMapMarkers().toString());
 
@@ -1214,12 +1214,17 @@ Waypoint=wayoint;
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSION_ACCESS_COURSE_LOCATION);
         }
+        //not useful?
 
-
+        mMap.setBuildingsEnabled(true);
+        mMap.setTrafficEnabled(true);
         //Top right symbol
         mMap.setMyLocationEnabled(true);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
 
-
+        mMap.getUiSettings().setMapToolbarEnabled(true);
+        //WTF IS THIS marker problem...?
+//TODO: must show this or just use intent to show it
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -1234,6 +1239,8 @@ Waypoint=wayoint;
                     //When clicked,have got marker lat and lng....how to compare
                     Log.d("onMarkerCLick", marker.toString());
                     ArrayList<View> children = new ArrayList<View>();
+//TODO:   java.lang.NullPointerException: Attempt to invoke virtual method 'android.support.v7.widget.RecyclerView$Adapter android.support
+// .v7.widget.RecyclerView.getAdapter()' on a null object reference
 
                     for (int i = recyclerView.getAdapter().getItemCount() - 1; i >= 0; i--) {
                         //     HashMap<String, Object> obj = (HashMap<String, Object>);
@@ -1246,7 +1253,7 @@ Waypoint=wayoint;
                         // recyclerView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
                         //TODO : Highlight item when marker is clicked.
                         if (lat.equals(String.valueOf(marker.getPosition().latitude)) && lng.equals(String.valueOf(marker.getPosition().longitude))) {
-//if same , then below will moves recyclerview
+                        //if same , then below will moves recyclerview
 
                             RecyclerView.ViewHolder holder2 = LocationListRecyclerViewAdapter.getHolder2();
 
@@ -1262,8 +1269,8 @@ Waypoint=wayoint;
                         children.add(recyclerView.getChildAt(i));
                     }
                     showPath(marker);
-
-                    return true;
+                    //TODO: check whether all markers have this properties....
+                    return false;
                 }
             }
         });
@@ -1296,10 +1303,8 @@ Waypoint=wayoint;
 
         LatLng ClickedMarker = new LatLng(marker.getPosition().latitude, marker.getPosition().longitude);
 
-        Log.d(TAG, "Current Location Lat is " + ClickedMarker);
 
         markerPoints.add(ClickedMarker);
-        Log.d(TAG, "Check if system workign got not,  " + currentLatlng.longitude);
 
         // Creating MarkerOptions
 
@@ -1309,13 +1314,10 @@ Waypoint=wayoint;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         LatLngBounds bounds;
         for (Marker c : mapMarkers) {
-            Log.d(TAG, "Ismapmarker  ");
             //builder.include(c.getPosition());
 
             if (dest.latitude == c.getPosition().latitude && dest.longitude == c.getPosition().longitude) {
-                //  c.remove();
-                //c is the exisintg marker?
-                Log.d(TAG, "Ismapmarkerrunning  ");
+
                 builder.include(marker.getPosition());
 
 
@@ -1358,14 +1360,14 @@ Waypoint=wayoint;
         // mMap.animateCamera(CameraUpdateFactory.zoomTo(13));
         // Getting URL to the Google Directions API
         String url = getDirectionsUrl(origin, dest);
-//Doing this, should... easiest way is to get a variable here to change color...
-        DownloadTask downloadTask = new DownloadTask();
+        //Doing this, should... easiest way is to get a variable here to change color...
+        //  DownloadTask downloadTask = new DownloadTask();
         Log.d(TAG, "THE URL is  IS ...2nd " + url);
         newcolor = true;
         // Start downloading json data from Google Directions API
-        downloadTask.execute(url);
-
-
+        downloadUrl download = new downloadUrl();
+        download.execute(url);
+//TODO: got direction then?
     }
     //Replaced with progress dialog ....**********
 //    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -1429,6 +1431,8 @@ Waypoint=wayoint;
 
 
     private static String getDirectionsUrl(LatLng origin, LatLng dest) {
+        //For getting an url
+
 
         // Origin of route
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
@@ -1443,33 +1447,34 @@ Waypoint=wayoint;
         //TODO: fixed this pile of messy code.. Logic might become easier.
         String waypoint = new String();
         StringBuilder waypointsb = new StringBuilder();
-        if (!Waypoint.isEmpty()) {
-            Log.d(TAG, "whathasbeendone2");
+        if (!WaypointwithDateList.isEmpty()) {
+            Log.d(TAG, "whathasbeendone2"+WaypointwithDateList);
 
             waypointsb.append("&waypoints=");
             waypointsb.append("optimize:true|");
 
-
+            //If no desination =
             if (dest != null) {
                 Log.d(TAG, "whathasbeendone3");
 
-                for (int i = 0; i < Waypoint.size(); i++) {
+                for (int i = 0; i < WaypointwithDateList.size(); i++) {
                     //TODO:Optimize =true should not be hard coded, require to change according to users choice,
                     //optimize:true|
-                    waypoint = (waypointsb.append("place_id:" + Waypoint.get(i) + "|").toString());
+                    waypoint = (waypointsb.append("place_id:" + WaypointwithDateList.get(i).get(0) + "|").toString());
                     Log.d(TAG, "whathasbeendone4");
 
                 }
 
 
             } else {
-                str_dest = "destination=place_id:" + Waypoint.get(Waypoint.size() - 1).toString();
+
+                str_dest = "destination=place_id:" + WaypointwithDateList.get(WaypointwithDateList.size() - 1).get(0).toString();
                 //When waypoint has only 1 varible
-                if (Waypoint.size() != 1) {
-                    for (int i = 0; i < Waypoint.size() - 1; i++) {
+                if (WaypointwithDateList.size() != 1) {
+                    for (int i = 0; i < WaypointwithDateList.size() - 1; i++) {
                         Log.d(TAG, "whathasbeendone5");
 
-                        waypoint = (waypointsb.append("place_id:" + Waypoint.get(i) + "|").toString());
+                        waypoint = (waypointsb.append("place_id:" + WaypointwithDateList.get(i).get(0) + "|").toString());
 
                     }
                 }
@@ -1537,58 +1542,58 @@ Waypoint=wayoint;
     //Path Searching
     //Download URL ?
     //change to public for access from placedetail activity
-    public static class DownloadTask extends AsyncTask<String, Void, String> {
-        protected void onPreExecute() {
-            //set message of the dialog
-            //show dialog
-
-            pd.show();
-            super.onPreExecute();
-        }
-
-        // Downloading data in non-ui thread
-        @Override
-        protected String doInBackground(String... url) {
-            Log.d(TAG, url[0]);
-            Log.d(TAG, "Do in Back Test");
-
-            // For storing data from web service
-            String data = "";
-
-            try {
-                // Fetching the data from web service
-                data = downloadUrl(url[0]);
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-
-
-            return data;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-//Click Marker and find path? Probably this is
-            Log.d("PTRESULT", result);
-
-            ParserTask parserTask = new ParserTask();
-            // Invokes the thread for parsing the JSON data
-            parserTask.execute(result);
-            Log.d("PTRESULTAFter", result);
-            if (pd.isShowing()) {
-
-                Log.d("PTRESULTAFte3nd", result);
-
-
-            }
-            pd.dismiss();
-            Log.d("PTRESULTAFte2nd", result);
-
-        }
-
-
-    }
+//    public static class DownloadTask extends AsyncTask<String, Void, String> {
+//        protected void onPreExecute() {
+//            //set message of the dialog
+//            //show dialog
+//
+//            pd.show();
+//            super.onPreExecute();
+//        }
+//
+//        // Downloading data in non-ui thread
+//        @Override
+//        protected String doInBackground(String... url) {
+//            Log.d(TAG, url[0]);
+//            Log.d(TAG, "Do in Back Test");
+//
+//            // For storing data from web service
+//            String data = "";
+//
+//            try {
+//                // Fetching the data from web service
+//                data = downloadUrl(url[0]);
+//            } catch (Exception e) {
+//                Log.d("Background Task", e.toString());
+//            }
+//
+//
+//            return data;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            super.onPostExecute(result);
+////Click Marker and find path? Probably this is
+//            Log.d("PTRESULT", result);
+//
+//            ParserTask parserTask = new ParserTask();
+//            // Invokes the thread for parsing the JSON data
+//            parserTask.execute(result);
+//            Log.d("PTRESULTAFter", result);
+//            if (pd.isShowing()) {
+//
+//                Log.d("PTRESULTAFte3nd", result);
+//
+//
+//            }
+//            pd.dismiss();
+//            Log.d("PTRESULTAFte2nd", result);
+//
+//        }
+//
+//
+//    }
 
     //TODO: Use this in all ?
     private Handler handler = new Handler() {
@@ -1734,7 +1739,7 @@ Waypoint=wayoint;
                         duration = (String) point.get("duration");
                         continue;
                     }
-                    Log.d("testhahanumber=", j + point.toString());
+                    //     Log.d("testhahanumber=", j + point.toString());
 
                     //  Log.d("wtfishahadistance", (String) point.get("distance"));
                     //    Log.d("wtfishahaduration", duration);
@@ -1784,67 +1789,156 @@ Waypoint=wayoint;
 
     //Originally private, change it to public so LocationDetailsActivity can access it
 //Any url can be insert here and will return different kind of data
-    private static String downloadUrl(String strUrl) throws IOException {
-        Log.d(TAG, "checkifone");
+    private static class downloadUrl extends AsyncTask<String, Void, String> {
 
-        String data = "";
-        InputStream iStream = null;
-        HttpURLConnection urlConnection = null;
-        Log.d(TAG, "Download URL" + strUrl);
-        Log.d(TAG, "checkiftwo");
 
-        try {
-            int retry = 0;
-            URL url = new URL(strUrl);
+        @Override
+        protected String doInBackground(String... strUrl) {
+            Log.d(TAG, "checkifone");
 
-            Log.d(TAG, "Download URL testing" + strUrl);
-            // Creating an http connection to communicate with url
-            urlConnection = (HttpURLConnection) url.openConnection();
+            String data = "";
+            InputStream iStream = null;
+            HttpURLConnection urlConnection = null;
+            Log.d(TAG, "Download URL" + strUrl);
+            Log.d(TAG, "checkiftwo");
 
-            // Connecting to url
-            urlConnection.connect();
+            try {
+                int retry = 0;
+                URL url = new URL(strUrl[0]);
+                Log.d(TAG, "Download URL testing" + strUrl[0]);
+                Log.d(TAG, "Download URL testing" + url.toString());
 
-            // Reading data from url
-            iStream = urlConnection.getInputStream();
-            while (retry == 0) {
-                BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+                // Creating an http connection to communicate with url
+                urlConnection = (HttpURLConnection) url.openConnection();
 
-                StringBuffer sb = new StringBuffer();
+                // Connecting to url
+                urlConnection.connect();
 
-                String line = "";
-                while ((line = br.readLine()) != null) {
-                    sb.append(line);
+                // Reading data from url
+                iStream = urlConnection.getInputStream();
+                while (retry == 0) {
+                    BufferedReader br = new BufferedReader(new InputStreamReader(iStream));
+
+                    StringBuffer sb = new StringBuffer();
+
+                    String line = "";
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line);
+                    }
+                    Log.d(TAG, "Direction Data for wtf is br" + sb);
+
+                    data = sb.toString();
+                    Log.d(TAG, "Direction Data for URL Downloa" + strUrl[0]);
+
+                    Log.d(TAG, "Direction Data for URL Download" + data);
+
+                    br.close();
+                    if (data.contains("You have exceeded your daily request quota for this API")) {
+                        Thread.sleep(2000);
+                        Log.d(TAG, "howmanytimesis thread");
+
+                    } else {
+
+                        retry = 1;
+
+                    }
                 }
-                Log.d(TAG, "Direction Data for wtf is br" + sb);
+                return data;
 
-                data = sb.toString();
-                Log.d(TAG, "Direction Data for URL Download" + data);
-                br.close();
-                if (data.contains("You have exceeded your daily request quota for this API")) {
-                    Thread.sleep(2000);
-                    Log.d(TAG, "howmanytimesis thread");
-
-                } else {
-
-                    retry = 1;
+            } catch (Exception e) {
+                Log.d("Exception url", e.toString());
+            } finally {
+                if (iStream != null) {
+                    try {
+                        iStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    urlConnection.disconnect();
+                } catch (Exception e) {
+                    //NetworkOnMainThreadException
+                    Log.d("Exception downLoadUrl", e.toString());
 
                 }
             }
-
-        } catch (Exception e) {
-            Log.d("Exception url", e.toString());
-        } finally {
-            if (iStream != null) {
-                iStream.close();
-            }try {
-                urlConnection.disconnect();
-            }catch (Exception e){
-                //NetworkOnMainThreadException
-                Log.d("Exception downLoadUrl", e.toString());
-
-            }
+            return null;
         }
-        return data;
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            ParserTask parserTask = new ParserTask();
+            Log.d(TAG, "On post execute 1st");
+//TODO:This is where different kinds of things should be separated: NearbySearch, Directions, and details....
+            //Just check whatrever result return and do if else
+            List<LinkedHashMap<String, String>> nearbyPlacesList = null;
+            DataParser dataParser = new DataParser();
+
+//Review is using separate one?
+//TODO: {   "html_attributions" : [      for Start searching
+//TODO"{   "geocoded_waypoints" :     check waypoints
+            //This is where its connected to DataParser and get the List of places wiyh ratings etc.
+
+            if (result.startsWith("{   \"html_attributions\" : [")) {
+//THIS iS DETAILS< need to put details in list
+
+
+                if (result.contains("next_page_token")) {
+                    nearbyPlacesList = dataParser.parse(result);
+                    ShowNearbyPlaces(nearbyPlacesList);
+                } else {
+                    //CHeck ths
+
+
+                    //     WayPointDetailsList.add(dataParser.parse(result).get(0));
+                    Log.d("Yeep", "dataparserresult1Details==" + dataParser.parse(result));
+                    WayPointDetailsList.add(dataParser.parse(result).get(0));
+
+                }
+
+
+            } else if (result.startsWith("{   \"geocoded_waypoints\" ")) {
+                //Wai... this is for direction...!??
+                // WayPointDetailsList.add(dataParser.parse(result));
+                Log.d("Yeep", "dataparserresult1==" + dataParser.parse(result));
+//DirectionsFetcher a = new DirectionsFetcher();
+//a.parse(result);
+                parserTask.execute(result);
+
+            }
+            Log.d("Yeep", "dataparserresult1==" + result);
+
+            Log.d("Yeep", "dataparserresult2=======" + nearbyPlacesList);
+
+//
+//            Log.d("GooglePlacesReadTask", nearbyPlacesList.toString());
+//            ListAdapter adapter = new SimpleAdapter(
+//
+//                    MapsActivity.this, nearbyPlacesList,
+//
+//                    R.layout.list_item, new String[]{"place_name"}, new int[]{R.id.name}
+//
+//            );
+
+            //This use locationadapter to put in listview?
+
+
+//Search list, user choose,
+            pager.invalidate();
+            pd.dismiss();
+            recycleadapter.notifyDataSetChanged();
+
+            // Start parsing the Google places in JSON format
+            // Invokes the "doInBackground()" method of the class ParserTask
+            // parserTask.execute(result);
+
+            Log.d(TAG, "On post execute ENDNENDNEDNNEND");
+
+        }
+
+        //  return data;
     }
 
     @Override
@@ -2003,7 +2097,6 @@ Waypoint=wayoint;
             try {
                 Log.d(TAG, "Runnign? PlacesTaskCheckurl" + url[0]);
 
-                data = downloadUrl(url[0]);
                 Log.d(TAG, "Runnign? PlacesTask" + data);
 
             } catch (Exception e) {
@@ -2018,45 +2111,7 @@ Waypoint=wayoint;
         protected void onPostExecute(String result) {
             Log.d(TAG, "Inmapsactivity");
 
-            ParserTask parserTask = new ParserTask();
-            Log.d(TAG, "On post execute 1st");
 
-            List<LinkedHashMap<String, String>> nearbyPlacesList = null;
-            DataParser dataParser = new DataParser();
-
-
-            //This is where its connected to DataParser and get the List of places wiyh ratings etc.
-            nearbyPlacesList = dataParser.parse(result);
-            Log.d("Yeep", "dataparserresult1==" + result);
-
-            Log.d("Yeep", "dataparserresult2=======" + nearbyPlacesList);
-
-//
-//            Log.d("GooglePlacesReadTask", nearbyPlacesList.toString());
-//            ListAdapter adapter = new SimpleAdapter(
-//
-//                    MapsActivity.this, nearbyPlacesList,
-//
-//                    R.layout.list_item, new String[]{"place_name"}, new int[]{R.id.name}
-//
-//            );
-            Log.d("GooglePlacesReadTask", "theheckis" + nearbyPlacesList);
-
-            //This use locationadapter to put in listview?
-
-
-            ShowNearbyPlaces(nearbyPlacesList);
-            Log.d("GooglePlacesReadTask", "onPostExecute Exit");
-//Search list, user choose,
-            pager.invalidate();
-            pd.dismiss();
-            recycleadapter.notifyDataSetChanged();
-
-            // Start parsing the Google places in JSON format
-            // Invokes the "doInBackground()" method of the class ParserTask
-            // parserTask.execute(result);
-
-            Log.d(TAG, "On post execute ENDNENDNEDNNEND");
         }
     }
 
@@ -2065,52 +2120,6 @@ Waypoint=wayoint;
     public static ConstraintLayout view;
     private FragmentActivity fa;
 
-
-    public class CustomPagerAdapter extends PagerAdapter {
-
-        private Context mContext;
-        private Vector<View> pages;
-
-        public CustomPagerAdapter(Context context, Vector<View> pages) {
-            Log.d(TAG, "endhere1");
-
-            this.mContext = context;
-            this.pages = pages;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Log.d(TAG, "endhere2a");
-
-            View page = pages.get(position);
-            container.addView(page);
-            Log.d(TAG, "endhere2b");
-
-            return page;
-        }
-
-        @Override
-        public int getCount() {
-            Log.d(TAG, "endhere3");
-
-            return pages.size();
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            Log.d(TAG, "endhere4");
-
-            return view.equals(object);
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            Log.d(TAG, "endhere5");
-
-            container.removeView((View) object);
-        }
-
-    }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
 

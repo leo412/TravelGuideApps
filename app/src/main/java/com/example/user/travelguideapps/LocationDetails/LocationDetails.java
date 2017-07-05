@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import com.example.user.travelguideapps.R;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -38,8 +40,19 @@ public class LocationDetails extends Fragment {
     private static TextView place_address;
     private static TextView place_phone;
     private static TextView place_website;
+    private static TextView Monday;
+    private static TextView Tuesday;
+    private static TextView Wednesday;
+    private static TextView Thursday;
+    private static TextView Friday;
+    private static TextView Saturday;
+    private static TextView Sunday;
 
 
+
+
+    private static TextView place_opennow;
+    private static TextView place_opening_hours;
 
     Button setplacebutton;
      Button removeplacebutton;
@@ -91,8 +104,52 @@ public class LocationDetails extends Fragment {
         place_phone.setText( placedetail.get("formatted_phone_number"));
         place_website=(TextView)view.findViewById(R.id.textViewWebsite);
         place_website.setText( placedetail.get("website"));
+        place_opennow=(TextView)view.findViewById(R.id.textViewOpenNow);
+        Monday = (TextView) view.findViewById(R.id.Monday);
+        Tuesday = (TextView) view.findViewById(R.id.Tuesday);
+        Wednesday = (TextView) view.findViewById(R.id.Wednesday);
+        Thursday = (TextView) view.findViewById(R.id.Thursday);
+        Friday = (TextView) view.findViewById(R.id.Friday);
+        Saturday = (TextView) view.findViewById(R.id.Saturday);
+        Sunday = (TextView) view.findViewById(R.id.Sunday);
+        Log.d(TAG, "Findingthisout first"+placedetail.get("opening_hours_text"));
+        Log.d(TAG, "Findingthisout second"+placedetail.get("opening_hours_text").indexOf(0));
+
+        ArrayList test=new ArrayList();
+        ArrayList<String> parts = new ArrayList<>(
+                Arrays.asList((placedetail.get("opening_hours_text")).split(",")));
+          // test=new ArrayList<>( Arrays.asList(placedetail.get("opening_hours_text").split(",").toString()));
+        Log.d(TAG, "Findingthisout third"+parts);
+
+        if(placedetail.get("open_now")!="") {
+            Log.d(TAG, "Findingthisout fourth"+parts.get(0));
+
+            Monday.setText( parts.get(0).toString());
+            Tuesday.setText( parts.get(1).toString());
+            Wednesday.setText( parts.get(2).toString());
+            Thursday.setText( parts.get(3).toString());
+            Friday.setText( parts.get(4).toString());
+            Saturday.setText( parts.get(5).toString());
+            Sunday.setText( parts.get(6).toString());
 
 
+
+        }
+switch (placedetail.get("open_now")){
+    case  "true":
+        place_opennow.setText("This location is opened now.");
+break;
+    case  "false":
+        place_opennow.setText("This location is closed now.");
+        break;
+default:
+    place_opennow.setText("This location does not provide time slot");
+
+
+}
+
+
+        //place_opening_hours=(TextView)view.findViewById(R.id.textViewO);
 
         //View mainview=inflater.inflate(R.layout.content_place_details, container, false);
 

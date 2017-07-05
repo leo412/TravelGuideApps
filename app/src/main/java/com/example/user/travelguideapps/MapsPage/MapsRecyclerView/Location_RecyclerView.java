@@ -82,10 +82,10 @@ private int scrollingtotop=1;
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
-   //     TextView tvLabel = (TextView) view.findViewById(R.id.tvLabel);
-      //  tvLabel.setText(page + " -- " + title);
+
 
         List<LinkedHashMap<String, String>> nearbyPlacesList= MapsActivity.getNearbyPlacesList();
+        System.out.println("insidefirst"+nearbyPlacesList);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 

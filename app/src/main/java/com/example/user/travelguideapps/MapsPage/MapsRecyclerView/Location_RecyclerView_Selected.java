@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -13,15 +14,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.user.travelguideapps.BaseActivity;
-import com.example.user.travelguideapps.LoginPage.LoginActivity;
+import com.example.user.travelguideapps.DataHolderClass;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import net.cachapa.expandablelayout.ExpandableLayout;
 
@@ -103,51 +100,104 @@ public class Location_RecyclerView_Selected extends Fragment {
         savefirebase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity(), "Location Saved!  ", Toast.LENGTH_SHORT).show();
+                if(SelectedLocationListRecyclerViewAdapter.getItemCount2()>0) {
 
+
+                    android.app.FragmentManager manager = getActivity().getFragmentManager();
+                    android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
+                    if (frag != null) {
+                        manager.beginTransaction().remove(frag).commit();
+                    }
+                    DataHolderClass.getInstance2().setDistributor_id2("Save");
+
+//                DialogCategoriesFragment alertDialogFragment = new DialogCategoriesFragment();
+//                alertDialogFragment.show(manager, "Save");
+                    Fragment fragment = null;
+                    Class fragmentClass = null;
+                    fragmentClass = SavedDataListFragment.class;
+
+                    try {
+                        fragment = (Fragment) fragmentClass.newInstance();
+                    } catch (java.lang.InstantiationException e) {
+                        e.printStackTrace();
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                    fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).addToBackStack(null).commit();
+
+                }else{
+                    Toast.makeText(getContext(), "Please select at least one location", Toast.LENGTH_SHORT).show();
+
+
+                }
+
+            }
                 //   final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
 
-                BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).setValue(MapsActivity.getWaypoint());
 
-            }
+
         });
         Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), waypoint);
 
         loadfirebase.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {
-                                                Toast.makeText(getActivity(), "Location Loaded!  ", Toast.LENGTH_SHORT).show();
 
-                                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                                DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID());
-                                                ref.addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        ArrayList post = (ArrayList) dataSnapshot.getValue();
+                                                android.app.FragmentManager manager = getActivity().getFragmentManager();
+                                                android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
+                                                if (frag != null) {
+                                                    manager.beginTransaction().remove(frag).commit();
+                                                }
+                                                DataHolderClass.getInstance2().setDistributor_id2("Load");
+                                                Fragment fragment = null;
+                                                Class fragmentClass = null;
+                                                fragmentClass = SavedDataListFragment.class;
 
-                                                        System.out.println("THIS IS IT" + post);
-                                                      //  System.out.println("THIS IS IT" + LoginActivity.getUserID());
+                                                try {
+                                                    fragment = (Fragment) fragmentClass.newInstance();
+                                                } catch (java.lang.InstantiationException e) {
+                                                    e.printStackTrace();
+                                                } catch (IllegalAccessException e) {
+                                                    e.printStackTrace();
+                                                }
+
+
+                                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                                                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).addToBackStack(null).commit();
+
 //
-//                                                        System.out.println("THIS IS IT" + post.username);
-//                                                        System.out.println("THIS IS IT" + post.waypoint);
-
-
-                                                        MapsActivity.setWaypoint(post);
-                                                        //Cannot directly update, findways to reset details,,,,
-                                                       Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), post);
-
-                                                        Locationadapter.notifyDataSetChanged();
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-                                                        System.out.println("The read failed: " + databaseError.getCode());
-                                                    }
-
-
-                                                });
+//                                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
+//                                                DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID());
+//                                                ref.addValueEventListener(new ValueEventListener() {
+//                                                    @Override
+//                                                    public void onDataChange(DataSnapshot dataSnapshot) {
+//                                                        ArrayList post = (ArrayList) dataSnapshot.getValue();
+//
+//                                                        System.out.println("THIS IS IT" + post);
+//                                                      //  System.out.println("THIS IS IT" + LoginActivity.getUserID());
+////
+////                                                        System.out.println("THIS IS IT" + post.username);
+////                                                        System.out.println("THIS IS IT" + post.waypoint);
+//
+//
+//                                                        MapsActivity.setWaypointwithDateList(post);
+//                                                        //Cannot directly update, findways to reset details,,,,
+//                                                       Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), MapsActivity
+//                                                               .getWayPointDetailsList());
+//
+//                                                        Locationadapter.notifyDataSetChanged();
+//
+//                                                    }
+//
+//                                                    @Override
+//                                                    public void onCancelled(DatabaseError databaseError) {
+//                                                        System.out.println("The read failed: " + databaseError.getCode());
+//                                                    }
+//
+//
+//                                                });
                                             }
                                         });
 

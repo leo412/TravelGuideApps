@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.user.travelguideapps.DataHolderClass;
 import com.example.user.travelguideapps.DetectConnection;
 import com.example.user.travelguideapps.MainMenu.MainMenuActivity;
 import com.example.user.travelguideapps.R;
@@ -626,6 +627,7 @@ pd.dismiss();
                                     Log.w(TAG, "signInCompleted");
                                   //  showProgress(false);
                                     pd.dismiss();
+                                    DataHolderClass.getInstance2().setDistributor_id2(mEmail);
 
                                     LoginActivity.this.startActivity(new Intent(LoginActivity.this, MainMenuActivity.class));
                                     //finish();

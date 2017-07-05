@@ -25,6 +25,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.user.travelguideapps.MainMenu.MainMenuActivityFragment;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
@@ -65,6 +67,8 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
     
         setContentView(R.layout.activity_base);
 
+
+
         Fragment fragment = null;
         Class fragmentClass=null;
 
@@ -91,11 +95,21 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
         Log.d("BaserActivity", "ssssss");
 
+        LinearLayout nav = (LinearLayout) getLayoutInflater().inflate(R.layout.nav_header_base, null);
+//TODO: not really important but if can pls change name
+        String emailtext=  DataHolderClass.getInstance2().getDistributor_id2();
+        TextView email=(TextView) nav.findViewById(R.id.emailtextview);
+        Log.d("gahhh", "testung"+email);
+        Log.d("gahhh", "testungtext   "+emailtext);
+
+
+        email.setText(emailtext);
+        email.invalidate();
+        Log.d("gahhh", "testungtext   "+email.getText());
 
     }
             @Override
             public void setContentView(int layoutResID) {
-                Log.d("BaserActivity", "setconte");
 
                 drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
 
@@ -141,10 +155,8 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
                     drawerToggle.setDrawerIndicatorEnabled(true);
                     drawer.setDrawerListener(drawerToggle);
                     drawerToggle.syncState();
-                    Log.d("BaserActivity", "diditrundea");
 
                 }
-
 
 
             }

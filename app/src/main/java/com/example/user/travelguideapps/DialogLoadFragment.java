@@ -4,20 +4,19 @@ package com.example.user.travelguideapps;
  * Created by User on 6/5/2017.
  */
 
-import android.app.Fragment;
-import android.content.Context;
+import android.app.DialogFragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.user.travelguideapps.LoginPage.LoginActivity;
 import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.LocationDataAdapter;
-import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.SelectedLocationListRecyclerViewAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -26,35 +25,16 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
 
-public class DialogCategoriesFragment extends Fragment  {
+public class DialogLoadFragment extends DialogFragment implements TextView.OnEditorActionListener {
 
     private EditText mEditText;
 
 
-    private Context mContext;
-    private LayoutInflater mInflater;
-    private  ArrayList mDataSource;
-    private static List<LinkedHashMap<String,String>> mDataSourceforSend;
-    private SelectedLocationListRecyclerViewAdapter Locationadapter;
-
-    private int Position;
-    private static RecyclerView.ViewHolder holder2;
-
-    public DialogCategoriesFragment(Context context, ArrayList items) {
-        mContext = context;
-        Log.d("A", "LocationDataadap(List)"+items);
-        //     mDataSourceforSend=items;
-        mDataSource = items;
-
-        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-
-
-
+    public interface UserNameListener {
+        void onFinishUserDialog(String user);
     }
+
     // Empty constructor required for DialogFragment
 
     @Override
@@ -75,8 +55,6 @@ public class DialogCategoriesFragment extends Fragment  {
 
          if(post==null){
              test.add("newewt");
-             test.add("newewt23");
-             test.add("newewt45");
 
              System.out.println("Whatispost1 " + post);
 
@@ -84,17 +62,25 @@ public class DialogCategoriesFragment extends Fragment  {
          }else{
              ArrayList a= new ArrayList();
 for(Object key:post.keySet()){
+    System.out.println("Whatispost2 " + post);
 
 test.add(key);
 
 }
+          //   test.add(a);
 
-
+             System.out.println("Whatispost3 " + post);
+             System.out.println("Whatispost3 " + a);
 
 
          }
 
 
+                //Cannot directly update, findways to reset details,,,,
+         //       Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), MapsActivity
+         //               .getWayPointDetailsList());
+
+            //    Locationadapter.notifyDataSetChanged();
 
             }
 
@@ -123,4 +109,12 @@ test.add(key);
         return view;
     }
 
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        // Return input text to activity
+        UserNameListener activity = (UserNameListener) getActivity();
+        activity.onFinishUserDialog(mEditText.getText().toString());
+        this.dismiss();
+        return true;
+    }
 }

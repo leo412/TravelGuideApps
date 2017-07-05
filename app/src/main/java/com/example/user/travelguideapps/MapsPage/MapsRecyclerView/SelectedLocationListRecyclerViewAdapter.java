@@ -37,7 +37,7 @@ import java.util.List;
 public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapter<SelectedLocationListRecyclerViewAdapter.MyViewHolder> {
     private Context mContext;
     private LayoutInflater mInflater;
-    private  List<LinkedHashMap<String,String>> mDataSource;
+    private static List<LinkedHashMap<String,String>> mDataSource;
     private static List<LinkedHashMap<String,String>> mDataSourceforSend;
 
     private int Position;
@@ -72,7 +72,6 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
     public static List<LinkedHashMap<String,String>>  getItem() {
 
 
-            Log.d("onPostExecute", "Selectedtimechecked"+mDataSourceforSend );
 
 
 
@@ -114,6 +113,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 //Well this helps when comning back from other page sooo....
         if(position==globalPosition)
         {
+
             //change color like
 holder.itemView.setSelected(true);
 
@@ -125,7 +125,7 @@ holder.itemView.setSelected(true);
             holder.itemView.setSelected(false);
         }
 
-        ArrayList waypoint= MapsActivity.getWaypoint();
+        ArrayList waypoint= MapsActivity.getWaypointwithDateList();
         if(waypoint.contains(mDataSource.get(position).get("place_id"))){
 
             holder.Selected.setVisibility(View.VISIBLE);
@@ -287,7 +287,7 @@ int add=position+1;
 
 
     @Override
-    public int getItemCount() {
+    public  int getItemCount() {
         if(mDataSource!=null) {
             Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
 
@@ -296,7 +296,14 @@ int add=position+1;
         return 0;
     }
 
+    public static int getItemCount2() {
+        if(mDataSource!=null) {
+            Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
 
+            return mDataSource.size();
+        }
+        return 0;
+    }
 
 
 
