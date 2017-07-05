@@ -1431,16 +1431,18 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
 
     private static String getDirectionsUrl(LatLng origin, LatLng dest) {
-        //For getting an url
+        //For getting an url for paths (including click 1 or multiple waypoints
 
 
         // Origin of route
+        //No changes here
         String str_origin = "origin=" + origin.latitude + "," + origin.longitude;
+
         // Destination of route
         String str_dest = "";
         if (dest != null) {
+            //get desnt latlng for 1 location only (For final location when clicking waypoint/item)
             Log.d(TAG, "whathasbeendone1");
-
             str_dest = "destination=" + dest.latitude + "," + dest.longitude;
         }
 
@@ -1448,12 +1450,12 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         String waypoint = new String();
         StringBuilder waypointsb = new StringBuilder();
         if (!WaypointwithDateList.isEmpty()) {
+            //if WaypointwithDateList is not empty  (which is when nothing is selected?),then add to waypoint
             Log.d(TAG, "whathasbeendone2"+WaypointwithDateList);
 
             waypointsb.append("&waypoints=");
             waypointsb.append("optimize:true|");
 
-            //If no desination =
             if (dest != null) {
                 Log.d(TAG, "whathasbeendone3");
 
@@ -1467,12 +1469,18 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
 
             } else {
+                //to let there be a destination.,
+                Log.d(TAG, "whathasbeendone5"+WaypointwithDateList);
+                Log.d(TAG, "whathasbeendone5"+WaypointwithDateList.get(0));
+                Log.d(TAG, "whathasbeendone5"+WaypointwithDateList.get(WaypointwithDateList.size() - 1).get(0).toString());
 
-                str_dest = "destination=place_id:" + WaypointwithDateList.get(WaypointwithDateList.size() - 1).get(0).toString();
-                //When waypoint has only 1 varible
+
+
+
+                str_dest = "destination=place_id:" + WaypointwithDateList.get(WaypointwithDateList.size() - 1).get(0);
+                //When waypoint has more than  1 varible?
                 if (WaypointwithDateList.size() != 1) {
                     for (int i = 0; i < WaypointwithDateList.size() - 1; i++) {
-                        Log.d(TAG, "whathasbeendone5");
 
                         waypoint = (waypointsb.append("place_id:" + WaypointwithDateList.get(i).get(0) + "|").toString());
 

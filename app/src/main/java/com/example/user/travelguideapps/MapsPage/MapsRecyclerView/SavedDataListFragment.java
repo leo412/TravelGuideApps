@@ -237,8 +237,8 @@ LoadButton.setOnClickListener(new View.OnClickListener() {
 //                                                        System.out.println("THIS IS IT" + post.username);
 //                                                        System.out.println("THIS IS IT" + post.waypoint);
 
-
-                                                        MapsActivity.addWaypointwithDateList(post);
+                                                        //Why should i have made this get 0...
+                                                        MapsActivity.addWaypointwithDateList((ArrayList)post.get(0));
                                                         //Cannot directly update, findways to reset details,,,,
                                                      //  Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), MapsActivity
                                                       //        .getWayPointDetailsList());
