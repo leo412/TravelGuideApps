@@ -1,12 +1,17 @@
 package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,15 +19,20 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.user.travelguideapps.BaseActivity;
 import com.example.user.travelguideapps.DataHolderClass;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
+import com.example.user.travelguideapps.SpacesItemDecoration;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import net.cachapa.expandablelayout.ExpandableLayout;
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,8 +47,8 @@ public class Location_RecyclerView_Selected extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "HI";
     private static final String ARG_PARAM2 = "First";
-    private static final String TAG ="RecyclerVIew2" ;
-    private int scrollingtotop=1;
+    private static final String TAG = "RecyclerVIew2";
+    private int scrollingtotop = 1;
 
     private SelectedLocationListRecyclerViewAdapter Locationadapter;
     private RecyclerView recyclerView;
@@ -75,6 +85,8 @@ public class Location_RecyclerView_Selected extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "recyclerview2 newinstance oncrea");
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -87,211 +99,254 @@ public class Location_RecyclerView_Selected extends Fragment {
         View view = inflater.inflate(R.layout.fragment_location__recycler_view2, container, false);
         //     TextView tvLabel = (TextView) view.findViewById(R.id.tvLabel);
         //  tvLabel.setText(page + " -- " + title);
+        Log.d(TAG, "recyclerview2 newinstance");
 
-        ArrayList waypoint= MapsActivity.getWayPointDetailsList();
+        final ArrayList<LinkedHashMap<String, Object>> waypoint = MapsActivity.getWayPointDetailsList();
+
+
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
 
-        recyclerView = (RecyclerView)  view.findViewById(R.id.poilistRecyclerView);
+        recyclerView = (RecyclerView) view.findViewById(R.id.poilistRecyclerView);
         //When button is clicked, recycler view is called and nearbyplaceslist is being inserted into the system
-        Button savefirebase = (Button) view.findViewById(R.id.save);
+        //      Button savefirebase = (Button) view.findViewById(R.id.save);
         Button loadfirebase = (Button) view.findViewById(R.id.load);
+        Button mapdirection = (Button) view.findViewById(R.id.mapdirection);
+        Button sorting = (Button) view.findViewById(R.id.sorting);
+
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-        savefirebase.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(SelectedLocationListRecyclerViewAdapter.getItemCount2()>0) {
+        if (MapsActivity.getWaypointwithDateList().isEmpty()) {
+            //TODO: might need to change it to call toast or something
+            mapdirection.setEnabled(false);
+        } else {
+            mapdirection.setEnabled(true);
+
+        }
 
 
-                    android.app.FragmentManager manager = getActivity().getFragmentManager();
-                    android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
-                    if (frag != null) {
-                        manager.beginTransaction().remove(frag).commit();
-                    }
-                    DataHolderClass.getInstance2().setDistributor_id2("Save");
-
-//                DialogCategoriesFragment alertDialogFragment = new DialogCategoriesFragment();
-//                alertDialogFragment.show(manager, "Save");
-                    Fragment fragment = null;
-                    Class fragmentClass = null;
-                    fragmentClass = SavedDataListFragment.class;
-
-                    try {
-                        fragment = (Fragment) fragmentClass.newInstance();
-                    } catch (java.lang.InstantiationException e) {
-                        e.printStackTrace();
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
-                    FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                    fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).addToBackStack(null).commit();
-
-                }else{
-                    Toast.makeText(getContext(), "Please select at least one location", Toast.LENGTH_SHORT).show();
-
-
-                }
-
-            }
-                //   final FirebaseDatabase database = FirebaseDatabase.getInstance();
-
-
-
-
-        });
         Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), waypoint);
 
         loadfirebase.setOnClickListener(new View.OnClickListener() {
-                                            @Override
-                                            public void onClick(View v) {
+            @Override
+            public void onClick(View v) {
 
-                                                android.app.FragmentManager manager = getActivity().getFragmentManager();
-                                                android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
-                                                if (frag != null) {
-                                                    manager.beginTransaction().remove(frag).commit();
-                                                }
-                                                DataHolderClass.getInstance2().setDistributor_id2("Load");
-                                                Fragment fragment = null;
-                                                Class fragmentClass = null;
-                                                fragmentClass = SavedDataListFragment.class;
+                android.app.FragmentManager manager = getActivity().getFragmentManager();
+                android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
+                if (frag != null) {
+                    manager.beginTransaction().remove(frag).commit();
+                }
+                DataHolderClass.getInstance2().setDistributor_id2("Load");
+                Fragment fragment = null;
+                Class fragmentClass = null;
+                fragmentClass = SavedDataListFragment.class;
 
-                                                try {
-                                                    fragment = (Fragment) fragmentClass.newInstance();
-                                                } catch (java.lang.InstantiationException e) {
-                                                    e.printStackTrace();
-                                                } catch (IllegalAccessException e) {
-                                                    e.printStackTrace();
-                                                }
-
-
-                                                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
-                                                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).addToBackStack(null).commit();
-
-//
-//                                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
-//                                                DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID());
-//                                                ref.addValueEventListener(new ValueEventListener() {
-//                                                    @Override
-//                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-//                                                        ArrayList post = (ArrayList) dataSnapshot.getValue();
-//
-//                                                        System.out.println("THIS IS IT" + post);
-//                                                      //  System.out.println("THIS IS IT" + LoginActivity.getUserID());
-////
-////                                                        System.out.println("THIS IS IT" + post.username);
-////                                                        System.out.println("THIS IS IT" + post.waypoint);
-//
-//
-//                                                        MapsActivity.setWaypointwithDateList(post);
-//                                                        //Cannot directly update, findways to reset details,,,,
-//                                                       Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), MapsActivity
-//                                                               .getWayPointDetailsList());
-//
-//                                                        Locationadapter.notifyDataSetChanged();
-//
-//                                                    }
-//
-//                                                    @Override
-//                                                    public void onCancelled(DatabaseError databaseError) {
-//                                                        System.out.println("The read failed: " + databaseError.getCode());
-//                                                    }
-//
-//
-//                                                });
-                                            }
-                                        });
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (java.lang.InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
 
 
+                FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+                fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).addToBackStack(null).commit();
 
-        Log.d(TAG, "recyclerview2 ssssss"+waypoint);
 
-        
+            }
+        });
+
+
+        mapdirection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //    MapsActivity.downloadUrl download = new MapsActivity.downloadUrl(getContext());
+
+                //download.execute("https://www.google.com/maps/dir/?api=1");
+
+                ArrayList a = new ArrayList();
+                StringBuilder b = new StringBuilder();
+                //    StringBuilder c= new StringBuilder();
+                String c = new String();
+                String dest = new String();
+                ArrayList<HashMap> array = MapsActivity.getWaypointwithDateList();
+                dest = array.get(array.size() - 1).get("place_id").toString();
+
+                for (int i = 0; i < array.size() - 1; i++) {
+                    a.add(array.get(i).get("place_id"));
+                    b.append(array.get(i).get("place_id") + "|");
+                    c = b.toString();
+                    c = c.substring(0, b.length() - 1);
+
+                }
+                Location CurrentLocation = BaseActivity.getCurrentLocation();
+                LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
+                String lat = Double.toString(CurrentLocation.getLatitude());
+                String lng = Double.toString(CurrentLocation.getLongitude());
+//TODO: Destination= A is just a placeholder, have no idea whether some will work........(SEEEMS TO work
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + lat + "," + lng +
+                        "&destination=A&destination_place_id=" + dest
+                        + "&waypoints=" + c + "&waypoint_place_ids=" + c));
+                getContext().startActivity(intent);
+
+            }
+        });
+        Log.d(TAG, "recyclerview2 ssssss" + waypoint.size());
+
+
         recyclerView.setLayoutManager(linearLayoutManager); // set LayoutManager to RecyclerView
+        recyclerView.addItemDecoration(new SpacesItemDecoration(50));
 
         recyclerView.setAdapter(Locationadapter);
         Locationadapter.notifyDataSetChanged();
+        ItemTouchHelper.Callback _ithCallback = new ItemTouchHelper.Callback() {
+            //and in your imlpementaion of
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                // get the viewHolder's and target's positions in your adapter data, swap them
+                Collections.swap(waypoint, viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                // and notify the adapter that its dataset has changed
+                Locationadapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
 
 
-        //   view = (ConstraintLayout)  inflater.inflate(R.layout.activity_maps, container, false);
+                return true;
+            }
 
-        final ExpandableLayout expandableLayout
-                = (ExpandableLayout) MapsActivity.view.findViewById(R.id.expandable_layout);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-
-
-
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                //TODO
             }
 
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
-                int pastVisibleItems = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
-
-          //      Log.d(TAG, "Scrollllllll"+dy);
-                System.out.println("Scrollllllll"+dy);
-
-
-                if(dx>0)
-                {
-
-
-                    System.out.println("Scrolled Right");
-
-                }
-                else if(dx < 0)
-                {
-                    System.out.println("Scrolled Left");
-
-                }
-                else {
-
-                    System.out.println("No Horizontal Scrolled");
-                }
-
-                if(dy>0)
-                {
-                    expandableLayout.collapse();
-
-                }
-                else if(dy < 0) {
-                    if (pastVisibleItems == 0) {
-
-                    //    expandableLayout.expand();
-
-                    }
-                }
-
-
-            }
-
-
-
-
-        });
-
-        //TODO:Little hack.......
-        recyclerView.setOnFlingListener(new RecyclerView.OnFlingListener() {
+            //defines the enabled move directions in each state (idle, swiping, dragging).
             @Override
-            public boolean onFling(int velocityX, int velocityY) {
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                        ItemTouchHelper.DOWN | ItemTouchHelper.UP | ItemTouchHelper.START | ItemTouchHelper.END);
+            }
+        };
+
+        sorting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//TODO: add saying that                 builder.setMessage("*Sorting is only for viewing purpose only and will not be saved");
+                try {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                    builder.setTitle("Sorting");
+                    builder.setItems(new CharSequence[]
+                                    {"By Name", "By rating", "By Time", "button 4"},
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // The 'which' argument contains the index position
+                                    // of the selected item
+                                    switch (which) {
+                                        case 0:
+                                            System.out.println("debuyaooh 1111" + waypoint);
+
+                                            Collections.sort(waypoint, new Comparator<HashMap>() {
+                                                @Override
+                                                public int compare(HashMap o1, HashMap o2) {
 
 
-                if(velocityY<-100&&scrollingtotop==1 ) {
+                                                    return o1.get("place_name").toString().compareTo(o2.get("place_name").toString());
+                                                }
 
-                    expandableLayout.expand();
+
+                                            });
+                                            MapsActivity.setWayPointDetailsList(waypoint);
+
+                                            break;
+                                        case 1:
+                                            //    Collections.sort(waypoint, new MapComparator("rating"));
+
+                                            Collections.sort(waypoint, new Comparator<HashMap>() {
+                                                @Override
+                                                public int compare(HashMap o1, HashMap o2) {
+
+
+                                                    return o2.get("rating").toString().compareTo(o1.get("rating").toString());
+                                                }
+
+
+                                            });
+                                            MapsActivity.setWayPointDetailsList(waypoint);
+
+
+                                            break;
+                                        case 2:
+
+                                            for (int i = 0; i < MapsActivity.getWaypointwithDateList().size(); i++) {
+                                                if (MapsActivity.getWaypointwithDateList().get(i).get("place_id").equals(waypoint.get(i).get
+                                                        ("place_id"))) {
+                                                    waypoint.get(i).put("starttime", MapsActivity.getWaypointwithDateList().get(i).get("starttime"));
+                                                    System.out.println("waypointaddstarttime" + "  Success");
+                                                }
+                                                System.out.println("waypointaddstarttime" + MapsActivity.getWaypointwithDateList().get(i).get
+                                                        ("starttime"));
+
+
+                                                System.out.println("waypointaddstarttime" + waypoint);
+
+                                            }
+
+                                            Collections.sort(waypoint, new Comparator<HashMap>() {
+                                                @Override
+                                                public int compare(HashMap o1, HashMap o2) {
+                                                    System.out.println("waypointaddstarttimechecking" + o1.get("starttime"));
+                                                    System.out.println("waypointaddstarttimechecking" + o2.get("starttime"));
+//TODO: seems to work, need testing
+                                                    if (o1.get("starttime").toString().equals("0") ) {
+                                                        return 1;
+                                                    }
+                                                    if (o2.get("starttime").toString().equals("0")) {
+                                                        return -1;
+                                                    }
+//                                                    if (o1.get("starttime").toString().equals("0") || o2.get("starttime").toString().equals("0")) {
+//
+//                                                        System.out.println("waypointaddstarttimechecking" + " Has not run here");
+//
+//                                                        return 0;
+//
+//                                                    } else {
+
+                                                        System.out.println("waypointaddstarttimechecking" + " Has run here");
+
+                                                        return o1.get("starttime").toString().compareTo(o2.get("starttime").toString());
+                                              //      }
+
+                                                }
+
+
+                                            });
+                                            break;
+                                        case 3:
+                                            break;
+
+
+                                    }
+                                    System.out.println("dudeUhhhyeh 2222" + waypoint);
+
+                                    //    MapsActivity.setWayPointDetailsList(waypoint);
+                                    Locationadapter.notifyDataSetChanged();
+
+                                }
+                            });
+                    builder.create().show();
+
+                } catch (Exception e) {
+                    Log.d(TAG, "ome error has occured! " + e.toString());
+
+
+                    Toast.makeText(getActivity(), "Some error has occured! " + e, Toast.LENGTH_SHORT).show();
+
                 }
-                return false;
             }
         });
-
-
-
+        ItemTouchHelper ith = new ItemTouchHelper(_ithCallback);
+        ith.attachToRecyclerView(recyclerView);
 
 
         return view;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

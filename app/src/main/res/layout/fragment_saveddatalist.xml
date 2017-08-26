@@ -1,29 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-              android:listSelector="@drawable/list_selector"
-              android:background="@drawable/list_selector"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="wrap_content"
+                                             android:background="@drawable/list_selector"
+                                             android:listSelector="@drawable/list_selector"
+                                             android:orientation="horizontal"
 
 
     >
+
+    <ImageView
+        android:id="@+id/fileimage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <TextView
         android:id="@+id/id"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:layout_marginLeft="8dp"
+        android:text="Place"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="@id/fileimage"
+        app:layout_constraintLeft_toRightOf="@id/fileimage"
+        app:layout_constraintTop_toTopOf="@id/fileimage"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintTop_creator="1"
+
+
+        />
+
+    <ImageView
+        android:id="@+id/calendarimage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="fitCenter"
+
+        app:layout_constraintLeft_toLeftOf="@id/fileimage"
+        app:layout_constraintTop_toBottomOf="@id/fileimage"/>
+
 
     <TextView
-        android:id="@+id/content"
+        android:id="@+id/calendartext"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:textAppearance="?attr/textAppearanceListItem"/>
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/calendarimage"
+        app:layout_constraintLeft_toLeftOf="@id/id"
+        app:layout_constraintTop_toTopOf="@id/calendarimage"
+        />
+
+    <ImageView
+        android:id="@+id/timeimage"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        android:scaleType="fitCenter"
+
+        app:layout_constraintLeft_toLeftOf="@id/calendarimage"
+        app:layout_constraintTop_toBottomOf="@id/calendarimage"/>
 
 
+    <TextView
+        android:id="@+id/overlapdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textSize="12dp"
+        app:layout_constraintBottom_toBottomOf="@id/timeimage"
+        app:layout_constraintLeft_toLeftOf="@id/id"
+        app:layout_constraintTop_toTopOf="@id/timeimage"
+        />
 
 
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/deleteimagebutton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="10dp"
+
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/loadimagebutton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="10dp"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/deleteimagebutton"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/saveimagebutton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginRight="10dp"
+
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/loadimagebutton"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+</android.support.constraint.ConstraintLayout>

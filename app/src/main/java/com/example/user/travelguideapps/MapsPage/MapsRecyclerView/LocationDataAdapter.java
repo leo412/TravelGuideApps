@@ -31,23 +31,20 @@ import java.util.List;
 public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapter.MyViewHolder> {
     private Context mContext;
     private LayoutInflater mInflater;
-    private  ArrayList mDataSource;
-    private static List<LinkedHashMap<String,String>> mDataSourceforSend;
+    private ArrayList mDataSource;
+    private static List<LinkedHashMap<String, String>> mDataSourceforSend;
     private SelectedLocationListRecyclerViewAdapter Locationadapter;
     private static String ItemName;
 
     private int Position;
     private static RecyclerView.ViewHolder holder2;
 
-    public LocationDataAdapter(Context context, ArrayList items) {
-        mContext = context;
-            Log.d("A", "LocationDataadap(List)"+items);
-   //     mDataSourceforSend=items;
+    public LocationDataAdapter(ArrayList items) {
+        Log.d("A", "LocationDataadap(List)" + items);
+        //     mDataSourceforSend=items;
         mDataSource = items;
 
-        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-
+        //mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
     }
@@ -55,10 +52,10 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
 
 
     //2
-  //  @Override
+    //  @Override
     //public Object getItem(int position) {
-   //     return mDataSource.get(position);
-   // }
+    //     return mDataSource.get(position);
+    // }
 
     //3
     @Override
@@ -67,13 +64,14 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
     }
 
 
-    public static List<LinkedHashMap<String,String>>  getItem() {
+    public static List<LinkedHashMap<String, String>> getItem() {
         return mDataSourceforSend;
     }
 
     public static RecyclerView.ViewHolder getHolder2() {
         return holder2;
     }
+
     public static String getItemName() {
         return ItemName;
     }
@@ -81,6 +79,7 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         Log.d("A", "DujjjjjjjLocationDataadap");
+        Context context = parent.getContext();
 
         // infalte the item Layout
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.data_row, parent, false);
@@ -88,165 +87,131 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
         MyViewHolder vh = new MyViewHolder(v); // pass the view to View Holder
 
 
-
-
-
-
         return vh;
     }
-    int    globalPosition=-1;
+
+    int globalPosition = -1;
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         // set the data in items
+        final Context mContext = holder.itemView.getContext();
 
-    //    holder2=holder;
+        //    holder2=holder;
 
-ItemName=mDataSource.get(position).toString();
-        Log.d("A", "LocationDataadapStop pls"+ItemName);
+        ItemName = mDataSource.get(position).toString();
+        Log.d("A", "LocationDataadapStop pls" + ItemName);
 
         holder.dataname.setText(mDataSource.get(position).toString());
 
 
-
-
         //Well this helps when comning back from other page sooo....so that i didnt reset to old one or some shit
-        if(position==globalPosition)
-        {
+        if (position == globalPosition) {
             //change color like
-holder.itemView.setSelected(true);
+            holder.itemView.setSelected(true);
 
-        }
-        else
-        {
+        } else {
 
             //revert back to regular color
             holder.itemView.setSelected(false);
         }
 
 
-
-
         holder.itemView.setOnClickListener(new View.OnClickListener() {
 
-                                               @Override
-                                               public void onClick(View view) {
+            @Override
+            public void onClick(View view) {
 
 
+                notifyDataSetChanged();
+                //TODO: uhhhh this one is not really that important anyway....
+                //   b.setVisibility(View.VISIBLE);
 
-                                                   notifyDataSetChanged();
-                                                   //TODO: uhhhh this one is not really that important anyway....
-                                                //   b.setVisibility(View.VISIBLE);
+                ArrayList<Marker> mapMarkers = MapsActivity.getMapMarkers();
 
-                                                   ArrayList<Marker> mapMarkers= MapsActivity.getMapMarkers();
+                view.setSelected(true);
+                Log.d("A", "CurrentWaypoint" + MapsActivity.getWaypointwithDateList() + DataHolderClass.getInstance2().getDistributor_id2());
 
-                                                   view.setSelected(true);
-                                                   Log.d("A", "CurrentWaypoint"+MapsActivity.getWaypointwithDateList()+DataHolderClass.getInstance2().getDistributor_id2());
+                globalPosition = position;
 
-                                                   globalPosition=position;
+                if (DataHolderClass.getInstance2().getDistributor_id2().equals("Save")) {
+                    Log.d("A", "CurrentWaypoint" + MapsActivity.getWaypointwithDateList());
 
-if(DataHolderClass.getInstance2().getDistributor_id2().equals("Save")) {
-    Log.d("A", "CurrentWaypoint"+MapsActivity.getWaypointwithDateList());
-
-    BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).child(mDataSource.get
-            (position).toString())
-            .setValue
-                    (MapsActivity
-                            .getWaypointwithDateList());
-    Log.d("A", "CurrentWaypoint"+MapsActivity.getWaypointwithDateList());
-
-
-}else{
+                    BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).child(mDataSource.get
+                            (position).toString())
+                            .setValue
+                                    (MapsActivity
+                                            .getWaypointwithDateList());
+                    Log.d("A", "CurrentWaypoint" + MapsActivity.getWaypointwithDateList());
 
 
+                } else {
 
 
-                                                final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                                DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID())
-                                                        .child(holder.dataname.getText().toString());
-                                                ref.addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        ArrayList post = (ArrayList) dataSnapshot.getValue();
+                    final FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID())
+                            .child(holder.dataname.getText().toString());
+                    ref.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                         LinkedHashMap post = (LinkedHashMap) dataSnapshot.getValue();
 
 
-                                                     //   ArrayList a=new ArrayList();
+                            //   ArrayList a=new ArrayList();
 
-                                                  //      a=new ArrayList<>(post.values());
+                            //      a=new ArrayList<>(post.values());
 //                                                        for(int i=0;i<post.size();i++){
 //
 //                                                            a.add(post.values());
 //                                                        }
-                                                        Log.d("A", "LocationDataadapClicked"+post);
+                            Log.d("A", "LocationDataadapClicked" + post);
 
 
-                                                        MapsActivity.addWaypointwithDateList(post);
-                                                        //Cannot directly update, findways to reset details,,,,
+                            MapsActivity.addWaypointwithDateList(post);
+                            //Cannot directly update, findways to reset details,,,,
 
-                                                       Locationadapter = new SelectedLocationListRecyclerViewAdapter(mContext,
-                                                               MapsActivity
-                                                               .getWayPointDetailsList());
-
-
-                                                        Locationadapter.notifyDataSetChanged();
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-
-                                                    }
+                            Locationadapter = new SelectedLocationListRecyclerViewAdapter(mContext,
+                                    MapsActivity
+                                            .getWayPointDetailsList());
 
 
+                            Locationadapter.notifyDataSetChanged();
 
-                                                });
-}
+                        }
 
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-
-                                               }
-
-                                           });
-
+                        }
 
 
-
-
-
-
-
-                // display a toast with person name on item click
-              //  Toast.makeText(context, personNames.get(position), Toast.LENGTH_SHORT).show();
-
-
-
-
-
-
-
+                    });
+                }
 
 
             }
 
+        });
 
 
+        // display a toast with person name on item click
+        //  Toast.makeText(context, personNames.get(position), Toast.LENGTH_SHORT).show();
 
 
-
+    }
 
 
     @Override
     public int getItemCount() {
-        if(mDataSource!=null) {
-            Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT"+ mDataSource.size());
+        if (mDataSource != null) {
+            Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT" + mDataSource.size());
 
-        return mDataSource.size();
+            return mDataSource.size();
         }
         Log.d("A", "DujjjjjjjNumberofitems(List)  Nope COUNT");
 
         return 0;
     }
-
 
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -267,14 +232,11 @@ if(DataHolderClass.getInstance2().getDistributor_id2().equals("Save")) {
                     Log.d("check", "hhhhhhhhhhhchecklocationtecycler");
 
 
-                v.setTag(getAdapterPosition());
+                    v.setTag(getAdapterPosition());
 
-                   // mItemClickListener.onItemClick(getLayoutPosition(), v, id);
+                    // mItemClickListener.onItemClick(getLayoutPosition(), v, id);
                 }
             });
-
-
-
 
 
         }

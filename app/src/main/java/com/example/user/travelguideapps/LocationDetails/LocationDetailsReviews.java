@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.travelguideapps.DataParser;
@@ -52,7 +53,7 @@ public class LocationDetailsReviews extends Fragment {
     private static final String TAG = "locationDetailsReivew";
 
     // TODO: Rename and change types of parameters
-    private static LinkedHashMap<String, String> placedetail;
+    private static LinkedHashMap<String, Object> placedetail;
     private String mParam2;
     private static TextView Reviews;
     private static TextView Author;
@@ -64,6 +65,7 @@ private LocationDetailsReviewAdapter reviewAdapter;
     Button setplacebutton;
     Button removeplacebutton;
     private OnFragmentInteractionListener mListener;
+    ImageView emptypersonimage;
 
     public LocationDetailsReviews() {
         // Required empty public constructor
@@ -78,7 +80,7 @@ private LocationDetailsReviewAdapter reviewAdapter;
      * @return A new instance of fragment LocationDetails.
      */
     // TODO: Rename and change types and number of parameters
-    public static LocationDetailsReviews newInstance(List<LinkedHashMap<String, String>> placedetails, String param2) {
+    public static LocationDetailsReviews newInstance(ArrayList<LinkedHashMap<String, Object>> placedetails, String param2) {
         LocationDetailsReviews fragment = new LocationDetailsReviews();
         placedetail=placedetails.get(0);
 
@@ -111,11 +113,11 @@ private LocationDetailsReviewAdapter reviewAdapter;
 
 
 
-        String  review_text=placedetail.get("review_text");
-        String  author_name=placedetail.get("review_author_name");
-        String author_photo=placedetail.get("review_author_photo");
-        String review_rating=placedetail.get("review_rating");
-        String relative_time_description=placedetail.get("review_time_description");
+        String  review_text=placedetail.get("review_text").toString();
+        String  author_name=placedetail.get("review_author_name").toString();
+        String author_photo=placedetail.get("review_author_photo").toString();
+        String review_rating=placedetail.get("review_rating").toString();
+        String relative_time_description=placedetail.get("review_time_description").toString();
 
 
         Log.d("Hasreviews placedetail", placedetail.toString());
@@ -142,24 +144,31 @@ private LocationDetailsReviewAdapter reviewAdapter;
             }
         }
         recyclerView=(RecyclerView)view.findViewById((R.id. recyclerViewReviews));
+TextView text=(TextView) view.findViewById(R.id.blankreviewtext);
+        ImageView blankimage=(ImageView) view.findViewById(R.id.emptyimageperson);
+
+        Picasso.with(getActivity()).load(R.drawable.emptypersonicon).fit().into
+                (blankimage);
+
+        if(author_name!="[]") {
+    recyclerView.setVisibility(View.VISIBLE);
+    text.setVisibility(View.GONE);
+            blankimage.setVisibility(View.GONE);
+
+    RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager
+            .VERTICAL, false);
+    recyclerView.setLayoutManager(layoutManager);
+    recyclerView.setHasFixedSize(true);
 
 
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity(),LinearLayoutManager
-                .VERTICAL,false);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+    reviewAdapter = new LocationDetailsReviewAdapter(author_namelist, reviews_textlist, author_photolist,
+            relative_time_descriptionlist, review_ratinglist);
+    Log.d("Hasreviews ", author_namelist.toString());
+    Log.d("Hasreviews ", reviews_textlist.toString());
 
 
-
-        reviewAdapter = new LocationDetailsReviewAdapter(getActivity(),author_namelist,reviews_textlist,author_photolist,
-                relative_time_descriptionlist,review_ratinglist);
-        Log.d("Hasreviews ", author_namelist.toString());
-        Log.d("Hasreviews ", reviews_textlist.toString());
-
-
-
-        recyclerView.setAdapter(reviewAdapter);
-
+    recyclerView.setAdapter(reviewAdapter);
+}
         //View mainview=inflater.inflate(R.layout.content_place_details, container, false);
 
    //     setplacebutton=(Button) mainview.findViewById(R.id.addLocation);

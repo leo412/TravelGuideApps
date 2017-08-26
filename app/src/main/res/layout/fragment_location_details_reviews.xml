@@ -6,17 +6,37 @@
                                              tools:context=".LocationDetails.LocationDetails">
 
     <!-- TODO: Update blank fragment layout -->
-
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+android:id="@+id/emptyimageperson"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp"/>
+<TextView
+    android:id="@+id/blankreviewtext"
+    android:layout_width="wrap_content"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    android:layout_height="551dp"
+    app:layout_constraintTop_toBottomOf="@+id/emptyimageperson"
+    android:text="No Reviews Available"
+    android:textSize="30dp"
+    android:textStyle="bold"
+  />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerViewReviews"
         android:layout_width="wrap_content"
-        android:layout_height="280dp"
-        android:background="@drawable/ic_cast_white"
+        android:layout_height="0dp"
+        android:background="#FFFFFF"
         android:orientation="vertical"
 
-
-        />
+android:visibility="gone"
+        tools:layout_editor_absoluteY="0dp"
+        tools:layout_editor_absoluteX="0dp"/>
 
 
 

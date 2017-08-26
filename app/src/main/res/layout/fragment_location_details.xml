@@ -1,206 +1,375 @@
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent"
-                                             xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             android:isScrollContainer="false"
-                                             app:layout_behavior="@string/appbar_scrolling_view_behavior"
-                                             tools:context=".LocationDetails.LocationDetails">
+<!-- TODO: Update blank fragment layout -->
 
-    <!-- TODO: Update blank fragment layout -->
+<android.support.v4.widget.NestedScrollView
 
 
-    <TextView
-        android:id="@+id/textViewAddressText"
-        android:layout_width="wrap_content"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:fillViewport="true"
+
+    android:isScrollContainer="false"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".LocationDetails.LocationDetails"
+    tools:layout_editor_absoluteX="8dp"
+    tools:layout_editor_absoluteY="8dp">
+
+
+    <android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Address"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:textSize="20sp"
-        />
+        android:isScrollContainer="true"
+        android:paddingBottom="300dp"
+        >
 
-    <TextView
-        android:id="@+id/textViewAdress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAddressText"
-        android:text="Place Address PlaceHolder"
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <TextView
+            android:id="@+id/textViewAddressText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="50dp"
+            android:layout_marginTop="8dp"
+            android:paddingRight="80dp"
+            android:text="Address"
+            android:textColor="#59e2f7"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintRight_toLeftOf="@id/textViewAddressText"
+            app:layout_constraintTop_toTopOf="@id/textViewAddressText"
+android:id="@+id/addressicon"
+            />
 
-    <TextView
-        android:id="@+id/textViewPhoneNumberText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Phone Number"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/textViewAdress"
-        />
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginRight="10dp"
+            android:background="#59e2f7"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@id/textViewAddressText"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="25dp"/>
 
-    <TextView
-        android:id="@+id/textViewPhoneNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/textViewPhoneNumberText"
-        android:text="Phone PlaceHolder"
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <TextView
+            android:id="@+id/textViewAdress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Place Address PlaceHolder"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAddressText"
+            app:layout_gravity="fill_horizontal"
 
-    <TextView
-        android:id="@+id/textViewWebsiteText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Website"
-        app:layout_constraintTop_toBottomOf="@id/textViewPhoneNumber"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:textSize="20sp"
-        />
-
-    <TextView
-        android:id="@+id/textViewWebsite"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/textViewWebsiteText"
-        android:text="This Location has no website."
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:autoLink="web"
-        />
+            tools:layout_constraintLeft_creator="1"
+            />
 
 
-    <TextView
-        android:id="@+id/textViewOpenNowText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Opening now?"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="8dp"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/textViewWebsite"
-        />
+        <TextView
+            android:id="@+id/textViewPhoneNumberText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Phone Number"
+            android:textColor="#59e2f7"
 
-    <TextView
-        android:id="@+id/textViewOpenNow"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/textViewOpenNowText"
-        android:text="This place does not show opening hours"
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAdress"
+            />
 
-    <TextView
-        android:id="@+id/Monday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/textViewOpenNow"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintRight_toLeftOf="@id/textViewPhoneNumberText"
+            app:layout_constraintTop_toTopOf="@id/textViewPhoneNumberText"
+android:id="@+id/phoneicon"
 
-    <TextView
-        android:id="@+id/Tuesday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/Monday"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+            />
 
-    <TextView
-        android:id="@+id/Wednesday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/Tuesday"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginRight="10dp"
+            android:background="#59e2f7"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@id/textViewPhoneNumberText"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="25dp"/>
 
-    <TextView
-        android:id="@+id/Thursday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/Wednesday"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <TextView
+            android:id="@+id/textViewPhoneNumber"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:autoLink="phone"
+            android:text="Phone PlaceHolder"
 
-    <TextView
-        android:id="@+id/Friday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/Thursday"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/textViewPhoneNumberText"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
 
-    <TextView
-        android:id="@+id/Saturday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/Friday"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <TextView
+            android:id="@+id/textViewWebsiteText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Website"
+            android:textColor="#59e2f7"
 
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
 
+            app:layout_constraintTop_toBottomOf="@+id/textViewPhoneNumber"
+            />
 
-    <TextView
-        android:id="@+id/Sunday"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/Saturday"
-        android:text=""
-        android:textColor="?android:textColorSecondary"
-        android:visibility="visible"
-        app:layout_gravity="fill_horizontal"
-        tools:layout_constraintLeft_creator="1"
-        app:layout_constraintLeft_toLeftOf="parent"/>
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintRight_toLeftOf="@id/textViewWebsiteText"
+            android:id="@+id/websiteicon"
+
+            app:layout_constraintTop_toTopOf="@id/textViewWebsiteText"
+
+            />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginRight="10dp"
+            android:background="#59e2f7"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@id/textViewWebsiteText"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="25dp"/>
+
+        <TextView
+            android:id="@+id/textViewWebsite"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:autoLink="web"
+
+            android:text="This Location has no website."
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/textViewWebsiteText"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"
+            />
 
 
+        <TextView
+            android:id="@+id/textViewOpenNowText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Opening Time"
+            android:textColor="#59e2f7"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+
+            app:layout_constraintTop_toBottomOf="@+id/textViewWebsite"
+            />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            app:layout_constraintRight_toLeftOf="@id/textViewOpenNowText"
+            app:layout_constraintTop_toTopOf="@id/textViewOpenNowText"
+            android:id="@+id/openinghoursicon"
 
 
+            />
 
-</android.support.constraint.ConstraintLayout>
+        <View
+            android:layout_width="0dp"
+            android:layout_height="3dp"
+            android:layout_marginRight="10dp"
+            android:background="#59e2f7"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@id/textViewOpenNowText"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="25dp"/>
+
+        <TextView
+            android:id="@+id/textViewOpenNow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="This place does not show opening hours"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/textViewOpenNowText"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+
+        <TextView
+            android:id="@+id/Monday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Monday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/textViewOpenNow"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+
+        <TextView
+            android:id="@+id/MondayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="80dp"
+            android:text=""
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toRightOf="@id/Monday"
+            app:layout_constraintTop_toTopOf="@id/Monday"
+            app:layout_gravity="fill_horizontal"
+            />
+
+        <TextView
+            android:id="@+id/Tuesday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tuesday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/Monday"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+        <TextView
+            android:id="@+id/TuesdayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@id/MondayText"
+            app:layout_constraintTop_toTopOf="@id/Tuesday"
+            app:layout_gravity="fill_horizontal"
+            />
+        <TextView
+            android:id="@+id/Wednesday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wednesday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/Tuesday"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+        <TextView
+            android:id="@+id/WednesdayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@id/MondayText"
+            app:layout_constraintTop_toTopOf="@id/Wednesday"
+            app:layout_gravity="fill_horizontal"
+            />
+        <TextView
+            android:id="@+id/Thursday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thursday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/Wednesday"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+        <TextView
+            android:id="@+id/ThursdayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@id/MondayText"
+            app:layout_constraintTop_toTopOf="@id/Thursday"
+            app:layout_gravity="fill_horizontal"
+            />
+        <TextView
+            android:id="@+id/Friday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/Thursday"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+        <TextView
+            android:id="@+id/FridayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@id/MondayText"
+            app:layout_constraintTop_toTopOf="@id/Friday"
+            app:layout_gravity="fill_horizontal"
+            />
+        <TextView
+            android:id="@+id/Saturday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saturday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/Friday"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"/>
+        <TextView
+            android:id="@+id/SaturdayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@id/MondayText"
+            app:layout_constraintTop_toTopOf="@id/Saturday"
+            app:layout_gravity="fill_horizontal"
+            />
+
+        <TextView
+            android:id="@+id/Sunday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sunday:"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
+            app:layout_constraintTop_toBottomOf="@+id/Saturday"
+            app:layout_gravity="fill_horizontal"
+            tools:layout_constraintLeft_creator="1"
+            />
+
+        <TextView
+            android:id="@+id/SundayText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="?android:textColorSecondary"
+            android:visibility="visible"
+            app:layout_constraintLeft_toLeftOf="@id/MondayText"
+            app:layout_constraintTop_toTopOf="@id/Sunday"
+            app:layout_gravity="fill_horizontal"
+            />
+    </android.support.constraint.ConstraintLayout>
+</android.support.v4.widget.NestedScrollView>

@@ -13,13 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.example.user.travelguideapps.BaseActivity;
 import com.example.user.travelguideapps.DataHolderClass;
 import com.example.user.travelguideapps.LoginPage.LoginActivity;
-import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
+import com.example.user.travelguideapps.SpacesItemDecoration;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -42,9 +43,8 @@ public class SavedDataListFragment extends Fragment {
     // TODO: Customize parameters
     private int mColumnCount = 1;
     private OnListFragmentInteractionListener mListener;
-    public Button SaveButton;
     public Button AddNewButton;
-    public Button LoadButton;
+    ImageButton loadimagebutton;
     private SelectedLocationListRecyclerViewAdapter Locationadapter;
     private Context mContext;
 
@@ -68,8 +68,7 @@ public class SavedDataListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mContext = getActivity();
-
+        //      mContext = getActivity();
 
 
         if (getArguments() != null) {
@@ -82,205 +81,241 @@ public class SavedDataListFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_saveddatalist_list, container, false);
         System.out.println("fragment_saveddatalist_list oncreatveiwe ");
-        SaveButton = (Button) view.findViewById(R.id.saveData);
         AddNewButton = (Button) view.findViewById(R.id.newData);
-        LoadButton = (Button) view.findViewById(R.id.loadData);
-        System.out.println("fragment_saveddatalist_list oncreatveiwe "+DataHolderClass.getInstance2());
-
-        if(DataHolderClass.getInstance2().getDistributor_id2().equals("Save")){
-
-    SaveButton.setVisibility(View.VISIBLE);
-    AddNewButton.setVisibility(View.VISIBLE);
-    LoadButton.setVisibility(View.INVISIBLE);
-
-
-}else if(DataHolderClass.getInstance2().getDistributor_id2().equals("Load")){
-
-    SaveButton.setVisibility(View.INVISIBLE);
-    AddNewButton.setVisibility(View.INVISIBLE);
-    LoadButton.setVisibility(View.VISIBLE);
-
-
-}
+        System.out.println("fragment_saveddatalist_list oncreatveiwe " + DataHolderClass.getInstance2());
+//
+//        if (DataHolderClass.getInstance2().getDistributor_id2().equals("Save")) {
+//
+//            AddNewButton.setVisibility(View.VISIBLE);
+//
+//
+//        } else if (DataHolderClass.getInstance2().getDistributor_id2().equals("Load")) {
+//
+//            AddNewButton.setVisibility(View.INVISIBLE);
+//
+//
+//        }
         // Set the adapter
-        Context context = view.getContext();
+        final Context context = view.getContext();
         final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.dataRecyclerViewList);
         if (mColumnCount <= 1) {
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
         } else {
             recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
         }
+        recyclerView.addItemDecoration(new SpacesItemDecoration(50));
+
+
         System.out.println("WhatispostbeforeitemsBEFORE ");
+        try {
+            final FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID());
+            ref.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.getValue() != null) {
+                        ArrayList<ArrayList> arrayarray = new ArrayList<ArrayList>();
 
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        //TODO:for whatrever reason if not logged in but managed to enter the syste,.....
-        DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID());
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() != null) {
+                        //TODO: check this empty logic more
+                        if (!dataSnapshot.getValue().equals("Empty")) {
+                            final ArrayList<ArrayList> test = new ArrayList<ArrayList>();
 
-                    //TODO: check this empty logic more
-                    if (!dataSnapshot.getValue().equals("Empty")) {
-                        final ArrayList test = new ArrayList();
+                            HashMap post = (HashMap) dataSnapshot.getValue();
+                            System.out.println("Whatispostbeforeitems1 " + post);
+                            System.out.println("Whatispostbeforeitemswhatiskeyterstingsdnffirst" + test);
+                            System.out.println("HA!datasnapshot" + dataSnapshot.getValue());
 
-                        HashMap post = (HashMap) dataSnapshot.getValue();
-                        System.out.println("Whatispostbeforeitems1 " + post);
-                        System.out.println("Whatispostbeforeitemswhatiskeyterstingsdnffirst" + test);
+                            if (post == null) {
 
-                        if (post == null) {
+                            } else {
+                                ArrayList a = new ArrayList();
+                                ArrayList<HashMap> arrayarrayforloop;
 
-                        } else {
-                            ArrayList a = new ArrayList();
-                            for (Object key : post.keySet()) {
-                                System.out.println("Whatispostbeforeitemswhatiskey2 " + key);
+//For every item (4)
+                                for (Object key : post.keySet()) {
+                                    //  LinkedHashMap b = key;
+                                    System.out.println("Whatispostbeforeitemswhatiskey2 " + key);
 
-                                test.add(key);
+                                    System.out.println("Whatispostbeforeitemswhatiskey2 " + post.get(key));
+                                    ArrayList array = new ArrayList();
+
+                                    //          String testing = Collections.max(post.values()).toString();
+                                    System.out.println("gahhhhh " + post);
+
+                                    // System.out.println("gahhhhh " + array.get(0).get(1));
+                                    array.add(key);
+                                    long mindate = 0;
+                                    long maxdate = 0;
+                                    if (!post.get(key).equals("Empty")) {
+                                        arrayarrayforloop = (ArrayList<HashMap>) post.get(key);
+
+
+                                        if ((long) arrayarrayforloop.get(0).get("starttime") != 0) {
+                                            mindate = Long.parseLong(arrayarrayforloop.get(0).get("starttime").toString());
+                                        }
+                                        if ((long) arrayarrayforloop.get(0).get("duration") != 0) {
+                                            maxdate = Long.parseLong(arrayarrayforloop.get(0).get("duration").toString()) + mindate;
+
+                                        }
+                                        for (int j = 0; j < arrayarrayforloop.size(); j++) {
+                                            System.out.println("enterhere " + arrayarrayforloop);
+
+                                            if ((long) arrayarrayforloop.get(j).get("starttime") != 0) {
+
+                                                System.out.println("enterhere2 " + mindate);
+
+                                                if (Long.parseLong(arrayarrayforloop.get(j).get("starttime").toString()) < mindate) {
+
+                                                    mindate = Long.parseLong(arrayarrayforloop.get(j).get("starttime").toString());
+                                                }
+
+                                            }
+                                            if ((long) arrayarrayforloop.get(j).get("duration") != 0) {
+                                                System.out.println("enterhere3 " + arrayarrayforloop.get(j).get("duration"));
+
+                                                if (Long.parseLong(arrayarrayforloop.get(j).get("starttime").toString()) + Long.parseLong
+                                                        (arrayarrayforloop.get(j)
+
+                                                                .get("duration").toString()) > maxdate) {
+                                                    System.out.println("enterhere4 " + arrayarrayforloop.get(j).get("duration"));
+
+                                                    maxdate = Long.parseLong(arrayarrayforloop.get(j).get("starttime").toString()) + Long.parseLong
+                                                            (arrayarrayforloop.get(j).get("duration").toString());
+                                                }
+
+                                            }
+
+                                        }
+                                    } else {
+
+
+                                    }
+
+                                    if (mindate != 0) {
+                                        array.add(mindate);
+                                        if (maxdate != 0) {
+                                            array.add(maxdate);
+
+                                        } else {
+                                            array.add(0L);
+                                        }
+                                    } else {
+                                        if (!post.get(key).equals("Empty")) {
+//TODO: check problems here
+                                            array.add(0L);
+                                            array.add(0L);
+
+
+                                            //       array.add("Time Not Selected");
+                                            //         array.add("Time Not Selected");
+
+                                        } else {
+                                            array.add(0L);
+                                            array.add(0L);
+
+                                            //x    array.add("No location Selected");
+                                            //   array.add("No location Selected");
+
+
+                                        }
+                                    }
+                                    arrayarray.add(array);
+                                    System.out.println("keepaddingarrmaxdate  " + mindate);
+//former father
+                                    System.out.println("keepaddingarrsmallarrya  " + array);
+
+                                    System.out.println("keepaddingarr " + arrayarray);
+
+
+                                    //test.add(arrayarray);
+                                }
                             }
-                        }
-                        System.out.println("Whatispostbeforeitemswhatiskeyterstingsdnf" + test);
 
-                        recyclerView.setAdapter(new MySavedDataListRecyclerViewAdapter(test, mListener));
+
+                            System.out.println("Whatispostbeforeitemswhatiskeyterstingsdnf" + test);
+
+                            recyclerView.setAdapter(new SavedDataListAdapter(getFragmentManager(), arrayarray, mListener));
+                        }
+
                     }
 
                 }
 
-            }
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    System.out.println("The read failed: " + databaseError.getCode());
+                }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
-            }
+            });
+        } catch (Exception e) {
 
-        });
+            System.out.println("SavedDataListFragmentException" + e);
+
+        }
+        //   ref.setValue(ServerValue.TIMESTAMP);
+
         System.out.println("Whatispostbeforeitemsfinally 33wtf");
 
 
-
-
-        SaveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                try {
-                    System.out.println("THIS IS thevalue" + MapsActivity
-                            .getWaypointwithDateList());
-
-                    BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).child(MySavedDataListRecyclerViewAdapter.getItemName())
-                            .setValue
-                                    (MapsActivity
-                                            .getWaypointwithDateList());
-                    Toast.makeText(getContext(), "Data is saved successfully!", Toast.LENGTH_SHORT).show();
-
-                    if(getFragmentManager().getBackStackEntryCount() > 0){
-                        getFragmentManager().popBackStackImmediate();
-                    }
-
-                } catch (Exception e) {
-
-                    Toast.makeText(getContext(), "Please select a file" + e, Toast.LENGTH_SHORT).show();
-
-                }
-
-            }
-
-
-        });
-
+        final Boolean[] wantToCloseDialog = {false};
         AddNewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 final EditText taskEditText = new EditText(getContext());
-                AlertDialog dialog = new AlertDialog.Builder(getContext())
+                final AlertDialog dialog = new AlertDialog.Builder(getContext())
                         .setTitle("Add a new File")
                         .setMessage("Please enter the File Name")
                         .setView(taskEditText)
                         .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                String task = String.valueOf(taskEditText.getText());
-                                //TODO: can add information like times or summary details
-                                if (task != "") {
-                                    BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).child(task).setValue("Empty");
 
-                                } else {
-                                    Toast.makeText(getContext(), "Please enter a file name", Toast.LENGTH_SHORT).show();
-
-
-                                }
 
                             }
                         })
                         .setNegativeButton("Cancel", null)
                         .create();
                 dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String task = taskEditText.getText().toString();
+                        //TODO: can add information like times or summary details
+                        Toast.makeText(getContext(), "Please" + task + "Plase", Toast.LENGTH_SHORT).show();
 
+                        if (task.length() != 0) {
+                            BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).child(task).setValue("Empty");
+                            wantToCloseDialog[0] = true;
+                        } else {
+                            Toast.makeText(getContext(), "Please enter a file name", Toast.LENGTH_SHORT).show();
+                            wantToCloseDialog[0] = false;
+
+
+                        }
+                        //Do stuff, possibly set wantToCloseDialog to true then...
+                        if (wantToCloseDialog[0])
+                            dialog.dismiss();
+                        //else dialog stays open. Make sure you have an obvious way to close the dialog especially if you set cancellable to false.
+                    }
+                });
 
             }
         });
-LoadButton.setOnClickListener(new View.OnClickListener() {
-    @Override
-    public void onClick(View v) {
 
-
-        final FirebaseDatabase database = FirebaseDatabase.getInstance();
-                                                DatabaseReference ref = database.getReference().child("users").child(LoginActivity.getUserID())
-                                                        .child(MySavedDataListRecyclerViewAdapter.getItemName());
-                                                ref.addValueEventListener(new ValueEventListener() {
-                                                    @Override
-                                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                                        ArrayList post = (ArrayList) dataSnapshot.getValue();
-
-                                                        System.out.println("THIS IS IT" + post);
-                                                      //  System.out.println("THIS IS IT" + LoginActivity.getUserID());
-//
-//                                                        System.out.println("THIS IS IT" + post.username);
-//                                                        System.out.println("THIS IS IT" + post.waypoint);
-
-                                                        //Why should i have made this get 0...
-                                                        MapsActivity.addWaypointwithDateList((ArrayList)post.get(0));
-                                                        //Cannot directly update, findways to reset details,,,,
-                                                     //  Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), MapsActivity
-                                                      //        .getWayPointDetailsList());
-
-                                                   //     Locationadapter.notifyDataSetChanged();
-                                                        System.out.println("waypointdetailsList: " + MapsActivity
-                                                                .getWayPointDetailsList());
-                                                        System.out.println("waypointdetailsList222: " + MapsActivity
-                                                                .getWaypointwithDateList());
-                                                        Toast.makeText(mContext, "Location Loaded!  ", Toast.LENGTH_SHORT).show();
-//TODO changed from normal to support, nope still might have error
-                                                        //TODO:Must solved this too random
-                                                        if(getActivity().getSupportFragmentManager().getBackStackEntryCount() > 0){
-                                                            getActivity().getSupportFragmentManager().popBackStackImmediate();
-                                                        }
-
-
-
-                                                    }
-
-                                                    @Override
-                                                    public void onCancelled(DatabaseError databaseError) {
-                                                        System.out.println("The read failed: " + databaseError.getCode());
-                                                    }
-
-
-                                                });
-
-
-
-    }
-});
 
         return view;
     }
 
-
+    //Remember this bitches
+//Transfer E1U7sXJxaV chu culain, herc, chamilia abc123
+    // tama cat, maria anato PaQnW5zZ6B
+    //cu culain, elizi, the green hair arcjer, martha
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        mContext=context;
+        mContext = context;
 
 //        if (context instanceof OnListFragmentInteractionListener) {
 //            mListener = (OnListFragmentInteractionListener) context;
@@ -293,7 +328,7 @@ LoadButton.setOnClickListener(new View.OnClickListener() {
     @Override
     public void onDetach() {
         super.onDetach();
-        mContext=null;
+        mContext = null;
         mListener = null;
     }
 

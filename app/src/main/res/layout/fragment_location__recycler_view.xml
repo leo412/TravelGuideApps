@@ -1,37 +1,245 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
                                              xmlns:tools="http://schemas.android.com/tools"
-                                             android:layout_width="fill_parent"
-                                             android:layout_height="wrap_content"
-                                             android:background="@drawable/list_selector"
+                                             android:layout_width="360dp"
+                                             android:layout_height="match_parent"
+                                             android:background="#f1f1f2"
                                              android:orientation="horizontal"
+
+
     >
 
-    <TextView
-        android:id="@+id/duh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Click Above item to show lists"
+
+    <Button
+        android:id="@+id/opensetting"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:background="#42f4a1"
+        android:text="Preferences"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <Button
+        android:id="@+id/sortingbutton"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="#49f3fc"
+        android:text="Sort"
+        android:visibility="visible"
+        app:layout_constraintLeft_toRightOf="@id/opensetting"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+    <Button
+        android:id="@+id/resetbutton"
+        style="@style/Widget.AppCompat.Button.Colored"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:background="#fc2a1b"
+        android:text="Reset"
+        android:visibility="visible"
+        app:layout_constraintLeft_toRightOf="@id/sortingbutton"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
+    <net.cachapa.expandablelayout.ExpandableLayout
+        android:id="@+id/expandable_layout"
+        android:layout_width="368dp"
+        android:layout_height="wrap_content"
+        app:el_duration="500"
+        app:el_expanded="false"
+        app:el_parallax="0.5"
+        app:layout_constraintLeft_toLeftOf="parent"
+
+        app:layout_constraintTop_toBottomOf="@+id/opensetting"
+        >
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/holo_blue_bright"
+
+            >
+
+            <AutoCompleteTextView
+                android:id="@+id/autocompletetext"
+                android:layout_width="352dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:hint="Search Phrase"
+                android:inputType="text"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+            <Switch
+                android:id="@+id/opennowtoggle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Show only Opened Location?"
+                app:layout_constraintLeft_toLeftOf="@+id/autocompletetext"
+                app:layout_constraintTop_toBottomOf="@+id/pricerangebar"
+                />
+
+
+            <TextView
+                android:id="@+id/Distancetext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Distance(km)"
+                app:layout_constraintLeft_toLeftOf="@+id/autocompletetext"
+                app:layout_constraintTop_toBottomOf="@+id/autocompletetext"
+                />
+
+            <org.adw.library.widgets.discreteseekbar.DiscreteSeekBar
+                android:id="@+id/radiusPicker"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                app:dsb_max="100"
+                app:dsb_min="1"
+                app:dsb_value="10"
+
+                app:layout_constraintLeft_toRightOf="@+id/Distancetext"
+                app:layout_constraintTop_toBottomOf="@+id/autocompletetext"
+                />
+
+
+            <Button
+                android:id="@+id/OpenCategoriesView"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="#0083ef"
+                android:text="Open Categories!"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/opennowtoggle"
+
+                />
+
+            <Button
+                android:id="@+id/selecttypes"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Search!"
+                app:layout_constraintLeft_toLeftOf="parent"
+
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/OpenCategoriesView"
+
+                />
+
+            <TextView
+                android:id="@+id/pricerangebartext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Price Level:"
+                app:layout_constraintBottom_toBottomOf="@+id/pricerangebar"
+                app:layout_constraintLeft_toLeftOf="@id/autocompletetext"
+                app:layout_constraintTop_toTopOf="@+id/pricerangebar"
+
+                />
+
+            <com.appyvet.rangebar.RangeBar
+                xmlns:custom="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/pricerangebar"
+                android:layout_width="250dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="8dp"
+                android:layout_marginStart="8dp"
+                custom:layout_constraintLeft_toRightOf="@+id/pricerangebartext"
+                custom:layout_constraintTop_toBottomOf="@+id/radiusPicker"
+                custom:pinMaxFont="10dp"
+
+                custom:pinRadius="10dp"
+                custom:tickEnd="4"
+                custom:tickInterval="1"
+                custom:tickStart="0"
+                />
+
+
+        </android.support.constraint.ConstraintLayout>
+
+
+    </net.cachapa.expandablelayout.ExpandableLayout>
+
+    <TextView
+        android:id="@+id/emptyview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter requirements from the above settings to obtain relevant locations!"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/quicksearch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:text="Quick Search"
+        android:textSize="30dp"
+        android:textStyle=""
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/expandable_layout"/>
+    <ImageButton
+        android:id="@+id/shopimagebutton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="50dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerCrop"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/expandable_layout"
+        />
+
+    <ImageButton
+        android:id="@+id/entertainmentimagebutton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerCrop"
+        app:layout_constraintLeft_toLeftOf="parent"
+
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/shopimagebutton"
+        />
+
+    <ImageButton
+        android:id="@+id/foodimagebutton"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginRight="5dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:scaleType="centerCrop"
+
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/shopimagebutton"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/poilistRecyclerView"
         android:layout_width="368dp"
         android:layout_height="wrap_content"
+        android:background="#f1f1f2"
         android:divider="#b5b5b5"
         android:dividerHeight="1dp"
         android:listSelector="@drawable/list_selector"
-        android:scrollbars="vertical"
         android:nestedScrollingEnabled="true"
-
+        android:paddingBottom="270dp"
+        android:scrollbars="vertical"
+        android:visibility="gone"
         app:layout_constraintLeft_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/empty"
-
+        app:layout_constraintTop_toBottomOf="@+id/expandable_layout"
 
 
         />
 
 
-    ></android.support.constraint.ConstraintLayout>
+    >
+</android.support.constraint.ConstraintLayout>

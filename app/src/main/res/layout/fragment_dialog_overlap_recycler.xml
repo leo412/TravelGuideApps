@@ -1,0 +1,105 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:layout_width="wrap_content"
+                                             android:layout_height="wrap_content"
+
+                                             android:background="@drawable/list_selector"
+                                             tools:context="layout.DialogOverlapRecyclerFragment">
+
+    <ImageView
+        android:id="@+id/list_image"
+        android:layout_width="100dip"
+        android:layout_height="100dip"
+        android:scaleType="matrix"
+
+        />
+
+    <ImageView
+        android:id="@+id/markerimage"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintLeft_toRightOf="@id/list_image"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/place_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+
+        android:text="Place_name"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintLeft_toRightOf="@id/markerimage"
+        app:layout_constraintTop_toTopOf="parent"
+
+        />
+
+    <ImageView
+        android:id="@+id/timeicon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintLeft_toRightOf="@id/list_image"
+        app:layout_constraintTop_toTopOf="@+id/overlapdate"
+        />
+
+    <TextView
+        android:id="@+id/overlapdate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif"
+        android:maxLines="1"
+        android:text="TIME"
+        android:textAppearance="?attr/textAppearanceListItem"
+        android:textSize="15dp"
+        app:layout_constraintLeft_toLeftOf="@id/place_name"
+        app:layout_constraintTop_toBottomOf="@id/place_name"
+        tools:layout_constraintTop_creator="1"/>
+
+    <ImageView
+        android:id="@+id/calendaricon"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        app:layout_constraintLeft_toRightOf="@id/list_image"
+        app:layout_constraintTop_toTopOf="@+id/overlaptime"
+        />
+
+    <TextView
+        android:id="@+id/overlaptime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TIME"
+        android:textAppearance="?attr/textAppearanceListItem"
+        app:layout_constraintLeft_toLeftOf="@id/place_name"
+        app:layout_constraintTop_toBottomOf="@id/overlapdate"
+        tools:layout_constraintTop_creator="1"
+
+        />
+
+    <ImageButton
+        android:id="@+id/details_btn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:focusable="false"
+        android:scaleType="fitCenter"
+        app:layout_constraintLeft_toRightOf="@id/list_image"
+        app:layout_constraintTop_toBottomOf="@id/overlaptime"
+
+        />
+
+    <TextView
+        android:id="@+id/place_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:text="PLACEHOLDERID"
+        android:textColor="#10bcc9"
+        android:textSize="10dip"
+        android:textStyle="bold"
+        android:visibility="gone"
+        />
+</android.support.constraint.ConstraintLayout>

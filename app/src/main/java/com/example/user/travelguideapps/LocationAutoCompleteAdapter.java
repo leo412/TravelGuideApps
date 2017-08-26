@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.Location_RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.http.GenericUrl;
@@ -46,6 +47,8 @@ public class LocationAutoCompleteAdapter extends ArrayAdapter<String> implements
      */
     public LocationAutoCompleteAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
+        System.out.print("ThisautocomLocationauto");
+
         this.context = context;
     }
 
@@ -63,21 +66,32 @@ public class LocationAutoCompleteAdapter extends ArrayAdapter<String> implements
     public Filter getFilter() {
         Filter filter = new Filter() {
 
-            protected FilterResults xtering(CharSequence constraint) {
-                FilterResults filterResults = new FilterResults();
-                if (constraint != null || constraint.length() == 0) {
-                    resultList = autocomplete(constraint.toString());
+            protected FilterResults performFiltering(CharSequence constraint) {
+                if(constraint==null){
 
+                    Log.d("URL", "getfilter0"+constraint);
+
+                }
+                Log.d("URL", "getfilter1"+constraint);
+                String con=constraint.toString();
+                Log.d("URL", "getfilter2"+con);
+
+                Log.d("URL", "getfilter3"+con.length());
+
+                FilterResults filterResults = new FilterResults();
+                if (con != null || con.length() == 0) {
+                    resultList = autocomplete(con);
                     filterResults.values = resultList;
                     filterResults.count = resultList.size();
                 }
                 return filterResults;
             }
-
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                return null;
-            }
+//
+//            @Override
+//            protected FilterResults performFiltering(CharSequence constraint) {
+//
+//                return null;
+//            }
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
@@ -93,7 +107,7 @@ public class LocationAutoCompleteAdapter extends ArrayAdapter<String> implements
 
     private ArrayList<String> autocomplete(String s) {
         ArrayList<String> resultList = new ArrayList<String>();
-        Log.d("SADASD", "AUtoComplete");
+        System.out.print("Thisautocomarraylist");
 
         try {
             HttpRequestFactory requestFactory = HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
@@ -121,8 +135,12 @@ public class LocationAutoCompleteAdapter extends ArrayAdapter<String> implements
         // Build URL.
         GenericUrl url = new GenericUrl(PLACES_API_AUTOCOMPLETION);
         url.put("input", input);
+        url.put("location", BaseActivity.getCurrentLocation().getLatitude()+","+BaseActivity.getCurrentLocation().getLongitude());
+        url.put("radius", Location_RecyclerView.getradius());
         url.put("key", "AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
         url.put("sensor", false);
+
+
         Log.i("URL", url.toString());
         return url;
     }

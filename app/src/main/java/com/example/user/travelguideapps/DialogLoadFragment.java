@@ -6,8 +6,6 @@ package com.example.user.travelguideapps;
 
 import android.app.DialogFragment;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +40,7 @@ public class DialogLoadFragment extends DialogFragment implements TextView.OnEdi
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fragment_dialog_categories, container);
        // mEditText = (EditText) view.findViewById(R.id.username);
-        final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.dataRecyclerView);
+       // final RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.dataRecyclerView);
         final ArrayList test=new ArrayList();
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -94,10 +92,10 @@ test.add(key);
 
 
 
-        LocationDataAdapter adapter= new LocationDataAdapter(getActivity(),test);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        LocationDataAdapter adapter= new LocationDataAdapter(test);
+        //recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        recyclerView.setAdapter(adapter);
+     //   recyclerView.setAdapter(adapter);
 
         // set this instance as callback for editor action
     //    mEditText.setOnEditorActionListener(this);

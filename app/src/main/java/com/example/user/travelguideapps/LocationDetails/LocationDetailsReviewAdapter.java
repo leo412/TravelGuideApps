@@ -35,8 +35,7 @@ public class LocationDetailsReviewAdapter extends RecyclerView.Adapter<LocationD
     private ArrayList review_ratinglist;
 
 
-
-    public LocationDetailsReviewAdapter(Context context, ArrayList mDataSource, ArrayList mDataSource2, ArrayList mDataSource3, ArrayList
+    public LocationDetailsReviewAdapter(ArrayList mDataSource, ArrayList mDataSource2, ArrayList mDataSource3, ArrayList
             mDataSource4, ArrayList mDataSource5) {
         this.context = context;
         this.author_namelist = mDataSource;
@@ -46,9 +45,6 @@ public class LocationDetailsReviewAdapter extends RecyclerView.Adapter<LocationD
         this.review_ratinglist = mDataSource5;
 
 
-
-
-
         Log.d("isthislistor... ", mDataSource.toString());
 
     }
@@ -56,7 +52,6 @@ public class LocationDetailsReviewAdapter extends RecyclerView.Adapter<LocationD
     @Override
     public LocationDetailsReviewAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View rowView = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row_reviews, viewGroup, false);
-
 
 
         return new ViewHolder(rowView);
@@ -85,16 +80,16 @@ public class LocationDetailsReviewAdapter extends RecyclerView.Adapter<LocationD
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
+        Context context = viewHolder.itemView.getContext();
 
-        Log.d("whichrun", "rrrrrrrr"+viewHolder.author_name.getText());
+        Log.d("whichrun", "rrrrrrrr" + viewHolder.author_name.getText());
 
-    //    viewHolder.setIsRecyclable(false);
+        //    viewHolder.setIsRecyclable(false);
         String data = author_namelist.get(i).toString();
         String data2 = reviews_textlist.get(i).toString();
         String data3 = author_photolist.get(i).toString();
         String data4 = relative_time_descriptionlist.get(i).toString();
         String data5 = review_ratinglist.get(i).toString();
-
 
 
         String changeddata = data.replace("[", "").replace("]", "").trim();
@@ -103,43 +98,43 @@ public class LocationDetailsReviewAdapter extends RecyclerView.Adapter<LocationD
         String changeddata4 = data4.replace("[", "").replace("]", "").trim();
         String changeddata5 = data5.replace("[", "").replace("]", "").trim();
 
-            if(changeddata5!="") {
+        if (changeddata5 != "") {
 
-        viewHolder.author_name.setText(changeddata);
-        viewHolder.review_text.setText(changeddata2);
-        viewHolder.relative_time_description.setText(changeddata4);
+            viewHolder.author_name.setText(changeddata);
+            viewHolder.review_text.setText(changeddata2);
+            viewHolder.relative_time_description.setText(changeddata4);
             viewHolder.rating_bar.setRating(Float.parseFloat(changeddata5));
 
 
-
-        Log.d("whichrun", "rrrrrrrr"+viewHolder.author_name.getText());
-        Log.d("whichrun", "rrrrrrrr222222"+viewHolder.review_text.getText());
+            Log.d("whichrun", "rrrrrrrr" + viewHolder.author_name.getText());
+            Log.d("whichrun", "rrrrrrrr222222" + viewHolder.review_text.getText());
 //String data= Arrays.toString(author_namelist.toArray()).replace("[", "").replace("]", "").replace(" ","").trim();
 
 //      Picasso.with(context).load("https://maps.googleapis.com/maps/api/place/photo?photoreference="+author_namelist.get(0).toString().trim()
 //           Picasso.with(context).cancelRequest(viewHolder.imageView);
 //        Only beow this TODO
-        if(changeddata3!="") {
-            Picasso.with(context).load(changeddata3).placeholder(R.drawable.loading_gif).into
-                    (viewHolder.imageView);
+            if (changeddata3 != "") {
+                Picasso.with(context).load(changeddata3).placeholder(R.drawable.loading_gif).into
+                        (viewHolder.imageView);
 
-            viewHolder.imageView.setTag(mTarget);
+                viewHolder.imageView.setTag(mTarget);
+            }
         }
     }
-    }
+
     @Override
     public int getItemCount() {
         //Notsure if correct wtf is this
         //   return android_versions.size();
         return author_namelist.size();
     }
-            
+
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
-TextView author_name;
+        TextView author_name;
         TextView review_text;
-RatingBar rating_bar;
+        RatingBar rating_bar;
         TextView relative_time_description;
 
         public ViewHolder(View rowView) {
@@ -147,16 +142,13 @@ RatingBar rating_bar;
 
             imageView =
                     (ImageView) rowView.findViewById(R.id.list_image);
-            author_name=      (TextView) rowView.findViewById(R.id.author_name);
+            author_name = (TextView) rowView.findViewById(R.id.author_name);
 
-            review_text=      (TextView) rowView.findViewById(R.id.review_text);
+            review_text = (TextView) rowView.findViewById(R.id.review_text);
 
-            relative_time_description=      (TextView) rowView.findViewById(R.id.relative_time_description);
+            relative_time_description = (TextView) rowView.findViewById(R.id.relative_time_description);
 
-            rating_bar=      (RatingBar) rowView.findViewById(R.id.rating_Bar);
-
-
-
+            rating_bar = (RatingBar) rowView.findViewById(R.id.rating_Bar);
 
 
         }

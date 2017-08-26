@@ -6,9 +6,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,11 +26,8 @@ import com.example.user.travelguideapps.BaseActivity;
 import com.example.user.travelguideapps.DataHolderClass;
 import com.example.user.travelguideapps.DataParser;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
-import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.Location_RecyclerView;
 import com.example.user.travelguideapps.R;
 import com.squareup.picasso.Picasso;
-import com.wdullaer.materialdatetimepicker.date.DatePickerDialog;
-import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,18 +39,15 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class LocationDetailsActivity extends Fragment{
-static String TAG="tag";
+static String TAG="LocationDetailsActivity";
     private static TextView place_name;
     private static TextView place_address;
     private static TextView place_addressHere;
@@ -60,14 +56,21 @@ static String TAG="tag";
 
 
 
-    private List<LinkedHashMap<String, String>> placedetails = null;
+    private ArrayList<LinkedHashMap<String, Object>> placedetails = null;
     private View place_location;
     private LocationDetailsPictureAdapter pictureadapter;
     private RecyclerView recyclerView;
     private ViewPager pager;
-    private FragmentPagerAdapter viewpageradapter;
+    private FragmentStatePagerAdapter viewpageradapter;
     public static Button setplacebutton;
     public static Button removeplacebutton;
+
+    public static  TextView selectedStartTimeText;
+    public static  TextView selectedStartTime;
+    public static  TextView selectedEndTimeText;
+    public static  TextView selectedEndTime;
+    public static  TextView timetext;
+    public static  Button selectdatebutton;
 
 
 
@@ -75,49 +78,78 @@ static String TAG="tag";
  //   private LocationDetailsPictureAdapter LocationDetailsPictureAdapter;
 //View content_place_details = findViewById(R.id.content_place_details);
     private CoordinatorLayout view;
-    private ConstraintLayout detailsview;
+  //  private ConstraintLayout detailsview;
+    private ConstraintLayout timeview;
 
     BaseActivity b=new BaseActivity();
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = (CoordinatorLayout) inflater.inflate(R.layout.activity_place_details, container, false);
-        detailsview= (ConstraintLayout) inflater.inflate(R.layout.fragment_location_details, container, false);
-        //   setSupportActionBar(toolbar);
+        timeview= (ConstraintLayout) inflater.inflate(R.layout.fragment_location_time_selected, container, false);
+
         place_location=(TextView)view.findViewById(R.id.textViewAdress);
         place_name=(TextView)view.findViewById(R.id.textViewPlaceName);
 
 
-        //  place_address=(TextView)detailsview.findViewById(R.id.textViewAdress);
-      //  place_addressHere=(TextView)view.findViewById(R.id.textViewAdress);
-      //  Log.d(TAG, "Dqqqqqqqqq"+place_address.getText());
 
-
-        //  imageView1=(ImageView)findViewById(R.id.imageView1);
-        //imageView2=(ImageView)findViewById(R.id.imageView2);
         recyclerView=(RecyclerView)view.findViewById((R.id.recycleviewphoto));
 
-        //TODO: is this placeid correct??? Seems to have a lot of problem in it?
-        //final String place_id=getIntent().getStringExtra("place_id");
-
-     //   Bundle bundle = this.getArguments();
-
+//everytime get here will use this place id hmmmm.
+        //TODO: problem here cus it keeps using the same id........ when trying to go back to other popbackstack
         String _data = DataHolderClass.getInstance().getDistributor_id();
+        String place_id_array = DataHolderClass.getInstancearray().getDistributor_idarray();
+
         removeplacebutton=(Button) view.findViewById(R.id.removeLocation);
         DataHolderClass.getInstance().setDistributor_id(null);
-
-        final String place_id = _data;
+//Changes here...
+        final String place_id = place_id_array;
 
 
         //Toast.makeText(getApplicationContext(),place_id, Toast.LENGTH_SHORT).show();
         //How to use this url?
         //"https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key=AIzaSyBSjyuGzRqI8WZ3Vdil99Dp2sTfwQI2-to"
-        String data="ASD";
         MapsActivity a=new MapsActivity();
         String takethistotest="https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
                 "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA";
         Log.d(TAG, "fortestingurl"+takethistotest);
+        selectedStartTime=(TextView) timeview.findViewById(R.id.SelectedDateText);
+        selectedEndTime=(TextView) timeview.findViewById(R.id.timeduration);
 
+
+
+        setplacebutton=(Button) view.findViewById(R.id.addLocation);
+        ArrayList<HashMap> waypoint=MapsActivity.getWaypointwithDateList();
+        Log.d(TAG, "ahahahshcn"+waypoint);
+        for(int i=0;i<waypoint.size();i++){
+            if (waypoint.get(i).get("place_id").equals(place_id)) {
+
+                removeplacebutton.setVisibility(View.VISIBLE);
+
+                if(waypoint.get(i).size()!=1) {
+                    Log.d(TAG, "has this run????"+waypoint);
+
+                  //  selectedStartTimeText.setVisibility(View.VISIBLE);
+                    selectedStartTime.setVisibility(View.VISIBLE);
+                    //selectedEndTimeText.setVisibility(View.VISIBLE);
+                    selectedEndTime.setVisibility(View.VISIBLE);
+
+                    //selectedStartTime.setText(waypoint.get(i).get(1).toString());
+                   // selectedduration.setText(waypoint.get(i).get(2).toString());
+                   // Log.d(TAG, "has this run????"+selectedduration.getText());
+                  //  Log.d(TAG, "has this run????"+selectedduration.getVisibility());
+
+                //    timetext.setVisibility(View.GONE);
+
+                }
+
+
+
+                setplacebutton.setVisibility(View.GONE);
+                break;
+            }
+        }
         try {
+            DataHolderClass.getInstance().setDistributor_id(place_id);
 
             new DownloadTask().execute(("https://maps.googleapis.com/maps/api/place/details/json?placeid="+place_id+"&key" +
                     "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA"));
@@ -125,18 +157,6 @@ static String TAG="tag";
             e.printStackTrace();
         }
 
-
-
-
-
-      setplacebutton=(Button) view.findViewById(R.id.addLocation);
-        ArrayList waypoint=MapsActivity.getWaypointwithDateList();
-        if(waypoint.contains(place_id)){
-
-            removeplacebutton.setVisibility(View.VISIBLE);
-            setplacebutton.setVisibility(View.GONE);
-
-        }
 
 
         removeplacebutton.setOnClickListener(new View.OnClickListener() {
@@ -149,18 +169,15 @@ static String TAG="tag";
                 DataHolderClass.getInstance().setDistributor_id(place_id);
                 FragmentManager fragmentManager = LocationDetailsActivity.this.getActivity().getSupportFragmentManager();
                 MapsActivity.removeWaypoint(place_id);
+        //        DataHolderClass.getInstancearray().removeDistributor_idarray();
 
                 if(fragmentManager.getBackStackEntryCount()>0) {
                     Log.d(TAG, "popbackrunning");
-
                     fragmentManager.popBackStack();
                     Log.d(TAG, "popbackrunning2");
 
-
                 }
-                Toast.makeText(getActivity(), "Location removed....!", Toast.LENGTH_SHORT).show();
-
-
+                Toast.makeText(getActivity().getApplicationContext(), "Location removed....!", Toast.LENGTH_SHORT).show();
             }
         });
         setplacebutton.setEnabled(false);
@@ -169,190 +186,46 @@ static String TAG="tag";
         setplacebutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-       //         newFragment.setArguments(args);
-                final String[] SelectedDate = new String[1];
-               // DataHolderClass.getInstance().setDistributor_id(place_id);
-                Calendar now = Calendar.getInstance();
-//Select the day you wanna go on, set time ?
-                //Set time now?
-                final String[] SelectedTime = new String[1];
-                final String[] StartSelectedTime = new String[1];
-
-                final TimePickerDialog tpd = TimePickerDialog.newInstance(
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePickerDialog view, int hour, int minute, int second) {
-                            //    String date = "You picked the following date: "+dayOfMonth+"/"+(monthOfYear+1)+"/"+year;
-                            //    String SelectedDateText=dayOfMonth+" "+monthOfYear+" "+year;
-
-                                String hourText;
-                                String minuteText;
-                                if( String.valueOf(hour).length()==1){
-
-                                    hourText="0"+hour;
-                                }else{
-                                    hourText=Integer.toString(hour);
-                                }
-                                if( String.valueOf(minute).length()==1){
-
-                                    minuteText="0"+minute;
-                                }else{
-
-                                    minuteText=Integer.toString(minute);
-
-                                }
-
-                                String SelectedTimeText=hourText+":"+minuteText;
-                                SelectedTime[0] =SelectedTimeText;
-
-
-                                adapter = new PickerAdapter(getFragmentManager());
-
                                 try {
-                                    SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-yyyy");
-                                    SimpleDateFormat timeformat = new SimpleDateFormat("hh:mm");
-
-                                    SimpleDateFormat datetimeformat = new SimpleDateFormat("dd-MM-yyyy hh:mm");
-
-                                    //TODO: add one more for length of time ?
-                                    Date selectedStarttime = datetimeformat.parse(SelectedDate[0]+" "+StartSelectedTime[0]);
-                                    Date selectedtime = datetimeformat.parse(SelectedDate[0]+" "+SelectedTime[0]);
+                                    LinkedHashMap selecteddata = new LinkedHashMap();
+                                    //TODO: Timestamp confirmation? Not Selected?
+                                    selecteddata.put("place_id",place_id);
+                                    selecteddata.put("starttime",0L);
+                                    selecteddata.put("duration",0L);
 
 
-                                    Date selecteddate = dateformat.parse(SelectedDate[0]);
-                                   // Date selectedStarttime = timeformat.parse(StartSelectedTime[0]);
-                                   // Date selectedtime = timeformat.parse(SelectedTime[0]);
-ArrayList selecteddata=new ArrayList();
-                                //    selecteddata.add(selecteddate);
-                                    selecteddata.add(place_id);
-
-                                    selecteddata.add(selectedStarttime);
-                                    selecteddata.add(selectedtime);
-
-//TODO: see if checknig time or date it self is better
-                                    Toast.makeText(getActivity(), "You have set time as "+selecteddate, Toast.LENGTH_SHORT).show();
-                                    Log.d("qqqqqqqqqqqq", "ASD"+selecteddate+selectedStarttime+selectedtime);
-                                    Log.d("qqqqqqqqqqqq", "ZXC"+selecteddata);
-
-                                    if(selecteddata!=null){
+                                    if (selecteddata != null) {
 
                                         DataHolderClass.getInstance2().setDistributor_id2("unselected");
                                         MapsActivity.addWaypointwithDateList(selecteddata);
 
-
+                                  //      DataHolderClass.getInstancearray().removeDistributor_idarray();
 
                                         FragmentManager fragmentManager = LocationDetailsActivity.this.getActivity().getSupportFragmentManager();
-                                        if(fragmentManager.getBackStackEntryCount()>0) {
+                                        if (fragmentManager.getBackStackEntryCount() > 0) {
+
                                             fragmentManager.popBackStack();
                                         }
-                                        Toast.makeText(getActivity(), "Location set....!", Toast.LENGTH_SHORT).show();
-                                        Toast.makeText(getActivity(), place_id.toString(), Toast.LENGTH_SHORT).show();
-
-
-
+                                        Toast.makeText(getActivity().getApplicationContext(), "Location set....!", Toast.LENGTH_SHORT).show();
 
 
                                     }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
-                                //     dateTextView.setText(date);
-                            }
-                        },
-                        now.get(Calendar.HOUR),
-                        now.get(Calendar.MINUTE),
-                        false
-                );
+                                }catch (Exception e){
 
-                final TimePickerDialog tpdStart = TimePickerDialog.newInstance(
-                        new TimePickerDialog.OnTimeSetListener() {
-                            @Override
-                            public void onTimeSet(TimePickerDialog view, int hour, int minute, int second) {
-                                //    String date = "You picked the following date: "+dayOfMonth+"/"+(monthOfYear+1)+"/"+year;
-                                //    String SelectedDateText=dayOfMonth+" "+monthOfYear+" "+year;
+                                    Toast.makeText(getActivity().getApplicationContext(), "Some Error has occured, please try again later!", Toast.LENGTH_SHORT).show();
+                                    Log.d("LocationDetailsTPicker", e.toString());
 
-                                String hourText;
-                                String minuteText;
-                                if( String.valueOf(hour).length()==1){
-
-                                    hourText="0"+hour;
-                                }else{
-                                    hourText=Integer.toString(hour);
-                                }
-                                if( String.valueOf(minute).length()==1){
-
-                                    minuteText="0"+minute;
-                                }else{
-
-                                    minuteText=Integer.toString(minute);
 
                                 }
-
-                                String SelectedTimeText=" "+hourText+":"+minuteText;
-                                tpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
-
-                                StartSelectedTime[0] =SelectedTimeText;
-
-
-                                adapter = new PickerAdapter(getFragmentManager());
-
-
-                                //     dateTextView.setText(date);
-                            }
-                        },
-                        now.get(Calendar.HOUR),
-                        now.get(Calendar.MINUTE),
-                        false
-                );
-
-
-
-
-
-                DatePickerDialog dpd = DatePickerDialog.newInstance(
-                        new DatePickerDialog.OnDateSetListener() {
-                            @Override
-                            public void onDateSet(DatePickerDialog view, int year, int monthOfYear, int dayOfMonth) {
-                                String date = "You picked the following date: "+dayOfMonth+"/"+(monthOfYear+1)+"/"+year;
-                                SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-                                String dayText;
-                                String monthText;
-                                if( String.valueOf(dayOfMonth).length()==1){
-
-                                    dayText="0"+dayOfMonth;
-                                }else{
-                                    dayText=Integer.toString(dayOfMonth);
-                                }
-                                if( String.valueOf(monthOfYear).length()==1){
-
-                                    monthText="0"+monthOfYear;
-                                }else{
-
-                                    monthText=Integer.toString(monthOfYear);
-
-                                }
-
-
-                                String SelectedDateText=dayText+"-"+monthText+"-"+year;
-                                tpdStart.show(getActivity().getFragmentManager(), "Datepickerdialog");
-                                SelectedDate[0] =SelectedDateText;
-                           //     dateTextView.setText(date);
-                            }
-                        },
-                        now.get(Calendar.YEAR),
-                        now.get(Calendar.MONTH),
-                        now.get(Calendar.DAY_OF_MONTH)
-                );
-
-
-
-
-                dpd.setTitle("Date for visiting");
-                tpdStart.setTitle("Starting Time");
-                tpd.setTitle("Ending Time");
-
-                dpd.show(getActivity().getFragmentManager(), "Datepickerdialog");
+                              //  break;
+                      //  }
+                   // }
+           //     };
+//TODO: See if needed to add the dialog box back in....?
+//                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+//                builder.setMessage("Do you want to set the time now?").setPositiveButton("Yes", dialogClickListener)
+//                        .setNegativeButton("No", dialogClickListener).show();
+       //         newFragment.setArguments(args);
 
 
 
@@ -372,6 +245,7 @@ return view;
 
 
     }
+
     private class PickerAdapter extends FragmentPagerAdapter {
         private static final int NUM_PAGES = 2;
         Fragment timePickerFragment;
@@ -417,6 +291,18 @@ return view;
 //
 //
 //    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+
+
+
+        DataHolderClass.getInstancearray().removeDistributor_idarray();
+
+
+    }
+
     public class DownloadTask extends AsyncTask<String, Void, String> {
         protected void onPreExecute() {
             //set message of the dialog
@@ -424,6 +310,8 @@ return view;
 
             super.onPreExecute();
         }
+
+
 
         // Downloading data in non-ui thread
         @Override
@@ -472,17 +360,13 @@ return view;
             //Change List of placedetails back to normal
 
             try {
-                LinkedHashMap<String, String> placedetail = placedetails.get(0);
+                LinkedHashMap<String, Object> placedetail = placedetails.get(0);
                 Log.d("DetailsResult", placedetail.toString());
 
-                place_name.setText( placedetail.get("place_name"));
-                //        place_addressHere.setText( placedetail.get("formatted_address"));
+                place_name.setText( placedetail.get("place_name").toString());
 
 
-// TODO: Commented and used hardcode, check if able to soft code
-//int photoindex=placedetails.indexOf("photo_reference");
-                //Doing this
-                LinkedHashMap<String,String>test= placedetails.get(0);
+                LinkedHashMap<String,Object>test= placedetails.get(0);
 
                 Log.d("Followthisshit", placedetails.toString());
 
@@ -495,7 +379,7 @@ return view;
 
                 }
 
-                String  photo=test.get("photo_reference");
+                String  photo=test.get("photo_reference").toString();
 
 
                 List<String> photoList = new ArrayList<String>(Arrays.asList(photo.split(",")));
@@ -510,7 +394,7 @@ return view;
 
 
 
-                pictureadapter = new LocationDetailsPictureAdapter(getActivity(), photoList);
+                pictureadapter = new LocationDetailsPictureAdapter( photoList);
 
                 recyclerView.setAdapter(pictureadapter);
 
@@ -518,27 +402,41 @@ return view;
                 if(!isAdded()) {
                     return;
                 }
-                //TODO: set adapter somtimes :Android IllegalStateException: Fragment not attached to Activity webview (isadded used to see if problem
+
+
 
                 //TODO:has changed to child, use support if problem persist?
                 viewpageradapter=new MyPagerAdapter(getChildFragmentManager());
                 pager.setAdapter(viewpageradapter);
+                int choice=0;
+                if(DataHolderClass.getInstance2().getDistributor_id2()=="Details"){
+
+                    choice=0;
+                }else if(DataHolderClass.getInstance2().getDistributor_id2()=="Time"){
+                    choice=2;
 
 
-
-//Problem caused : empty space in front of something..........
-
-
+                }
+                pager.setCurrentItem(choice);
+                viewpageradapter.notifyDataSetChanged();
+                TabLayout tabLayout= (TabLayout) view.findViewById(R.id.pager_header);
+                tabLayout.setupWithViewPager(pager);
+                //TODO: set adapter somtimes :Android IllegalStateException: Fragment not attached to Activity webview (isadded used to see if problem
+                tabLayout.getTabAt(0).setIcon(R.drawable.detailsicon);
+                tabLayout.getTabAt(1).setIcon(R.drawable.reviewsicon);
+                tabLayout.getTabAt(2).setIcon(R.drawable.timewhiteicon);
+              //  Toast.makeText(getActivity().getApplicationContext(), "Successfully HA!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "LocationDetailsactivity successfully");
 
                 Picasso.with(getActivity()).setLoggingEnabled(true);
 
                 //place_address.setText( placedetail.get("formatted_address"));
-                viewpageradapter.notifyDataSetChanged();
 
             }catch (Exception e){
+                //TODO:Fragment no longer exists for key f1: index 0 (Sometimes got this ... ignore?
                 Log.d(TAG, "Some Error has occured, Plea" + e);
 
-                Toast.makeText(getActivity(), "Some Error has occured, Please try again!", Toast.LENGTH_SHORT).show();
+           //     Toast.makeText(getActivity().getApplicationContext(), "Some Error has occured, Please try again!", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -549,6 +447,24 @@ return view;
 
 
 }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+if(viewpageradapter!=null) {
+    TabLayout tabLayout= (TabLayout) view.findViewById(R.id.pager_header);
+    tabLayout.setupWithViewPager(pager);
+    viewpageradapter.notifyDataSetChanged();
+    Log.d(TAG, "LocationDetailsactivity successfully inside onresume"+placedetails);
+    tabLayout.getTabAt(0).setIcon(R.drawable.detailsicon);
+    tabLayout.getTabAt(1).setIcon(R.drawable.reviewsicon);
+    tabLayout.getTabAt(2).setIcon(R.drawable.timewhiteicon);
+}
+
+
+    }
+
     public static LinkedHashMap<String, String> toMap(JSONObject object) throws JSONException {
         LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 
@@ -627,7 +543,12 @@ return view;
         }
         return data;
     }
-    private class MyPagerAdapter extends FragmentPagerAdapter {
+
+
+
+
+
+    public class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         public MyPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -637,20 +558,19 @@ return view;
         @Override
         public Fragment getItem(int pos) {
 
-      //      Log.d(TAG, "Dujjjjjjjcalled 2nd time....1"+place_address.getText());
+            Log.d(TAG, "locationdetailsgetitem"+placedetails);
 
             switch(pos) {
 
                 case 0: return LocationDetails.newInstance(placedetails,"Ok yupe");
                 case 1: return LocationDetailsReviews.newInstance(placedetails," Instance 1");
-                //   case 2: return ThirdFragment.newInstance("ThirdFragment, Instance 1");
+                case 2: return Time_Selection_Fragment.newInstance(placedetails,"ASd");
                 //       case 3: return ThirdFragment.newInstance("ThirdFragment, Instance 2");
                 //     case 4: return ThirdFragment.newInstance("ThirdFragment, Instance 3");
-                default: return Location_RecyclerView.newInstance("FirstFragmen","Ok yupe");
+                default: return LocationDetails.newInstance(placedetails,"Ok yupe");
 
 
             }
-
 
 
         }
@@ -659,28 +579,27 @@ return view;
         @Override
         public CharSequence getPageTitle(int position) {
             String title = null;
-            if (position == 0)
-            {
+            Log.d(TAG, "isthiscall....1");
+
+            if (position == 0) {
                 title = "Details";
-            }
-            else if (position == 1)
-            {
+            } else if (position == 1) {
                 title = "Reviews";
+            }else if (position == 2) {
+                title = "Time Slot";
             }
 
             return title;
         }
         @Override
         public int getCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public int getItemPosition(Object object){
 
-            Log.d(TAG, "DujjjjjjjRefresh....1");
 
-            Log.d(TAG, "DujjjjjjjRefresh....2");
 
             return POSITION_NONE;
         }

@@ -6,6 +6,7 @@
                                              android:layout_height="wrap_content"
                                              android:orientation="horizontal"
 
+android:background="@drawable/list_selector"
 
 
     >
@@ -17,9 +18,11 @@
         android:id="@+id/list_image"
         android:layout_width="100dip"
         android:layout_height="100dip"
-        android:scaleType="centerCrop"
+        android:scaleType="matrix"
 
-        android:src="@drawable/cast_album_art_placeholder"/>
+
+
+        />
 
     <TextView
         android:id="@+id/data_name"

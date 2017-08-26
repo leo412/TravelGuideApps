@@ -28,7 +28,7 @@ public class LocationDetailsPictureAdapter extends RecyclerView.Adapter<Location
     private RecyclerView.ViewHolder viewHolder2;
     private List mDataSource;
 
-    public LocationDetailsPictureAdapter(Context context, List mDataSource) {
+    public LocationDetailsPictureAdapter(List mDataSource) {
         this.context = context;
         this.mDataSource = mDataSource;
         Log.d("isthislistor... ", mDataSource.toString());
@@ -66,6 +66,7 @@ public class LocationDetailsPictureAdapter extends RecyclerView.Adapter<Location
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
         Log.d("whichrun", "Onbind");
+        Context context = viewHolder.itemView.getContext();
 
 
         viewHolder2 = viewHolder;
@@ -78,7 +79,8 @@ public class LocationDetailsPictureAdapter extends RecyclerView.Adapter<Location
 //      Picasso.with(context).load("https://maps.googleapis.com/maps/api/place/photo?photoreference="+mDataSource.get(0).toString().trim()
         //   Picasso.with(context).cancelRequest(viewHolder.imageView);
         Picasso.with(context).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + changeddata +
-                "&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").placeholder(R.drawable.loading_gif).into
+                "&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").error(R.drawable.noimage).placeholder(R.drawable
+                .loading_gif).into
                 (viewHolder.imageView);
 
         viewHolder.imageView.setTag(mTarget);

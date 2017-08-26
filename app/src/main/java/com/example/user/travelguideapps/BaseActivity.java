@@ -1,6 +1,7 @@
 package com.example.user.travelguideapps;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.location.Criteria;
@@ -45,44 +46,48 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-public class BaseActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener,LocationListener, NavigationView.OnNavigationItemSelectedListener
-        {
-            ArrayList place_idarray;
+public class BaseActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleApiClient.ConnectionCallbacks, GoogleApiClient
+        .OnConnectionFailedListener, LocationListener, NavigationView.OnNavigationItemSelectedListener {
+    ArrayList place_idarray;
 
-            private DrawerLayout drawer;
+    private DrawerLayout drawer;
     private Toolbar toolbar;
     private NavigationView navigationView;
     private ActionBarDrawerToggle drawerToggle;
     GoogleApiClient mGoogleApiClient;
     LocationRequest mLocationRequest = new LocationRequest();
-            private LocationManager locationManager;
-            private String provider;
-            private static Location CurrentLocation;
-        private    FrameLayout flContent;
-            private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
+    private LocationManager locationManager;
+    private String provider;
+    private static Location CurrentLocation;
+    private FrameLayout flContent;
+    private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("BaseActivity", "Baserunning");
-    
-        setContentView(R.layout.activity_base);
 
+
+
+
+        setContentView(R.layout.activity_base);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 
         Fragment fragment = null;
-        Class fragmentClass=null;
+        Class fragmentClass = null;
 
         fragmentClass = MainMenuActivityFragment.class;
 
         try {
-            if(fragmentClass!=null) {
+            if (fragmentClass != null) {
                 fragment = (Fragment) fragmentClass.newInstance();
                 Log.d("BaserActivity", "oppssss");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (fragmentClass!=null) {
+        if (fragmentClass != null) {
             // Insert the fragment by replacing any existing fragment
             FragmentManager fragmentManager = getSupportFragmentManager();
             fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
@@ -97,171 +102,169 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         LinearLayout nav = (LinearLayout) getLayoutInflater().inflate(R.layout.nav_header_base, null);
 //TODO: not really important but if can pls change name
-        String emailtext=  DataHolderClass.getInstance2().getDistributor_id2();
-        TextView email=(TextView) nav.findViewById(R.id.emailtextview);
-        Log.d("gahhh", "testung"+email);
-        Log.d("gahhh", "testungtext   "+emailtext);
+        String emailtext = DataHolderClass.getInstance2().getDistributor_id2();
+        TextView email = (TextView) nav.findViewById(R.id.emailtextview);
+        Log.d("gahhh", "testung" + email);
+        Log.d("gahhh", "testungtext   " + emailtext);
 
 
         email.setText(emailtext);
         email.invalidate();
-        Log.d("gahhh", "testungtext   "+email.getText());
+        Log.d("gahhh", "testungtext   " + email.getText());
 
     }
-            @Override
-            public void setContentView(int layoutResID) {
 
-                drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
+    @Override
+    public void setContentView(int layoutResID) {
 
-                //flComtent 2 is in content_base
-                 flContent = (FrameLayout) drawer.findViewById(R.id.flContent2);
+        drawer = (DrawerLayout) getLayoutInflater().inflate(R.layout.activity_base, null);
 
-                getLayoutInflater().inflate(layoutResID, flContent, true);
+        //flComtent 2 is in content_base
+        flContent = (FrameLayout) drawer.findViewById(R.id.flContent2);
 
-                super.setContentView(drawer);
+        getLayoutInflater().inflate(layoutResID, flContent, true);
 
-                 toolbar = (Toolbar) findViewById(R.id.toolbar);
-                setSupportActionBar(toolbar);
-                setTitle("Activity Title");
-                navigationView = (NavigationView) findViewById(R.id.nav_view);
-                if (navigationView != null) {
+        super.setContentView(drawer);
 
-                    Log.d("BaseActivity", "navigaterun");
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle("Activity Title");
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        if (navigationView != null) {
 
-                    setupDrawerContent(navigationView);
-                }
-                Log.d("BaserActivity", "diditrun");
+            Log.d("BaseActivity", "navigaterun");
 
-                final ActionBar actionBar = getSupportActionBar();
+            setupDrawerContent(navigationView);
+        }
+        Log.d("BaserActivity", "diditrun");
 
-                if (actionBar != null)
-                {
-                    actionBar.setDisplayHomeAsUpEnabled(true);
-                    drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer)
-                    {
+        final ActionBar actionBar = getSupportActionBar();
 
-                        public void onDrawerClosed(View view)
-                        {
-                            supportInvalidateOptionsMenu();
-                            //drawerOpened = false;
-                        }
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
-                        public void onDrawerOpened(View drawerView)
-                        {
-                            supportInvalidateOptionsMenu();
-                            //drawerOpened = true;
-                        }
-                    };
-                    drawerToggle.setDrawerIndicatorEnabled(true);
-                    drawer.setDrawerListener(drawerToggle);
-                    drawerToggle.syncState();
-
+                public void onDrawerClosed(View view) {
+                    supportInvalidateOptionsMenu();
+                    //drawerOpened = false;
                 }
 
+                public void onDrawerOpened(View drawerView) {
+                    supportInvalidateOptionsMenu();
+                    //drawerOpened = true;
+                }
+            };
+            drawerToggle.setDrawerIndicatorEnabled(true);
+            drawer.setDrawerListener(drawerToggle);
+            drawerToggle.syncState();
 
-            }
-            @Override
-            protected void onPostCreate(Bundle savedInstanceState)
-            {
-                super.onPostCreate(savedInstanceState);
-                drawerToggle.syncState();
-            }
+        }
 
-            @Override
-            public void onConfigurationChanged(Configuration newConfig)
-            {
-                super.onConfigurationChanged(newConfig);
-                drawerToggle.onConfigurationChanged(newConfig);
-            }
 
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
 
 
     private void setupDrawerContent(NavigationView navigationView) {
 
-    navigationView.setNavigationItemSelectedListener(
-            new NavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(MenuItem menuItem) {
-                    Log.d("BaseActivity","navigaterunsetnavi");
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        Log.d("BaseActivity", "navigaterunsetnavi");
 
-                    selectDrawerItem(menuItem);
-                    return true;
-                }
-            });
+                        selectDrawerItem(menuItem);
+                        return true;
+                    }
+                });
 
 
     }
 
-             @Override
-            public boolean onNavigationItemSelected(MenuItem menuItem) {
+    @Override
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
 
-                selectDrawerItem(menuItem);
-                return true;
-            }
-            public void selectDrawerItem(MenuItem menuItem) {
-                Log.d("BaserActivity", "isentercase1");
+        selectDrawerItem(menuItem);
+        return true;
+    }
 
-                // Create a new fragment and specify the fragment to show based on nav item clicked
-                Fragment fragment = null;
-                Class fragmentClass=null;
-                switch(menuItem.getItemId()) {
-                    case R.id.nav_main_menu:
-                        Log.d("BaserActivity", "isentercase");
+    public void selectDrawerItem(MenuItem menuItem) {
+        Log.d("BaserActivity", "isentercase1");
 
-                        fragmentClass = MainMenuActivityFragment.class;
-                        break;
-                    case R.id.nav_maps:
+        // Create a new fragment and specify the fragment to show based on nav item clicked
+        Fragment fragment = null;
+        Class fragmentClass = null;
+        switch (menuItem.getItemId()) {
+            case R.id.nav_main_menu:
+                Log.d("BaserActivity", "isentercase");
 
-                  //      BaseActivity.this.startActivity(new Intent(BaseActivity.this, MapsActivity.class));
-                  //      android.app.Fragment mFragment = getFragmentManager().findFragmentById(R.layout.activity_maps      );
-                  //      if (mFragment instanceof )
-                        fragmentClass = MapsActivity.class;
+                fragmentClass = MainMenuActivityFragment.class;
+                break;
+            case R.id.nav_maps:
+
+                //      BaseActivity.this.startActivity(new Intent(BaseActivity.this, MapsActivity.class));
+                //      android.app.Fragment mFragment = getFragmentManager().findFragmentById(R.layout.activity_maps      );
+                //      if (mFragment instanceof )
+                fragmentClass = MapsActivity.class;
 
 
-                       // fragmentClass = MainMenuActivityFragment.class;
-                        break;
-                    case R.id.nav_slideshow:
-                        fragmentClass = MainMenuActivityFragment.class;
-                        break;
-                    default:
-                        fragmentClass = MainMenuActivityFragment.class;
-                }
-
-                try {
-                    if(fragmentClass!=null) {
-                        fragment = (Fragment) fragmentClass.newInstance();
-                        Log.d("BaserActivity", "oppssss");
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-if (fragmentClass!=null) {
-    // Insert the fragment by replacing any existing fragment
-        //...Its after calling that it will overlap, wtf?
-    //TODO: this probably is not really good since it required Views to be restart everytime...?
-//Usinf remove all views just destroy  ability to go back
-   // flContent.removeAllViews();
-    FragmentManager fragmentManager = getSupportFragmentManager();
-    fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
-}
-                // Highlight the selected item has been done by NavigationView
-                menuItem.setChecked(true);
-                // Set action bar title
-                setTitle(menuItem.getTitle());
-                // Close the navigation drawer
-                drawer.closeDrawers();
-            }
-            //TODO: uhhhh i dont think these things are being used....
-        public void setPlace_id(ArrayList a){
-            Log.d("BASE", "uhhhhhhhfirstsetplace"+a+"andalso"+place_idarray);
-
-    place_idarray=a;
+                // fragmentClass = MainMenuActivityFragment.class;
+                break;
+            case R.id.nav_slideshow:
+                fragmentClass = MainMenuActivityFragment.class;
+                break;
+            default:
+                fragmentClass = MainMenuActivityFragment.class;
         }
-            public ArrayList getPlace_id(){
-                Log.d("BASE", "uhhhhhhhfirstgetplace"+place_idarray);
 
-            return place_idarray;
+        try {
+            if (fragmentClass != null) {
+                fragment = (Fragment) fragmentClass.newInstance();
+                Log.d("BaserActivity", "oppssss");
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (fragmentClass != null) {
+            // Insert the fragment by replacing any existing fragment
+            //...Its after calling that it will overlap, wtf?
+            //TODO: this probably is not really good since it required Views to be restart everytime...?
+//Usinf remove all views just destroy  ability to go back
+            // flContent.removeAllViews();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
+        }
+        // Highlight the selected item has been done by NavigationView
+        menuItem.setChecked(true);
+        // Set action bar title
+        setTitle(menuItem.getTitle());
+        // Close the navigation drawer
+        drawer.closeDrawers();
+    }
+
+    //TODO: uhhhh i dont think these things are being used....
+    public void setPlace_id(ArrayList a) {
+        Log.d("BASE", "uhhhhhhhfirstsetplace" + a + "andalso" + place_idarray);
+
+        place_idarray = a;
+    }
+
+    public ArrayList getPlace_id() {
+        Log.d("BASE", "uhhhhhhhfirstgetplace" + place_idarray);
+
+        return place_idarray;
+    }
 
 //
 //    @Override
@@ -281,15 +284,6 @@ if (fragmentClass!=null) {
 //    }
 
 
-
-
-
-
-
-
-
-
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -299,15 +293,16 @@ if (fragmentClass!=null) {
             super.onBackPressed();
         }
     }
-            public static DatabaseReference mDatabase= FirebaseDatabase.getInstance().getReference();
+
+    public static DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
 
 
+    public void writeNewUser(String userId, String name, ArrayList Waypoint) {
+        FirebaseDatabaseUser user = new FirebaseDatabaseUser(name, Waypoint);
 
-            public void writeNewUser(String userId, String name, ArrayList Waypoint) {
-                FirebaseDatabaseUser user = new FirebaseDatabaseUser(name, Waypoint);
+        mDatabase.child("users").child(userId).setValue(user);
+    }
 
-                mDatabase.child("users").child(userId).setValue(user);
-            }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -331,106 +326,107 @@ if (fragmentClass!=null) {
     }
 
 
-
-            @Override
-            public void onConnected(@Nullable Bundle bundle) {
-                Log.d("BaseActivity", "diditevenonconnected");
-                mLocationRequest = LocationRequest.create();
-                mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-                mLocationRequest.setInterval(5000);
-                mLocationRequest.setNumUpdates(1);
-                mLocationRequest.setFastestInterval(1000);
-
-
-                // Get the location manager
-                locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-                //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-
-                // Define the criteria how to select the locatioin provider -> use
-                // default
-                Criteria criteria = new Criteria();
-                provider = locationManager.getBestProvider(criteria, false);
-                if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
-                        PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
-                }
-                try {
-                    //   CurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-                    LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
-                    Log.d("BaseActivity", "Yerp. updating... ");
-
-                }catch (Exception e){
-
-                    Log.d("BaseActivity", "requestLocationUpdateError"+e);
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Log.d("BaseActivity", "diditevenonconnected");
+        mLocationRequest = LocationRequest.create();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(5000);
+        mLocationRequest.setNumUpdates(1);
+        mLocationRequest.setFastestInterval(1000);
 
 
-                }
+        // Get the location manager
+        locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+        //LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
 
+        // Define the criteria how to select the locatioin provider -> use
+        // default
+        Criteria criteria = new Criteria();
+        provider = locationManager.getBestProvider(criteria, false);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) !=
+                PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-
-                    CurrentLocation=fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
-              //   Location location = locationManager.getLastKnownLocation(provider);
-            }
-
-            @Override
-            public void onConnectionSuspended(int i) {
-                Log.d("BaseActivity", "diditevensuspend");
-
-            }
-
-            @Override
-            public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-                Log.d("BaseActivity", "failsssss"+connectionResult);
-
-            }
-
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.d("BaseActivity", "OnLocationChanged");
-
-                CurrentLocation=location;
-
-            }
-public static Location getCurrentLocation(){
-
-    return CurrentLocation;
-}
-            @Override
-            public void onMapReady(GoogleMap googleMap) {
-
-            }
-
-            public Action getIndexApiAction() {
-                Thing object = new Thing.Builder()
-                        .setName("Maps Page") // TODO: Define a title for the content shown.
-                        // TODO: Make sure this auto-generated URL is correct.
-                        .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                        .build();
-                return new Action.Builder(Action.TYPE_VIEW)
-                        .setObject(object)
-                        .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                        .build();
-            }
-            public void onStart() {
-
-                mGoogleApiClient.connect();
-                Log.d("BaseActivity", "diditevenstart");
-
-                super.onStart();
-
-
-                // ATTENTION: This was auto-generated to implement the App Indexing API.
-                // See https://g.co/AppIndexing/AndroidStudio for more information.
-          //      AppIndex.AppIndexApi.start(mGoogleApiClient, getIndexApiAction());
-            }
-
-            public void onStop() {
-                mGoogleApiClient.disconnect();
-
-                super.onStop();
-                // ATTENTION: This was auto-generated to implement the App Indexing API.
-                // See https://g.co/AppIndexing/AndroidStudio for more information.
-            //    AppIndex.AppIndexApi.end(mGoogleApiClient, getIndexApiAction());
-            }
         }
+        try {
+            //   CurrentLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+            Log.d("BaseActivity", "Yerp. updating... ");
+
+        } catch (Exception e) {
+
+            Log.d("BaseActivity", "requestLocationUpdateError" + e);
+
+
+        }
+
+
+        CurrentLocation = fusedLocationProviderApi.getLastLocation(mGoogleApiClient);
+        //   Location location = locationManager.getLastKnownLocation(provider);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.d("BaseActivity", "diditevensuspend");
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+        Log.d("BaseActivity", "failsssss" + connectionResult);
+
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.d("BaseActivity", "OnLocationChanged");
+
+        CurrentLocation = location;
+
+    }
+
+    public static Location getCurrentLocation() {
+
+        return CurrentLocation;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+    }
+
+    public Action getIndexApiAction() {
+        Thing object = new Thing.Builder()
+                .setName("Maps Page") // TODO: Define a title for the content shown.
+                // TODO: Make sure this auto-generated URL is correct.
+                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .build();
+        return new Action.Builder(Action.TYPE_VIEW)
+                .setObject(object)
+                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
+                .build();
+    }
+
+    public void onStart() {
+
+        mGoogleApiClient.connect();
+        Log.d("BaseActivity", "diditevenstart");
+
+        super.onStart();
+
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        //      AppIndex.AppIndexApi.start(mGoogleApiClient, getIndexApiAction());
+    }
+
+    public void onStop() {
+        mGoogleApiClient.disconnect();
+
+        super.onStop();
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        //    AppIndex.AppIndexApi.end(mGoogleApiClient, getIndexApiAction());
+    }
+}

@@ -13,7 +13,7 @@
 
     <Button
         android:id="@+id/removeLocation"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/cast_intro_overlay_button_background_color"
         android:text="Remove this location"
@@ -29,8 +29,7 @@
         android:id="@+id/addLocation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
-        android:background="@color/cast_intro_overlay_button_background_color"
+        android:background="#33B5E5"
         android:text="Add this location"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -47,8 +46,7 @@
         android:background="@android:color/holo_orange_light"
         android:fontFamily="casual"
         android:text="Place Name"
-
-
+android:paddingLeft="8dp"
         android:textColor="#FFFFFF"
         android:textSize="20sp"
         android:visibility="visible"
@@ -72,7 +70,7 @@
             android:id="@+id/recycleviewphoto"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_cast_white"
+            android:background="@drawable/gradient_bg_hover"
             android:orientation="horizontal">
 
 
@@ -80,32 +78,27 @@
 
 
     </HorizontalScrollView>
-    <android.support.design.widget.TabLayout
-        android:id="@+id/tabs"
-        style="@style/amu_Bubble.TextAppearance.Light"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        app:tabGravity="fill"
-        app:tabMode="fixed"
-        tools:layout_editor_absoluteY="0dp"
-        tools:layout_editor_absoluteX="8dp"/>
 
+    <android.support.design.widget.TabLayout
+        android:id="@+id/pager_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/textViewPlaceName"
+        app:tabGravity="fill"
+android:background="#2b81c6"
+
+        app:tabSelectedTextColor="#FFFFFF"
+        app:tabIndicatorHeight="5dp"
+        app:tabIndicatorColor="#FFFFFF"
+        />
     <android.support.v4.view.ViewPager
         android:id="@+id/vpDetailsReviews"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        app:layout_constraintTop_toBottomOf="@+id/textViewPlaceName"
+        app:layout_constraintTop_toBottomOf="@+id/pager_header"
         app:layout_constraintLeft_toRightOf="parent">
 
-        <android.support.v4.view.PagerTabStrip
-            android:id="@+id/pager_header"
-
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="top"
-            android:paddingBottom="4dp"
-            android:paddingTop="4dp" />
 
     </android.support.v4.view.ViewPager>
 </android.support.constraint.ConstraintLayout>

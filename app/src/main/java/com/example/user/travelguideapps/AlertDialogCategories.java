@@ -25,13 +25,13 @@ public class AlertDialogCategories extends DialogFragment{
     // positive button
     .setPositiveButton("OK", new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
-            Toast.makeText(getActivity(), "Pressed OK", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Pressed OK", Toast.LENGTH_SHORT).show();
         }
     })
             // negative button
             .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
         public void onClick(DialogInterface dialog, int which) {
-            Toast.makeText(getActivity(), "Cancel", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), "Cancel", Toast.LENGTH_SHORT).show();
         }
     }).create();
 }

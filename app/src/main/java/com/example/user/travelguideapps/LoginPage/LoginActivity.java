@@ -48,6 +48,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.squareup.leakcanary.LeakCanary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,10 +92,23 @@ private static String userId;
 
         return userId;
     }
-
+    protected void setupLeakCanary() {
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        //  enabledStrictMode();
+        LeakCanary.install(this.getApplication());
+    }
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+setupLeakCanary();
+        // Normal app init code...
+
         pd = new ProgressDialog(this);
         pd.setMessage("Logging in... ...");
         pd.setCancelable(false);
@@ -177,6 +191,8 @@ private static String userId;
                                         public void onClick(DialogInterface dialog, int which) {
                                             switch (which) {
                                                 case DialogInterface.BUTTON_POSITIVE:
+                                                    Log.d(TAG, "inside 4");
+
                                                     //user enables permisssion do your task..
                                                     break;
 

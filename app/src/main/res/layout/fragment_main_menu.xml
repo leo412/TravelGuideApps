@@ -6,60 +6,61 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:weightSum="10"
-    android:background="@drawable/mainmenu"
 
     tools:context="com.example.user.travelguideapps.MainMenu.MainMenuActivityFragment"
-    tools:layout_editor_absoluteY="25dp"
-    tools:layout_editor_absoluteX="0dp">
+    tools:layout_editor_absoluteX="0dp"
+    tools:layout_editor_absoluteY="25dp">
+    <!---background TODO:     android:background="@drawable/mainmenu"^^^^-->
 
     <Button
         android:id="@+id/main_Menu_Search_Button"
-        android:textSize="50dp"
         android:layout_width="368dp"
         android:layout_height="178dp"
-        app:layout_constraintHorizontal_weight="1"
+
         android:background="#BF54c9f7"
+        android:drawablePadding="-100dp"
         android:fontFamily="sans-serif"
         android:text="Search"
-        android:drawablePadding="-100dp"
-
+        android:textSize="50dp"
         app:layout_constraintBottom_toTopOf="@+id/main_Menu_Edit_Button"
-        app:layout_constraintTop_toTopOf="parent"
+
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent">
+        app:layout_constraintTop_toTopOf="parent">
 
 
-        </Button>
+    </Button>
 
 
     <Button
-        app:layout_constraintHorizontal_weight="1"
-        android:textSize="50dp"
-
         android:id="@+id/main_Menu_Edit_Button"
         android:layout_width="368dp"
+
         android:layout_height="178dp"
         android:background="#BFff2b91"
         android:text="Edit"
-        app:srcCompat="@android:drawable/ic_search_category_default"
+        android:textSize="50dp"
         app:layout_constraintBottom_toTopOf="@+id/main_Menu_Setting_Button"
-        app:layout_constraintTop_toBottomOf="@+id/main_Menu_Search_Button"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"/>
-    <Button
         app:layout_constraintHorizontal_weight="1"
-android:textSize="50dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_Menu_Search_Button"
+        app:srcCompat="@android:drawable/ic_search_category_default"/>
+
+    <Button
         android:id="@+id/main_Menu_Setting_Button"
         android:layout_width="368dp"
         android:layout_height="179dp"
         android:background="#BFe2e17a"
         android:text="Setting"
-        app:srcCompat="@android:drawable/ic_search_category_default"
+        android:textSize="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/main_Menu_Edit_Button"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"/>
-
+        app:layout_constraintTop_toBottomOf="@+id/main_Menu_Edit_Button"
+        app:srcCompat="@android:drawable/ic_search_category_default"/>
 
 
 </android.support.constraint.ConstraintLayout>
