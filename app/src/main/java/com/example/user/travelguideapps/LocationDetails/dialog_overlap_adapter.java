@@ -15,7 +15,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.user.travelguideapps.DataHolderClass;
-import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.CircleTransform;
 import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.SavedDataListFragment.OnListFragmentInteractionListener;
 import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.dummy.DummyContent.DummyItem;
 import com.example.user.travelguideapps.R;
@@ -143,8 +142,13 @@ public class dialog_overlap_adapter extends RecyclerView.Adapter<dialog_overlap_
         List<String> myList = new ArrayList<String>(Arrays.asList(singlephotoreference.split(",")));
         String list = myList.get(0).replace("[", "").replace("]", "");
         //TODO:WELL lets ignore the image unless necessary....? (Image out of memory error
+//        Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
+//                + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().transform(new CircleTransform())
+//                .error(R.drawable.noimage)
+//                .placeholder(R.drawable.loading_gif).into
+//                (holder.image);
         Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
-                + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().transform(new CircleTransform())
+                + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit()
                 .error(R.drawable.noimage)
                 .placeholder(R.drawable.loading_gif).into
                 (holder.image);

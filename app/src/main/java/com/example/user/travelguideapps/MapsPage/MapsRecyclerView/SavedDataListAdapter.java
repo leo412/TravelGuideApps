@@ -31,7 +31,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
@@ -69,15 +68,16 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Context mContext = holder.itemView.getContext();
+        MapsActivity.pd.dismiss();
 
         holder.mItem = mValues.get(position).toString();
         holder.mIdView.setText(mValues.get(position).get(0).toString());
         String date;
         String time;
-      //  System.out.println("onBindViewsaveddatalistadapter" + mValues.get(position).get(1));
+        //  System.out.println("onBindViewsaveddatalistadapter" + mValues.get(position).get(1));
 
-        if (Long.parseLong(mValues.get(position).get(1).toString())!=0 && Long.parseLong(mValues.get(position).get(1)
-                .toString())!=0) {
+        if (Long.parseLong(mValues.get(position).get(1).toString()) != 0 && Long.parseLong(mValues.get(position).get(1)
+                .toString()) != 0) {
 
             date = new java.text.SimpleDateFormat("MM/dd/yyyy").format(new java.util.Date(Long.parseLong(mValues.get(position).get(1)
                     .toString()) * 1000)) + "->" + new java.text.SimpleDateFormat("MM/dd/yyyy").format(new java.util.Date(Long.parseLong(mValues.get
@@ -90,8 +90,8 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
 
 
         if (Long.parseLong(mValues.get(position).get(2)
-                .toString())!=0 && Long.parseLong(mValues.get(position).get(2)
-                .toString())!=0) {
+                .toString()) != 0 && Long.parseLong(mValues.get(position).get(2)
+                .toString()) != 0) {
             time = new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date(Long.parseLong(mValues.get(position).get(1)
                     .toString()) * 1000)) + "->" + new java.text.SimpleDateFormat("HH:mm").format(new java.util.Date(Long.parseLong(mValues.get
                     (position).get(2)
@@ -218,54 +218,66 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        //   Toast.makeText(mContext, "datasa  "+dataSnapshot, Toast.LENGTH_SHORT).show();
-                        // System.out.println("THIS IS ITdata" + dataSnapshot.getValue());
-
+                        System.out.println("THIS IS IT" + dataSnapshot.getValue());
+                   //     Toast.makeText(mContext, "Location Loaded ",  Toast.LENGTH_SHORT).show();
+                        MapsActivity.pd.show();
                         ArrayList<HashMap> post = new ArrayList<HashMap>();
-                        for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
-                          HashMap Hash = new HashMap<>();
-                            Hash.putAll ((HashMap)childSnapshot.getValue());
-                            post.add(Hash);
+                        ArrayList<HashMap> nostarttime = new ArrayList<HashMap>();
+
+                        for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+                            HashMap Hash = new HashMap<>();
+                            Hash.putAll((HashMap) childSnapshot.getValue());
+
+                            if (Long.parseLong(Hash.get("starttime").toString()) != 0) {
+
+                                post.add(Hash);
+                            } else {
+                                nostarttime.add(Hash);
+
+                            }
                         }
+
+                        if (!nostarttime.isEmpty()) {
+
+                            post.addAll(nostarttime);
+
+
+                        }
+
+
                         if (!dataSnapshot.getValue().equals("Empty")) {
                             System.out.println("THIS IS IT" + dataSnapshot.getValue());
 
-                         //   ArrayList<HashMap> post = (ArrayList<HashMap>) dataSnapshot.getValue();
+                            //   ArrayList<HashMap> post = (ArrayList<HashMap>) dataSnapshot.getValue();
                             ArrayList array = new ArrayList();
                             array.add(post.get(0));
                             System.out.println("THIS IS IT" + post);
-
-                            LinkedHashMap map = new LinkedHashMap();
 
 
                             System.out.println("THIS IS IT array" + array);
 
 
-
                             //Why should i have made this get 0...
                             MapsActivity.setWaypointwithDateList(post);
                             //Cannot directly update, findways to reset details,,,,
-                            //  Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), MapsActivity
-                            //        .getWayPointDetailsList());
 
-                            //     Locationadapter.notifyDataSetChanged();
                             System.out.println("waypointdetailsList: " + MapsActivity
                                     .getWayPointDetailsList());
                             System.out.println("waypointdetailsList222: " + MapsActivity
                                     .getWaypointwithDateList());
+                            System.out.println("waypointdetailsList222: " + MapsActivity
+                                    .getWayPointDetailsList());
                             //TODO changed from normal to support,( nope still might have error
                             //TODO:Must solved this too random
-                            Toast.makeText(mContext, "Location Loaded ",
-                                    Toast.LENGTH_SHORT).show();
+
 
                             if (fragmentManager.getBackStackEntryCount() > 0) {
-                                //Toast.makeText(mContext, "POPBACK!  ", Toast.LENGTH_SHORT).show();
 
                                 fragmentManager.popBackStackImmediate();
                             }
 
                         } else {
-
+MapsActivity.pd.dismiss();
                             Toast.makeText(mContext, "This file is empty, please choose another one!", Toast.LENGTH_SHORT).show();
 
                         }
@@ -281,8 +293,6 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                 });
 
                 //      ref.removeEventListener(listener);
-                MapsActivity.pd.dismiss();
-
 
             }
         });
@@ -329,6 +339,7 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
         if (prev != null) {
             ft.remove(prev);
         }
+
         // save transaction to the back stack
         ft.addToBackStack("dialog");
         newFragment.show(ft, "dialog");
@@ -379,4 +390,7 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
+
+
+
 }

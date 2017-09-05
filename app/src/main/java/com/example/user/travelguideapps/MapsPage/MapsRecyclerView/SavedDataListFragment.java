@@ -303,6 +303,7 @@ public class SavedDataListFragment extends Fragment {
             }
         });
 
+        System.out.println("Before getting saveddata");
 
         return view;
     }

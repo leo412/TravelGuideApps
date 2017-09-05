@@ -57,16 +57,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 
 
     }
-    //1
 
-
-    //2
-    //  @Override
-    //public Object getItem(int position) {
-    //     return mDataSource.get(position);
-    // }
-
-    //3
     @Override
     public long getItemId(int position) {
         return position;
@@ -87,13 +78,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
             Log.d("A", "stopthiscluster" + clickedView.isSelected());
 
         }
-//        if(holder2!=null) {
-//            Log.d("A", "Isthistunnable");
-//
-//            holder2.itemView.setSelected(true);
-//            Log.d("A", "Isthistunnable"+holder2);
-//        }
-        //  return position;
+
     }
 
     public static List<LinkedHashMap<String, Object>> getItem() {
@@ -147,14 +132,19 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         Log.d("A", "nopeway" + waypoint);
 
         for (int i = 0; i < waypoint.size(); i++) {
-           // Log.d("A", "nopeway" + waypoint.get(i).get(0));
+            // Log.d("A", "nopeway" + waypoint.get(i).get(0));
             Log.d("A", "nopeway" + mDataSource.get(position).get("place_name"));
 
 
             if (waypoint.get(i).get("place_id").equals(mDataSource.get(position).get("place_id"))) {
-                Log.d("A", "forsomereasonsvisibling?" + waypoint);
+                Log.d("A", "setas visible?" + waypoint);
 
                 holder.selectedimage.setVisibility(View.VISIBLE);
+                break;
+            } else {
+                Log.d("A", "setas gone?" + waypoint);
+
+                holder.selectedimage.setVisibility(View.GONE);
 
             }
 
@@ -187,15 +177,24 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         final ImageButton b = (ImageButton) holder.itemView.findViewById(R.id.details_btn);
         final ImageButton directionsbutton = (ImageButton) holder.itemView.findViewById(R.id.directions_btn);
         final ImageButton googlemapsbutton = (ImageButton) holder.itemView.findViewById(R.id.google_details_btn);
-        final ImageButton timebutton = (ImageButton) holder.itemView.findViewById(R.id.time_btn);
+        //  final ImageButton timebutton = (ImageButton) holder.itemView.findViewById(R.id.time_btn);
         try {
-            //Changed to noplaceholder..... TODO: PLS REMOVE PLACEHOLDER WORST CASE SCENARIO (WORST ANNOYING THINGS EVER
+            //TODO Can take away circle transformation for memory iussue
+            //Changed to noplaceholder..... TODO: PLS REMOVE PLACEHOLDER WORST CASE SCENARIO (WORST ANNOYING THINGS EVER (also circle transform
+//            Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
+//                    + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().transform(new CircleTransform())
+//                    .error(R.drawable.noimage)
+//                    .placeholder(R.drawable.loading_gif).into
+//                    (holder.image);
+//
+
             Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
-                    + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().transform(new CircleTransform())
+                    + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit()
                     .error(R.drawable.noimage)
                     .placeholder(R.drawable.loading_gif).into
                     (holder.image);
-//
+
+
             Picasso.with(mContext).load(R.drawable.googlemapsicon).fit().into
                     (googlemapsbutton);
 
@@ -203,8 +202,8 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
                     (b);
             Picasso.with(mContext).load(R.drawable.directionsicon).fit().into
                     (directionsbutton);
-            Picasso.with(mContext).load(R.drawable.timeicon).fit().into
-                    (timebutton);
+//            Picasso.with(mContext).load(R.drawable.timeicon).fit().into
+//                    (timebutton);
         } catch (Exception e) {
 
             Toast.makeText(mContext, "An exception has occured (Picasso)" + e, Toast.LENGTH_SHORT).show();
@@ -291,6 +290,8 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
             public void onClick(View v) {
 //TODO: Move data to there
                 View parentRow = (View) v.getParent();
+                //tODO:CHECK
+                MapsActivity.pd.show();
 
 
                 TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
@@ -321,44 +322,45 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 
             }
         });
-        timebutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//TODO: Move data to there
-                View parentRow = (View) v.getParent();
-
-
-                TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
-                String place_id_text = place_id.getText().toString();
-
-                Fragment fragment = null;
-                Class fragmentClass = null;
-                fragmentClass = LocationDetailsActivity.class;
-                try {
-                    // DataHolderClass.getInstance().setDistributor_id(place_id_text);
-                    DataHolderClass.getInstance2().setDistributor_id2("Time");
-
-
-                    DataHolderClass.getInstancearray().setDistributor_idarray(place_id_text);
-
-                    fragment = (Fragment) fragmentClass.newInstance();
-
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-
-                FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.flContent2, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
-
-
-            }
-        });
-
+//        timebutton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////TODO: Move data to there
+//                View parentRow = (View) v.getParent();
+//                MapsActivity.pd.show();
+//
+//
+//                TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
+//                String place_id_text = place_id.getText().toString();
+//
+//                Fragment fragment = null;
+//                Class fragmentClass = null;
+//                fragmentClass = LocationDetailsActivity.class;
+//                try {
+//                    // DataHolderClass.getInstance().setDistributor_id(place_id_text);
+//                    DataHolderClass.getInstance2().setDistributor_id2("Time");
+//
+//
+//                    DataHolderClass.getInstancearray().setDistributor_idarray(place_id_text);
+//
+//                    fragment = (Fragment) fragmentClass.newInstance();
+//
+//                } catch (InstantiationException e) {
+//                    e.printStackTrace();
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                }
+//
+//                FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
+//                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.flContent2, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
+//
+//
+//            }
+//        });
+MapsActivity.pd.dismiss();
     }
 
 
@@ -407,4 +409,6 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 
         }
     }
+
+
 }

@@ -17,8 +17,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.SelectedLocationListRecyclerViewAdapter;
-
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +30,6 @@ public class DialogCategoriesFragment extends DialogFragment  {
     private LayoutInflater mInflater;
     private  ArrayList mDataSource;
     private static List<LinkedHashMap<String,String>> mDataSourceforSend;
-    private SelectedLocationListRecyclerViewAdapter Locationadapter;
 
     private int Position;
     private static RecyclerView.ViewHolder holder2;

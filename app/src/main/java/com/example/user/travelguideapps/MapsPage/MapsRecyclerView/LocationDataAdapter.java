@@ -28,6 +28,7 @@ import java.util.List;
 /**
  * Created by User on 6/2/2017.
  */
+//TODO: NOT used anymore??!??
 public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapter.MyViewHolder> {
     private Context mContext;
     private LayoutInflater mInflater;

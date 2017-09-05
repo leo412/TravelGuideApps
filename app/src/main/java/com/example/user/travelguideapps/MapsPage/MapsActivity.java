@@ -34,7 +34,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.GestureDetector;
@@ -95,12 +94,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
 
 import static com.example.user.travelguideapps.R.id.map;
 
@@ -154,8 +155,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
     private static TextView mDurationView;
     private static TextView mDistanceView;
-    private LocationListRecyclerViewAdapter Locationadapter;
+    private static LocationListRecyclerViewAdapter Locationadapter;
     // private static ArrayList WaypointwithDateList = new ArrayList();
+    private static SelectedLocationListRecyclerViewAdapter selectedLocationadapter;
 
     private static ArrayList<HashMap> WaypointwithDateList = new ArrayList<HashMap>();
 
@@ -189,12 +191,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         //Get waypoints from others
+        getActivity().setTitle("Map");
 
         String b = DataHolderClass.getInstance().getDistributor_id();
         mInstance = getActivity();
         mGetResources = getResources();
         context = getActivity();
 
+        //Check if Map is already created
         if (view != null) {
             ViewGroup parent = (ViewGroup) view.getParent();
             if (parent != null)
@@ -208,10 +212,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     /* map is already there, just return view as it is */
 
         }
-
-
-        fragmentpoilist = (ConstraintLayout) inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
-        boolean isFirstTime = true;
 
 
         //For swipping on the "Selection"
@@ -287,46 +287,19 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                 return false;
             }
         });
-//Run the aboce code
-//        expandableLayout.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//
-//
-//                return gestureDetector.onTouchEvent(event);
-//
-//            }
-//        });
 
-//Show layout,
-        if (isFirstTime) {
-            Log.d(TAG, "isfirsttime");
+//at first is zero
 
-//            expandableLayout.expand();
-
-
-        }
-
-
+        //Repeat the datelist until it gets all details (have no distancetonext
         for (int i = 0; i < WaypointwithDateList.size(); i++) {
             Log.d(TAG, "Numberwaypoint" + WaypointwithDateList + "ASDASD" + i);
             Log.d(TAG, "Numberwaypointdafaq" + WaypointwithDateList.size());
 
             selectedsizeint = i + 1;
             waypointdatelistint = i;
-            if (WayPointDetailsList != null) {
-                Log.d(TAG, "Numberwaypoint" + WayPointDetailsList.size());
-            }
-
-//Waypint -5, waypont  detals =0
-
-//wait for datelist to get details,.,,,
-            String returnedwaypointdetails = "";
 //TODO: using clear everything and bedone with it way....
-            //Currently solved... any other ways?
-//Dataparser-> changejsonobject from downloadurl to readable linked hashmap
-            //Download url  Change url to data
-            //   DataParser dataParser = new DataParser();
+
+//Everytime we enter the mainpage::::
             try {
                 downloadUrl download = new downloadUrl(getContext());
                 //need to have ifelse..?
@@ -339,10 +312,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                         "&key" +
                         "=AIzaSyC4IFgnQ2J8xpbC2DmR6fIvrS5JIQV5vkA");
                 Log.d("Checkruntimes", "Runningdownloadurl  2");
-//asdfghjk
 
             } catch (Exception e) {
                 Log.d(TAG, "Server is busy, Please try agai" + e.toString());
+
 
                 Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "Server is busy, Please try again!", Toast
                         .LENGTH_SHORT).show();
@@ -356,16 +329,13 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         //}
         //REFRESHPAGE
 
-
-        //Use these waypoints to change all marker.
-
-        if (mapMarkersForSelected != null) {
-
-            //Is empty first time runt
-            Log.d("onPostExecute", "BeforeFirsttimechecked" + mapMarkersForSelected);
-
-
+        setDistanceURL(getContext());
+        //TODO: first time the distance will not appear
+        if (pager != null || fragmentPagerAdapter != null) {
+            //    pager.invalidate();
+            //     fragmentPagerAdapter.notifyDataSetChanged();
         }
+
         try {
             int j = mapMarkersForSelected.size();
             for (int i = 0; i < j; i++) {
@@ -385,12 +355,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
 
         }
-        if (mapMarkersForSelected != null) {
 
-
-            Log.d("onPostExecute", "Firsttimechecked" + mapMarkersForSelected);
-
-        }
         List<LinkedHashMap<String, Object>> o = SelectedLocationListRecyclerViewAdapter.getItem();
 
 
@@ -417,22 +382,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                 Log.d("onPostExecute", "Tried to remove markeoptions" + wayPointmarkerOptions);
 
                 mapMarkersForSelected.add(mMap.addMarker(wayPointmarkerOptions));
-
+//
             }
         }
-        if (mapMarkersForSelected != null) {
-
-
-            Log.d("onPostExecute", "secondtimechecked" + mapMarkersForSelected);
-
-        }
-
         if (!WaypointwithDateList.isEmpty()) {
             //This draws path when returning to page
             LatLng latlng = new LatLng(CurrentLocation.getLatitude(), CurrentLocation.getLongitude());
             String url = getDirectionsUrl(latlng, null);
-//ignore downloadtask changed to
-            //    DownloadTask downloadTask = new DownloadTask();
+
             Log.d(TAG, "THE URL is IS 1st" + url);
 
             // Start downloading json data from Google Directions API
@@ -455,56 +412,22 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         fragmentPagerAdapter = new MyPagerAdapter(getChildFragmentManager());
 
 
-        pd.setMessage("Loading Path...");
+        pd.setMessage("Loading...");
         pd.setCancelable(false);
-        //Number picker design needs to be changed
-        //  numberpicker = (DiscreteSeekBar) view.findViewById(R.id.radiusPicker);
 
-
-        //TODO:Not sure fixed or not
-        //    LinearLayout linearLayout = (LinearLayout)  view.findViewById(R.id.linearLayout);
-        //    final ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) linearLayout.getLayoutParams();
-
-
-        //   setContentView(R.layout.activity_maps);
         markerPoints = new ArrayList<LatLng>();
 
-
-        //    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         mHandler = new Handler();
-
-        //     AutoCompleteTextView from = (AutoCompleteTextView) view.findViewById(R.id.from);
-        //    AutoCompleteTextView to = (AutoCompleteTextView) view.findViewById(R.id.to);
-
-        // AutoCompleteTextView from = (AutoCompleteTextView) v.findViewById(R.id.from);
-        //   AutoCompleteTextView to = (AutoCompleteTextView) v.findViewById(R.id.to);
-        Button but = (Button) view.findViewById(R.id.load_directions);
 
         mDurationView = (TextView) view.findViewById(R.id.duration_label);
         mDistanceView = (TextView) view.findViewById(R.id.distance_label);
-        Button SelectTypes = (Button) view.findViewById(R.id.selecttypes);
 
-        Button opencategories = (Button) view.findViewById(R.id.OpenCategoriesView);
-//        Button openFoodLayout = (Button) view.findViewById(R.id.FoodButton);
-//        Button openEntertainmentLayout = (Button) view.findViewById(R.id.EntertainmentButton);
-//        Button openShopLayout = (Button) view.findViewById(R.id.ShopButton);
-        Button categories_expandable_layout = (Button) view.findViewById(R.id.opensetting);
-        ConstraintLayout Selectedview = (ConstraintLayout) inflater.inflate(R.layout.fragment_location__recycler_view2, container, false);
+
+        ConstraintLayout Selectedview = (ConstraintLayout) inflater.inflate(R.layout.fragment_location__recycler_view_selected, container, false);
 //
-        //     Button savefirebase = (Button) Selectedview.findViewById(R.id.save);
         Button loadfirebase = (Button) Selectedview.findViewById(R.id.load);
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
-//        savefirebase.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "Location Saved!  ", Toast.LENGTH_SHORT).show();
-//
-//
-//                BaseActivity.mDatabase.child("users").child(LoginActivity.getUserID()).setValue(WaypointwithDateList);
-//
-//            }
-//        });
 
         loadfirebase.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -531,247 +454,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                 });
             }
         });
-        // opencategories.setOnClickListener(onClickListener);
-//        openFoodLayout.setOnClickListener(onClickListener);
-//        openEntertainmentLayout.setOnClickListener(onClickListener);
-//        openShopLayout.setOnClickListener(onClickListener);
-        //     categories_expandable_layout.setOnClickListener(onClickListener);
-        //  ex.setOnClickListener(onClickListener);
-
-        //  expandablecategories = (ExpandableLayout) view.findViewById(R.id.categories_expandable_layout);
-//
-//        FoodLayout = (ExpandableLayout) view.findViewById(R.id.FoodExpandable);
-//
-//        EntertainmentLayout = (ExpandableLayout) view.findViewById(R.id.EntertainmentExpandable);
-//
-//        ShopLayout = (ExpandableLayout) view.findViewById(R.id.ShopExpandable);
-
-//
-//        final CheckBox barCheckBox = (CheckBox) view.findViewById(R.id.barCheckBox);
-//        final CheckBox restaurantCheckBox = (CheckBox) view.findViewById(R.id.restaurantCheckBox);
-//        final CheckBox amusement_parkCheckBox = (CheckBox) view.findViewById(R.id.amusement_parkCheckBox);
-//
-//        final CheckBox libraryCheckBox = (CheckBox) view.findViewById(R.id.libraryCheckBox);
-//        final CheckBox shopping_mallCheckBox = (CheckBox) view.findViewById(R.id.shopping_mallCheckBox);
-//
-//
-//        final CheckBox aquarium_CheckBox = (CheckBox) view.findViewById(R.id.aquariumCheckBox);
-//        final CheckBox book_Store_CheckBox = (CheckBox) view.findViewById(R.id.bookstoreCheckBox);
-//
-//        final CheckBox movie_theater_CheckBox = (CheckBox) view.findViewById(R.id.movietheaterCheckBox);
-        //  final CheckBox shopping_mallCheckBox=(CheckBox)        view.findViewById(R.id.shopping_mallCheckBox);
 
 
-//TODO:For dialogbox
-//        SelectTypes.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//
-//                android.app.FragmentManager manager = getActivity().getFragmentManager();
-//                android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
-//                if (frag != null) {
-//                    manager.beginTransaction().remove(frag).commit();
-//                }
-//                Log.d("viewid",Integer.toString(view.getId()));
-//                Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "DUUUHH!"+Integer.toString(view.getId()), Toast
-// .LENGTH_SHORT).show();
-//                Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "gah!"+Integer.toString(R.id.selecttypes), Toast
-// .LENGTH_SHORT).show();
-//
-//
-//                switch (v.getId()) {
-////                    case R.id.selecttypes:
-////                        DialogCategoriesFragment editNameDialog = new DialogCategoriesFragment();
-////                        editNameDialog.show(manager, "fragment_edit_name");
-////                        break;
-//                    case R.id.selecttypes:
-//                        AlertDialogCategories alertDialogFragment = new AlertDialogCategories();
-//                        alertDialogFragment.show(manager, "fragment_edit_name");
-//                        break;
-//                }
-//
-//
-//
-//            }
-//        });
-//---------------------------Maybe important
-//        SelectTypes.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                LocationType = new StringBuilder();
-//                if (!DetectConnection.checkInternetConnection(getActivity())) {
-//                    Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "No Internet!", Toast.LENGTH_SHORT).show();
-//                } else
-//
-//                {
-//                    ArrayList array = DataHolderClass.getInstance3().getDistributor_id3();
-//
-//
-//                    newcolor = false;
-//                    mMap.clear();
-//                    if (array != null) {
-//                        for (int i = 0; i < array.size(); i++) {
-//
-//                            LocationType.append(array.get(i) + "|");
-//
-//
-//                        }
-//                    }
-//                    try {
-//                        if (LocationType.toString() != "") {
-//                            expandableLayout.collapse();
-//                            pd.show();
-//                            setRecyclerView(LocationType);
-//
-//
-//                        } else {
-//                            Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "Please Select Types", Toast
-// .LENGTH_SHORT).show();
-//
-//
-//                        }
-//
-//                    } catch (IllegalAccessException e) {
-//                        e.printStackTrace();
-//                    } catch (java.lang.InstantiationException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                Log.d(TAG, "Runned hmmm ");
-//
-//
-//            }
-//        });
-
-//        SearchBar.setOnClickListener(onClickListener);
-//        SearchBank.setOnClickListener(onClickListener);
-//        SearchAmusement.setOnClickListener(onClickListener);
-//        SearchCafe.setOnClickListener(onClickListener);
-//        SearchCasino.setOnClickListener(onClickListener);
-//        SearchNightCLub.setOnClickListener(onClickListener);
-
-        //Testing Purpose, delete later
-        // List<String> data=new List<String>()      {"abc"};
-        //  from.setText("Google is your friend.", TextView.BufferType.EDITABLE);
-
-
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
-
-
-        //    nearbyPlacesList=  new ArrayList<LinkedHashMap<String, String>>();
-
-        //     Locationadapter = new LocationListRecyclerViewAdapter(getActivity(), nearbyPlacesList);
-
-        //   recyclerView.setAdapter(Locationadapter);
-
-
-        TextView emptyText = (TextView) view.findViewById(android.R.id.empty);
-        //   recyclerView.setEmptyView(emptyText);
-        // FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        // Log.d("checkrange","qqqqqq"+emptyText.getText());
-
-
-        //TODO:uh what is this.
-        //   Vector<View> pages = new Vector<View>();
-        // pages.add(recyclerView);
-
-        //     pages.add(recyclerView);
-
-
-//Todo: Currently doing this.... error try filtering itemss first
-//        recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position,long arg3) {
-//                view.setSelected(true);
-//
-//
-//                Object itemobj =(recyclerView.getItemAtPosition(position).toString());
-//                Toast.makeText(getApplicationContext(), itemobj.toString(), Toast.LENGTH_SHORT).show();
-//                Log.d(TAG, "abcdef checking for onoitem");
-//
-//              //  Toast.makeText(getApplicationContext(), lat, Toast.LENGTH_SHORT).show();
-//
-//            }
-//        });
-
-//        recyclerView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-////TODO:Figure out how to reset others items
-//
-////                recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-////
-////                    @Override
-////                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int
-//// oldBottom) {
-////                        recyclerView.removeOnLayoutChangeListener(this);
-////                        Log.e(TAG, "updated");
-////                    }
-////                });
-////                Locationadapter.notifyDataSetChanged();
-//
-////TODO: Delete others's buttons
-////                for (int i = recyclerView.getCount() - 1; i >= 0; i--) {
-////
-////                    Button b=(Button)    view.findViewById(R.id.details_btn);
-////
-////                    b.setVisibility(View.GONE);
-////
-////
-////                }
-////               Button d=(Button) parent.findViewById(R.id.details_btn);
-////
-////                d.setVisibility(View.GONE);
-//                HashMap<String, Object> obj = (HashMap<String, Object>) recyclerView.getItemAtPosition(position);
-//                String lat = (String) obj.get("lat");
-//                String lng = (String) obj.get("lng");
-//                //TODO: the "Selected" refresh when finish loading / Check if Focused on item how to do "somthing"
-//
-//
-//
-//                view.setSelected(true);
-//
-//
-//
-//
-//                Button b = (Button) view.findViewById(R.id.details_btn);
-//                b.setVisibility(View.VISIBLE);
-//
-//
-//
-//
-//
-//
-//                Log.d("Yourtag", lat);
-//                //  Toast.makeText(getApplicationContext(), lat.toString(), Toast.LENGTH_SHORT).show();
-//                LatLng latlng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-//                Marker result = null;
-//                //For each marker in the map...where the lat equals to the lat provided by the listview
-//                for (Marker c : mapMarkers) {
-//                    Log.d("Well", String.valueOf(c.getPosition().latitude));
-//
-//                    if (lat.equals(String.valueOf(c.getPosition().latitude)) && lng.equals(String.valueOf(c.getPosition().longitude))) {
-//                        Log.d("Its done ", lat);
-//                        showPath(c);
-//                        result = c;
-//                        //This should not be here... showpath is already up there.
-//                        //       mMap.moveCamera(CameraUpdateFactory.newLatLng(latxlng));
-//                        //      mMap.animateCamera(CameraUpdateFactory.zoomTo(16));
-//
-//                        break;
-//                    }
-//                }
-
-        //     }
-        //     });
-
-
-        //from.setAdapter(new LocationAutoCompleteAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line));
-        //    to.setAdapter(new LocationAutoCompleteAdapter(getActivity(), android.R.layout.simple_dropdown_item_1line));
         getChildFragmentManager();
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
@@ -787,12 +471,12 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
             CURRENT_TAG = TAG_HOME;
         }
 //TODO:probably put this back where it should be.....?
+        //TODO: is there anyway to make it not reload everytime?
         WayPointDetailsList.clear();
 
-        //   mMapFormView = view.findViewById(R.id.list_form);
         mProgressView = view.findViewById(R.id.maps_progress);
         setTabIcon();
-        Log.d(TAG, "Visibibility checking if progess is showing" + mProgressView.getVisibility());
+
         return view;
     }
 
@@ -831,150 +515,20 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         pd = new ProgressDialog(getActivity());
         super.onCreate(savedInstanceState);
 
-
     }
-//TODO: THISIOEN
-//    protected void onNewIntent(Intent intent) {
-//        super.onNewIntent(intent);
-//        setIntent(intent);
-//        //Just show path directly?
-//        //Get placeid and sace
-//        String place_id = intent.getStringExtra("place_id");
-//        if (place_id != null) {
-//
-//            WaypointwithDateList.add(place_id);
-//            Toast.makeText(getApplicationContext(), WaypointwithDateList.toString(), Toast.LENGTH_SHORT).show();
-//            //Use these waypoints to change all marker.
-//
-//            LatLng latlng=new LatLng(CurrentLocation.getLatitude(),CurrentLocation.getLongitude());
-//            String url = getDirectionsUrl(latlng, null);
-//
-//            DownloadTask downloadTask = new DownloadTask();
-//            Log.d(TAG, "THE URL is IS " + url);
-//
-//            // Start downloading json data from Google Directions API
-//            downloadTask.execute(url);
-//
-//
-//        }
-//
-//    }
-//STORE
-//jewelry_store
-//liquor_store
-    //pharmacy
-    //            electronics_store
-//    shoe_store
-//            convenience_store
-//            clothing_store
-//                    store
-
-//                    department_store
-
-    //SERVICES
-//beauty_salon
-////    doctor
-
-    //FOOD
-    ////    cafe
-    //bakery
-
-
-//ENTERTAIN
-    //    spa
-//            gym
-
-//bowling_alley
-//        campground
-
-    //TRAVEL
-//    car_rental
-    //            parking
-//    subway_station
-//            bus_station
-//    transit_station
-//            train_station
-//    taxi_stand
-
-    //RELIGIONS
-//            church
-//    hindu_temple
-//            mosque
-//
-
-//--------------------------------------IMPORTANT
-//    private View.OnClickListener onClickListener = new View.OnClickListener() {
-//        @Override
-//        public void onClick(View v) {
-//            if (!DetectConnection.checkInternetConnection(getActivity())) {
-//                Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "No Internet!", Toast.LENGTH_SHORT).show();
-//            } else
-//
-//            {
-//                switch (v.getId()) {
-//
-//                    case R.id.OpenCategoriesView:
-//
-//
-//                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-//                        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-//                        if (prev != null) {
-//                            ft.remove(prev);
-//                        }
-//                        ft.addToBackStack(null);
-//
-//                        // Create and show the dialog.
-//                        DialogCategoriesFragment newFragment = DialogCategoriesFragment.newInstance("Name");
-//                        newFragment.show(getActivity().getFragmentManager(), "dialog");
-//
-//
-//                        //   expandablecategories.toggle();
-//                        break;
-//
-//                    case R.id.opensetting:
-//
-//
-//
-//
-//                        expandableLayout.toggle();
-//                        break;
-//
-//                }
-//
-//            }
-//        }
-//
-//    };
-    //--------------------------------------IMPORTANT
-
-    // FragmentActivity activity = (FragmentActivity)view.getContext();
-    //  FragmentManager manager = activity.getSupportFragmentManager();
-
-//    public static FragmentManager getFragmentManagerMaps(){
-//
-//    return getSupportFragmentManager();
-//}
 
     //todo: check whether to move "List" to another classes (wtf i dont think locationtype is used.
     public static void setRecyclerView(StringBuilder sbValue) throws IllegalAccessException, java.lang.InstantiationException {
         try {
-//LocationType=locationType;
-            //StringBuilder sbValue = new StringBuilder(nearbyListBuilder());
-
-
+//This get URL from different places and process it (details, neraby etc
             if (sbValue.toString() != null) {
                 Log.d(TAG, "isthisrunningbefore" + sbValue);
 
-                //  PlacesTask placesTask = new PlacesTask();
-                //    placesTask.execute(sbValue.toString());
                 downloadUrl download = new downloadUrl((context));
                 download.execute(sbValue.toString());
                 Log.d(TAG, "isthisrunning");
                 Log.d("Checkruntimes", "Runningdownloadurl  4");
 
-//TODO:not todo, but warning if anything rpoblem uncomment below....
-                //     pager.invalidate();
-                //     fragmentPagerAdapter.notifyDataSetChanged();
             } else {
 // Temporary solution, make sure it does not (to refesth the page) Note:(Probably fixed but not sure)
 
@@ -1893,7 +1447,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
             String data = "";
             InputStream iStream = null;
-            HttpURLConnection urlConnection = null;
+            HttpsURLConnection urlConnection = null;
             Log.d(TAG, "Download URL" + strUrl);
             Log.d(TAG, "checkiftwo");
 
@@ -1904,7 +1458,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                 Log.d(TAG, "Download URL testing" + url.toString());
 
                 // Creating an http connection to communicate with url
-                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection = (HttpsURLConnection) url.openConnection();
 
                 // Connecting to url
                 urlConnection.connect();
@@ -1969,8 +1523,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 //TODO:This is where different kinds of things should be separated: NearbySearch, Directions, and details....
             //Just check whatrever result return and do if else
             List<LinkedHashMap<String, Object>> nearbyPlacesList = null;
-            DataParser dataParser = new DataParser();
+            Log.d(TAG, "runningdataparser " + " before mapsac");
 
+            DataParser dataParser = new DataParser();
+//the same who could ,e
 //Review is using separate one?
 //TODO: {   "html_attributions" : [      for Start searching
 //TODO"{   "geocoded_waypoints" :     check waypoints
@@ -1989,10 +1545,10 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                             fragmentPagerAdapter.notifyDataSetChanged();
 
                         } else {
-                            //Problem with next_page token not 100%
+                            //Problem with next_page token not 100%(?solved?)
                             //CHeck ths
                             //     WayPointDetailsList.add(dataParser.parse(result).get(0));
-                            Log.d("Yeep", "dataparserresult1Details==" + dataParser.parse(result));
+                            //Log.d("Yeep", "dataparserresult1Details==" + dataParser.parse(result));
                             if (!dataParser.parse(result).isEmpty()) {
                                 WayPointDetailsList.add(dataParser.parse(result).get(0));
                             } else {
@@ -2001,7 +1557,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                                 showDialog(mContext, "No Location can be found using these criteria!!");
                             }
                             Log.d("Yeep", "checkselectedsizeint==" + selectedsizeint);
-                            Log.d("Yeep", "checkselectedsizeint==" + getWayPointDetailsList().size());
+                            Log.d("Yeep", "checkselectedsizeint==" + getWayPointDetailsList());
 
                             if (selectedsizeint == getWayPointDetailsList().size()) {
                                 pager.invalidate();
@@ -2013,7 +1569,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                     } else if (result.startsWith("{   \"geocoded_waypoints\" ")) {
                         //Wai... this is for direction...!??
                         // WayPointDetailsList.add(dataParser.parse(result));
-                        Log.d("Yeep", "dataparserresult1==" + dataParser.parse(result));
+                        //   Log.d("Yeep", "dataparserresult1==" + dataParser.parse(result));
 //DirectionsFetcher a = new DirectionsFetcher();
 //a.parse(result);
                         parserTask.execute(result);
@@ -2031,9 +1587,13 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                     //Temporaty holder TODO
                     showDialog(mContext, "No Location can be found using these criteria!!");
                 }
-                pd.dismiss();
-                //This must be used or else the viewopager will not update
+                //   MapsActivity.pd.dismiss();
 
+                //This must be used or else the viewopager will not update
+                Log.d("MapsAcitivity", "Setdistance first");
+
+
+                Log.d("MapsAcitivity", "Setdistance second ");
 
 //TODO: must fix this shit
                 //    recycleadapter.setSelectedItem();
@@ -2043,78 +1603,111 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
             }
             try {
-                //        pager.setAdapter(fragmentPagerAdapter);
-                //        recyclerView.setAdapter(recycleadapter);
-                //   PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) view.findViewById(R.id.pager_header);
-                Log.d(TAG, "oncreatviewisruntwice");
 
                 TabLayout tabLayout = (TabLayout) view.findViewById(R.id.sliding_tabs);
                 tabLayout.setupWithViewPager(pager);
-//
-//                Picasso.with(mContext).load(R.drawable.googlemapsicon).fit().into
-//                        (tabLayout.getTabAt(0).setIcon());
+
                 tabLayout.getTabAt(0).setIcon(R.drawable.searchicon);
                 tabLayout.getTabAt(1).setIcon(R.drawable.filesimpleicon);
 
 
-                //tabLayout.addTab(tabLayout.newTab().setText("Available Locations"));
-                //  tabLayout.addTab(tabLayout.newTab().setText("Selected Locations"));
-                // tabs.setViewPager(pager);
             } catch (Exception e) {
                 //TODO:java.lang.NullPointerException: Attempt to invoke virtual method 'android.os.Handler android.support.v4.app
-                // .FragmentHostCallback
-                // .getHandler()' on a null object reference
+
                 Toast.makeText(context, "Uh oh! Some error has occured  ", Toast.LENGTH_SHORT).show();
 
-
-            }
-            try {
-
-                //       if (position + 1 < WaypointwithDateList.size()) {
-
-                for (int i = 0; i < WaypointwithDateList.size(); i++) {
-                    StringBuilder url = new StringBuilder();
-
-                    HashMap h = WaypointwithDateList.get(i);
-                    HashMap end = new HashMap();
-                    if (i + 1 < WaypointwithDateList.size()) {
-                        end = WaypointwithDateList.get(i + 1);
-                    } else {
-                        end.put("place_id", "null");
-                    }
-                    //start 0 1
-                    // 1 1
-                    Log.d("A", "WaypointwithDateLigethash 1 " + WaypointwithDateList);
-                    Log.d("A", "WaypointwithDateLigethash 2 " + i);
-                    Log.d("A", "WaypointwithDateLigethash 3 " + h);
-
-                    Log.d("A", "WaypointwithDateLigethash 4 " + end);
-                    Log.d(TAG, "WaypointwithDateLigethash 5" + url.toString());
-
-                    url.append("https://maps.googleapis.com/maps/api/distancematrix/json?");
-                    url.append("origins=place_id:" + h.get("place_id") + "&destinations=place_id:" + end.get("place_id"));
-                    url.append("&key=AIzaSyD5XXsvbPu_ZMHr6D_nLfRmcIj7bESfzYk");
-                    Log.d(TAG, "WaypointwithDateLigethash 6  " + url.toString());
-//its normal here?
-                    if(!end.get("place_id").equals(null)) {
-                        downloadDistanceurl download = new downloadDistanceurl(mContext);
-                        download.execute(url.toString());
-                    }
-                }
-
-            } catch (Exception e) {
-                Log.d(TAG, "Server is busy, Please try agai 22222" + e.toString());
-
-                Toast.makeText(mContext.getApplicationContext().getApplicationContext(), "Server is busy, Please try again!", Toast
-                        .LENGTH_SHORT).show();
 
             }
 
         }
     }
 
+    public static void setDistanceURL(Context mContext) {
+        Log.d("MapsAcitivity", "Setdistance inside" + WaypointwithDateList);
+        Log.d("MapsAcitivity", "Setdistance inside" + WayPointDetailsList);
+
+        try {
+            for (int i = -1; i < WaypointwithDateList.size(); i++) {
+                StringBuilder url = new StringBuilder();
+                HashMap h = new HashMap();
+                if (i >= 0) {
+                    h = WaypointwithDateList.get(i);
+                }
+                HashMap end = new HashMap();
+                if (i + 1 < WaypointwithDateList.size()) {
+                    end = WaypointwithDateList.get(i + 1);
+                } else {
+                    end.put("place_id", "null");
+                }
+
+
+                //start 0 1
+                // 1 1
+                Log.d("A", "WaypointwithDateLigethash 1 " + WaypointwithDateList);
+                Log.d("A", "WaypointwithDateLigethash 2 " + i);
+                Log.d("A", "WaypointwithDateLigethash 3 " + h);
+
+                Log.d("A", "WaypointwithDateLigethash 4 " + BaseActivity.getCurrentLocation());
+                Log.d(TAG, "WaypointwithDateLigethash 5" + url.toString());
+                ArrayList array = DataHolderClass.getInstance4().getDistributor_id4();
+//TODO: why didnt i put everything in one url?
+                url.append("https://maps.googleapis.com/maps/api/distancematrix/json?");
+//                url.append("origins=place_id:" + h.get("place_id")+"|" + BaseActivity.getCurrentLocation().getLatitude() + "," +
+//                        BaseActivity.getCurrentLocation().getLongitude()+ "&destinations=place_id:" + end.get("place_id"));
+//
+                if (i != -1) {
+                    Log.d(TAG, "WaypointwithDateLigethash 6    first" + i);
+
+                    url.append("origins=" + BaseActivity.getCurrentLocation().getLatitude() + "," +
+                            BaseActivity.getCurrentLocation().getLongitude() + URLEncoder.encode("|", "UTF-8") + "place_id:" + h.get("place_id") +
+                            "&destinations=place_id:" + end
+                            .get("place_id"));
+                } else {
+                    Log.d(TAG, "WaypointwithDateLigethash 6    second" + i);
+
+                    url.append("origins=" + BaseActivity.getCurrentLocation().getLatitude() + "," + BaseActivity.getCurrentLocation().getLongitude() +
+                            "&destinations=place_id:" + end.get
+                            ("place_id"));
+
+                }
+
+
+//Oh, because need this mode........
+//TODO: try to see if need to make all into 1 url only.
+                if (array != null && !array.isEmpty()) {
+                    url.append("&mode=" + array.get(0));
+                    url.append("&avoid=" + array.get(1));
+                    url.append("&language=en");
+
+                }
+                //TODO:wtf? for some reason language solve the "" problem....?
+                // url.append("&language=en");
+
+
+                url.append("&key=AIzaSyD5XXsvbPu_ZMHr6D_nLfRmcIj7bESfzYk");
+                Log.d(TAG, "WaypointwithDateLigethash 6  " + url.toString());
+                if (!end.get("place_id").equals(null)) {
+//String newurl= URLEncoder.encode(url.toString(),"UTF-8");
+                    downloadDistanceurl download = new downloadDistanceurl(mContext);
+                    download.execute(url.toString());
+
+                }
+            }
+
+        } catch (Exception e) {
+            Log.d(TAG, "Server is busy, Please try agai 22222" + e.toString());
+
+            Toast.makeText(mContext.getApplicationContext().getApplicationContext(), "Server is busy, Please try again!", Toast
+                    .LENGTH_SHORT).show();
+
+        }
+    }
+
     static ArrayList distance = new ArrayList();
     static ArrayList duration = new ArrayList();
+    static ArrayList timetostart = new ArrayList();
+    static ArrayList distancetonext = new ArrayList();
+    static ArrayList durationtonext = new ArrayList();
 
     public static class downloadDistanceurl extends AsyncTask<String, Void, String> {
 
@@ -2130,17 +1723,18 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
             String data = "";
             InputStream iStream = null;
-            HttpURLConnection urlConnection = null;
+            HttpsURLConnection urlConnection = null;
 
 
             try {
                 int retry = 0;
                 URL url = new URL(strUrl[0]);
                 Log.d("A", "tryingtofindout doinbackground" + url);
+                Log.d("check", "checkreturndatahell  123 " + url);
 
 
                 // Creating an http connection to communicate with url
-                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection = (HttpsURLConnection) url.openConnection();
 
                 // Connecting to url
                 urlConnection.connect();
@@ -2154,11 +1748,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
                     String line = "";
                     while ((line = br.readLine()) != null) {
+
+
                         sb.append(line);
                     }
 
                     data = sb.toString();
 
+                    Log.d("check", "checkreturndatahell 456  " + data);
 
                     br.close();
                     if (data.contains("You have exceeded your daily request quota for this API")) {
@@ -2199,7 +1796,13 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
             super.onPostExecute(result);
             String jsonArrayduration = new String();
             String jsonArraydistance = new String();
-//wtf
+
+            String jsonArraydistancetonext = new String();
+            String jsonArraydurationtonext = new String();
+
+
+            Long jsonArraytimetostart = new Long(0);
+
             Log.d("A", "tryingtofindout onPostExecute" + result);
 
             Log.d("A", "dafaqisresult" + result);
@@ -2208,79 +1811,145 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                 try {
                     jsonObject = new JSONObject(result);
 
-                    Log.d("A", "dafaqisresultjsonObject" + jsonObject);
+                    Log.d("A", "dafaqisresultjsonObjecttheobject " + jsonObject);
+                    if (!jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getString("status")
+                            .equals("NOT_FOUND")) {
 
-                    jsonArraydistance = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject
-                            ("distance").getString("text");
 
-                    //    duration.add(jsonArraydistance.get(1));
+                        Log.d("A", "tryingtofindouthaveurunthis 1");
 
-                    jsonArrayduration = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject
-                            ("duration").getString("text");
-                    Log.d("A", "tryingtofindout jsonArraydistance" + jsonArraydistance);
+                        jsonArraydistance = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject
+                                ("distance").getString("text");
+                        Log.d("A", "tryingtofindouthaveurunthis 2");
+
+                        jsonArrayduration = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getJSONObject
+                                ("duration").getString("text");
+
+                        if (jsonObject.getJSONArray("rows").length() > 1) {
+                            Log.d("A", "tryingtofindout haveurunthis inside");
+
+                            jsonArraydistancetonext = jsonObject.getJSONArray("rows").getJSONObject(1).getJSONArray("elements").getJSONObject(0)
+                                    .getJSONObject
+                                            ("distance").getString("text");
+
+                            jsonArraydurationtonext = jsonObject.getJSONArray("rows").getJSONObject(1).getJSONArray("elements").getJSONObject(0)
+                                    .getJSONObject
+                                            ("duration").getString("text");
+
+
+                            jsonArraytimetostart = jsonObject.getJSONArray("rows").getJSONObject(1).getJSONArray("elements").getJSONObject(0)
+                                    .getJSONObject
+                                            ("duration").getLong("value");
+                        }
+                        Log.d("A", "tryingtofindout haveurunthis outside");
+
+                        Log.d("A", "tryingtofindout jsonArraydistance" + jsonArraydistance);
 //^^^Correct
 
-                    Log.d("A", "dafaqisresultjsonObjectjsonArraydistance" + jsonArraydistance);
-                    Log.d("A", "dafaqisresultjsonObjectjsonArrayduration" + jsonArrayduration);
+                        Log.d("A", "dafaqisresultjsonObjectjsonArraydistance" + jsonArraydistance);
+                        Log.d("A", "dafaqisresultjsonObjectjsonArraytostart" + jsonArraytimetostart);
 
 //duration=new ArrayList();
 //                distance=new ArrayList();
-                    ArrayList<LinkedHashMap<String, Object>> a = MapsActivity.getWayPointDetailsList();
-                    Log.d("A", "distancedurationeasiertochec sizes  " + a.size());
-                    Log.d("A", "distancedurationeasiertochec l distance  " + distance);
-                    //SHIThonr etong
-                    Log.d("A", "distancedurationeasiertochec l duration  " + duration);
-//STILL correct dafaq?
+                        ArrayList<LinkedHashMap<String, Object>> a = MapsActivity.getWayPointDetailsList();
 
-//
-                    //   if (distance.size() < a.size()) {
-                    //TODO: need to remove durations
-                    if (distance.size() != a.size()-1) {
-                        distance.add(jsonArraydistance);
-                        duration.add(jsonArrayduration);
-                    }
-                    Log.d("A", "distancedurationeasiertochec l distance  after add" + distance);
+                        Log.d("A", "distancedurationeasiertochec sizes  distance" + distance.size());
+
+                        Log.d("A", "distancedurationeasiertochec sizes  " + a.size());
+                        Log.d("A", "distancedurationeasiertochec l distance  " + distance);
+                        //SHIThonr etong
+                        Log.d("A", "distancedurationeasiertochec l duration  " + duration);
 
 
-                    Log.d("A", "distancedurationeasiertochec l distance sec " + jsonArraydistance);
-                    Log.d("A", "distancedurationeasiertochec l duration sec" + jsonArrayduration);
-                    Log.d("A", "distancedurationeasiertochec l distance sec " + distance);
-                    Log.d("A", "distancedurationeasiertochec l duration sec" + duration);
-                    //After final one
-                    Log.d("A", "haverunhere  1");
+                        //   if (distance.size() < a.size()) {
+                        //TODO: need to remove durations
+                        if (distance.size() != a.size()) {
 
-                    if (duration.size() == a.size()-1) {
-                        Log.d("A", "haverunhere  2");
+                            timetostart.add(jsonArraytimetostart);
 
-                        for (int i = 0; i < duration.size() ; i++) {
-                            Log.d("A", "haverunhere  3");
+                            distancetonext.add(jsonArraydistancetonext);
+                            durationtonext.add(jsonArraydurationtonext);
 
-
-                            Log.d("A", "distancedurationonly  1" + duration + distance);
-
-                            Log.d("A", "distancedurationonly  2" + i);
-                            Log.d("A", "distancedurationonly  3" + a);
-
-                            a.get(i).remove("durationtonext");
-                            a.get(i).put("durationtonext", duration.get(i));
-
-
-                            a.get(i).remove("distancetonext");
-                            a.get(i).put("distancetonext", distance.get(i));
 
                         }
-                        Log.d("A", "haverunhere  4");
+                        distance.add(jsonArraydistance);
+                        duration.add(jsonArrayduration);
+                        Log.d("A", "distancedurationeasiertochec l distance  after add" + distance);
 
+
+                        Log.d("A", "haverunhere  1size" + duration.size());
+                        Log.d("A", "haverunhere  1size" + a.size());
+                        if (duration.size() == a.size()) {
+                            Log.d("A", "haverunhere  2");
+                            Log.d("A", "haverunheretest outside");
+
+                            for (int i = 0; i < duration.size(); i++) {
+                                Log.d("A", "haverunhere  3");
+
+
+                                Log.d("A", "distancedurationonly  1" + duration + distance);
+
+                                Log.d("A", "distancedurationonly  2" + i);
+                                Log.d("A", "distancedurationonly  3" + a);
+
+                                a.get(i).put("duration", duration.get(i));
+
+
+                                a.get(i).put("distance", distance.get(i));
+                                if (i + 1 != duration.size()) {
+                                    a.get(i).put("durationtonext", durationtonext.get(i + 1));
+
+                                    //       a.get(i).put("dafaqistimeto ", timetostart);
+
+                                    a.get(i).put("distancetonext", distancetonext.get(i + 1));
+                                }
+                                Long travelstarttime = null;
+
+                                if (timetostart.get(i).toString().equals("")) {
+                                    Log.d("A", "haveloadthis 1st" + a);
+
+                                    Long durationtoreach = Long.parseLong(timetostart.get(i).toString());
+                                    Long starttime = Long.parseLong(getWaypointwithDateList().get(i).get("starttime").toString());
+                                    travelstarttime = starttime - durationtoreach;
+                                    String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm").format(new java.util.Date(travelstarttime *
+                                            1000));
+                                    a.get(i).put("timetostart", date);
+                                } else {
+                                    Log.d("A", "haveloadthis 2nd" + a);
+
+                                    a.get(i).put("timetostart", 0);
+
+                                }
+
+
+                            }
+                            Log.d("A", "haverunhere  4");
+
+                        }
+                        Log.d("A", "checkingwtfisaasdasd" + duration.size());
+                        Log.d("A", "checkingwtfisaasdasd" + a.size());
+
+                        if (duration.size() == a.size()) {
+
+                            duration.clear();
+                            distance.clear();
+                            durationtonext.clear();
+                            distancetonext.clear();
+                        }
+//TODO:PLS work pls work
+
+                        Log.d("A", "checkingwtfisa" + a);
+
+                        Log.d("A", "checkingwtfisa this is way" + getWayPointDetailsList());
+                    } else {
+
+                        Log.d("A", "Yephaveranhgere" + getWayPointDetailsList());
                         duration.clear();
                         distance.clear();
+                        durationtonext.clear();
+                        distancetonext.clear();
+
                     }
-
-//TODO:PLS work pls work
-                    //
-                    //  Log.d("A", "distanceduration" + duration + distance);
-                    Log.d("A", "checkingwtfisa" + a);
-
-
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.d("JSONException", "exceptionherejsonplscheck" + e);
@@ -2355,6 +2024,8 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         if (mPendingRunnable != null) {
             mHandler.post(mPendingRunnable);
         }
+
+
         // show or hide the fab button
 
         //Closing drawer on item click
@@ -2374,7 +2045,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
         Thing object = new Thing.Builder()
                 .setName("Maps Page") // TODO: Define a title for the content shown.
                 // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
+                .setUrl(Uri.parse("https://[ENTER-YOUR-URL-HERE]"))
                 .build();
         return new Action.Builder(Action.TYPE_VIEW)
                 .setObject(object)
@@ -2383,124 +2054,6 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
     }
 
     private FusedLocationProviderApi fusedLocationProviderApi = LocationServices.FusedLocationApi;
-
-
-//    public static StringBuilder nearbyListBuilder() {
-//        //TODO:probably fixed... location null
-//        Location location = CurrentLocation;
-//
-//        try {
-//            if (location != null) {
-//                //use your current location here
-//                double mLatitude = location.getLatitude();
-//                double mLongitude = location.getLongitude();
-//
-//                StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
-//                sb.append("location=" + mLatitude + "," + mLongitude);
-//                //TODO: Set radius to be controllable
-//
-////Yep not using now.
-////                numberpicker.setNumericTransformer(new DiscreteSeekBar.NumericTransformer() {
-////                    @Override
-////                    public int transform(int value) {
-////                        return value * 1000;
-////                    }
-////                });
-//
-//
-//              //  int radius = numberpicker.getNumericTransformer().transform(numberpicker.getProgress());
-//
-//               // radius = radius * 1000;
-//           //     Log.d("CheckBit", numberpicker.toString());
-//
-//                LocationType.deleteCharAt(LocationType.length() - 1);
-//                Log.d("CheckBit", "222gagag  2"+Location_RecyclerView.getradius());
-//
-//                // sb.append("&radius=5000");
-//                //Todo: figure out how to support multiple types (location)..........
-//                //IMPORTANT
-//
-//                sb.append("&radius=" + Integer.toString(Location_RecyclerView.getradius()));
-//
-//                sb.append("&types=" + LocationType);
-//
-//                if(Location_RecyclerView.getswitch()){
-//                    sb.append("&opennow=true");
-//
-//
-//                }
-//
-//                //if -1 then anything.....TODO:problem of price cannot detect
-//                if (minpriceint == 0) {
-//                    minpriceint = -1;
-//
-//                }
-//                if (maxpriceint == 4) {
-//                    maxpriceint = -1;
-//
-//                }
-//
-//
-//
-//
-//                sb.append("&minprice=" + minpriceint + "&maxprice=" + maxpriceint);
-//                sb.append("&sensor=true");
-//                sb.append("&key=AIzaSyDkIa12Y9nXORou_xCnwS09K53kbJabKHo");
-//                ;
-//                Log.d("Map", "api: " + sb.toString());
-//
-//                return sb;
-//            } else {
-//
-//                return null;
-//            }
-//        } catch (Exception e) {
-//            StringBuilder sb = new StringBuilder("Fail");
-//            Log.d("CheckBit", e.toString());
-//
-//            return sb.append("Test");
-//        }
-//
-//    }
-
-    //Loading Locations (URL is the location with things
-    private class PlacesTask extends AsyncTask<String, Integer, String> {
-        protected void onPreExecute() {
-            //set message of the dialog
-            //show dialog
-            pd.setMessage("Loading Locations...");
-
-            pd.show();
-            super.onPreExecute();
-        }
-
-        String data = null;
-
-        // Invoked by execute() method of this object
-        //TODO:Doing this (if else one place.(solve by other wayse
-        @Override
-        protected String doInBackground(String... url) {
-//
-            try {
-                Log.d(TAG, "Runnign? PlacesTaskCheckurl" + url[0]);
-
-                Log.d(TAG, "Runnign? PlacesTask" + data);
-
-            } catch (Exception e) {
-                Log.d("Background Task", e.toString());
-            }
-            return data;
-        }
-
-
-        // Executed after the complete execution of doInBackground() method
-        @Override
-        protected void onPostExecute(String result) {
-            Log.d(TAG, "Inmapsactivity");
-
-
-        }
-    }
 
 
     // Executed after the complete execution of doInBackground() method

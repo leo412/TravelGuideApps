@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
 import com.squareup.picasso.Picasso;
 
@@ -42,6 +43,7 @@ public class LocationDetails extends Fragment {
     private static TextView place_address;
     private static TextView place_phone;
     private static TextView place_website;
+
     private static TextView Monday;
     private static TextView Tuesday;
     private static TextView Wednesday;
@@ -50,6 +52,13 @@ public class LocationDetails extends Fragment {
     private static TextView Saturday;
     private static TextView Sunday;
 
+    private static TextView MondayString;
+    private static TextView TuesdayString;
+    private static TextView WednesdayString;
+    private static TextView ThursdayString;
+    private static TextView FridayString;
+    private static TextView SaturdayString;
+    private static TextView SundayString;
 
     private static ImageView addressimage;
     private static ImageView phoneimage;
@@ -114,6 +123,19 @@ public class LocationDetails extends Fragment {
         place_website = (TextView) view.findViewById(R.id.textViewWebsite);
         place_website.setText(placedetail.get("website").toString());
         place_opennow = (TextView) view.findViewById(R.id.textViewOpenNow);
+
+        MondayString = (TextView) view.findViewById(R.id.Monday);
+        TuesdayString = (TextView) view.findViewById(R.id.Tuesday);
+        WednesdayString= (TextView) view.findViewById(R.id.Wednesday);
+        ThursdayString = (TextView) view.findViewById(R.id.Thursday);
+        FridayString = (TextView) view.findViewById(R.id.Friday);
+        SaturdayString = (TextView) view.findViewById(R.id.Saturday);
+        SundayString = (TextView) view.findViewById(R.id.Sunday);
+
+
+
+
+
         Monday = (TextView) view.findViewById(R.id.MondayText);
         Tuesday = (TextView) view.findViewById(R.id.TuesdayText);
         Wednesday = (TextView) view.findViewById(R.id.WednesdayText);
@@ -154,7 +176,6 @@ public class LocationDetails extends Fragment {
             Saturday.setText(parts.get(5).substring(parts.get(5).indexOf(":") + 1));
             Sunday.setText(parts.get(6).substring(parts.get(6).indexOf(":") + 1, parts.get(6).length() - 1));
 
-
         }
         switch (placedetail.get("open_now").toString()) {
             case "true":
@@ -167,21 +188,24 @@ public class LocationDetails extends Fragment {
                 place_opennow.setText("This location does not provide opening hours.");
 
 
+                MondayString.setVisibility(View.GONE);
+                TuesdayString.setVisibility(View.GONE);
+                WednesdayString.setVisibility(View.GONE);
+                ThursdayString.setVisibility(View.GONE);
+                FridayString.setVisibility(View.GONE);
+                SaturdayString.setVisibility(View.GONE);
+                SundayString.setVisibility(View.GONE);
+
+
         }
 
-
-        //place_opening_hours=(TextView)view.findViewById(R.id.textViewO);
-
-        //View mainview=inflater.inflate(R.layout.content_place_details, container, false);
-
-        //     setplacebutton=(Button) mainview.findViewById(R.id.addLocation);
-        //   removeplacebutton=(Button) mainview.findViewById(R.id.removeLocation);
         removeplacebutton = LocationDetailsActivity.removeplacebutton;
-
         setplacebutton = LocationDetailsActivity.setplacebutton;
         setplacebutton.setEnabled(true);
-
         removeplacebutton.setEnabled(true);
+
+        MapsActivity.pd.dismiss();
+
         return view;
     }
 

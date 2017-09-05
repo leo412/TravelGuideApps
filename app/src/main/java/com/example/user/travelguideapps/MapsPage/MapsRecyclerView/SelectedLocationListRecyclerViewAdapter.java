@@ -1,5 +1,6 @@
 package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -7,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,10 +21,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.example.user.travelguideapps.DataHolderClass;
+import com.example.user.travelguideapps.DialogTravelSettingFragment;
 import com.example.user.travelguideapps.LocationDetails.LocationDetailsActivity;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.squareup.picasso.Picasso;
 
@@ -47,6 +49,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
     private int Position;
     private static RecyclerView.ViewHolder holder2;
+    private ProgressDialog pDialog;
 
     private static ArrayList duration = new ArrayList();
     private static ArrayList distance = new ArrayList();
@@ -102,8 +105,8 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
     int globalPosition = -1;
     boolean completedloop = false;
-    int previousposition=-1;
-ArrayList previousarray=new ArrayList();
+    int previousposition = -1;
+    ArrayList previousarray = new ArrayList();
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
@@ -113,25 +116,24 @@ ArrayList previousarray=new ArrayList();
 //        distance.clear();
 
 
+        Log.d("A", "testingforpositionrunnning fort positions" + previousposition + "><" + position);
 
-        Log.d("A", "testingforpositionrunnning fort positions" + previousposition+"><"+position);
-
-        if(previousarray.contains(position)){
+        if (previousarray.contains(position)) {
             //becomes false = don't run notify
             completedloop = true;
-            Log.d("A", "testingforposition" + "TOPPPPPPPP"+distance);
+            Log.d("A", "testingforposition" + "TOPPPPPPPP" + distance);
 
 
-        }else{
+        } else {
             //Run notify??
-            Log.d("A", "testingforposition" + "BOTTTTTTOM"+distance);
+            Log.d("A", "testingforposition" + "BOTTTTTTOM" + distance);
 
             completedloop = false;
 
         }
         previousarray.add(position);
 //
-            previousposition   =position;
+        previousposition = position;
         Log.d("A", "testingforposition" + MapsActivity.getWayPointDetailsList().size());
 
         Log.d("A", "calculatethesize" + completedloop);
@@ -163,7 +165,6 @@ ArrayList previousarray=new ArrayList();
             for (int i = 0; i < waypoint.size(); i++) {
 
                 Log.d("A", "selectedwaypointcheck" + waypoint.get(i).get("place_id"));
-                Log.d("A", "selectedwaypointcheck" +mDataSource.get(position).get("place_id"));
 
                 if (waypoint.get(i).get("place_id").equals(mDataSource.get(position).get("place_id"))) {
 
@@ -185,30 +186,37 @@ ArrayList previousarray=new ArrayList();
             holder.lat.setText(mDataSource.get(position).get("lat").toString());
             holder.lng.setText(mDataSource.get(position).get("lng").toString());
 
+            Log.d("A", "selectedwaypointcheckwtfhere 1 " + mDataSource.get(position).get("distance"));
 
-try {
-    holder.distance.setText(mDataSource.get(position).get("distancetonext").toString());
-    holder.duration.setText(mDataSource.get(position).get("durationtonext").toString());
+            try {
+                Log.d("A", "selectedwaypointcheckwtfhere 2 " + mDataSource.get(position).get("distance"));
 
-}catch (Exception e){
-
-    Log.d("SelectedLocationList", "Line 223 "+ e);
-
-}
+                holder.distance.setText(mDataSource.get(position).get("distancetonext").toString());
+                holder.duration.setText(mDataSource.get(position).get("durationtonext").toString());
+                holder.departuretime.setText(mDataSource.get(position).get("timetostart").toString());
 
 
 
+                holder.localdistancetext.setText(mDataSource.get(position).get("distance").toString());
+                holder.localdurationtext.setText(mDataSource.get(position).get("duration").toString());
+                Log.d("A", "selectedwaypointcheckwtfhere 3 " + mDataSource.get(position).get("distancetonext"));
+
+            } catch (Exception e) {
+
+                Log.d("SelectedLocationList", "Line 223 " + e);
+
+            }
 
 
-      //      Log.d("A", "checkdistancetonext" + mDataSource.get(position).get("distancetonext").toString());
+            //      Log.d("A", "checkdistancetonext" + mDataSource.get(position).get("distancetonext").toString());
 
             Log.d("A", "distancedurationonly  in adapter" + mDataSource.get(position).get("distancetonext").toString());
 
 
-           // holder.distance.setText(mDataSource.get(position).get("distancetonext").toString());
+            // holder.distance.setText(mDataSource.get(position).get("distancetonext").toString());
             //holder.duration.setText(mDataSource.get(position).get("durationtonext").toString());
-            Log.d("A", "pherw" +mDataSource.get(position).get("distancetonext").toString());
-            Log.d("A", "pherw" +mDataSource.get(position).get("durationtonext").toString());
+            Log.d("A", "pherw" + mDataSource.get(position).get("distancetonext").toString());
+            Log.d("A", "pherw" + mDataSource.get(position).get("durationtonext").toString());
 
 
             holder.vicinity.setText(mDataSource.get(position).get("vicinity").toString());
@@ -232,28 +240,57 @@ try {
 
                 Picasso.with(mContext).load(R.drawable.selected).fit().into
                         (holder.selectedimage);
+                Picasso.with(mContext).load(R.drawable.distanceicon).fit().into
+                        (holder.localdistance);
 
-                if(!holder.distance.getText().equals("")){
+                Picasso.with(mContext).load(R.drawable.durationicon).fit().into
+                        (holder.localduration);
+                if (!holder.distance.getText().equals("")) {
                     Picasso.with(mContext).load(R.drawable.durationicon).fit().into
                             (holder.durationimage);
                     Picasso.with(mContext).load(R.drawable.distanceicon).fit().into
                             (holder.distanceimage);
                     Picasso.with(mContext).load(R.drawable.arrowdownicon).fit().into
                             (holder.arrowimage);
-//TODO working but need some adjustment
+                    Picasso.with(mContext).load(R.drawable.roadicon).fit().into
+                            (holder.startingtimeimage);
+                    Picasso.with(mContext).load(R.drawable.settingsicon).fit().into
+                            (holder.travelsetting);
+                    holder.distanceimage.setVisibility(View.VISIBLE);
+                    holder.durationimage.setVisibility(View.VISIBLE);
+                    holder.arrowimage.setVisibility(View.VISIBLE);
+                    holder.distance.setVisibility(View.VISIBLE);
+                    holder.duration.setVisibility(View.VISIBLE);
+                    holder.startingtimeimage.setVisibility(View.VISIBLE);
+                    holder.departuretime.setVisibility(View.VISIBLE);
+
+                    //TODO working but need some adjustment
+                } else {
+
+
+                    holder.distanceimage.setVisibility(View.GONE);
+                    holder.durationimage.setVisibility(View.GONE);
+                    holder.arrowimage.setVisibility(View.GONE);
+                    holder.distance.setVisibility(View.GONE);
+                    holder.duration.setVisibility(View.GONE);
+
+                    holder.startingtimeimage.setVisibility(View.GONE);
+
+                    holder.departuretime.setVisibility(View.GONE);
+
                 }
 
 
                 Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
-                        + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().transform(new
-                        CircleTransform()
-                ).error(R.drawable
+                        + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().error(R.drawable
                         .noimage)
                         .placeholder(R
                                 .drawable
                                 .loading_gif).into(holder.image);
+
                 Picasso.with(mContext).load(R.drawable.googlemapsicon).fit().into
                         (googlemapsbutton);
+
 
                 Picasso.with(mContext).load(R.drawable.viewdetails).fit().into
                         (detailsbutton);
@@ -292,9 +329,6 @@ try {
 
                     globalPosition = position;
 
-                    //  Toast.makeText(getApplicationContext(), lat.toString(), Toast.LENGTH_SHORT).show();
-                    LatLng latlng = new LatLng(Double.parseDouble(lat), Double.parseDouble(lng));
-                    Marker result = null;
                     //For each marker in the map...where the lat equals to the lat provided by the  recycle view?
                     if (mapMarkers != null) {
                         for (Marker c : mapMarkers) {
@@ -314,6 +348,10 @@ try {
                             }
                         }
                     }
+                    Log.d("Hashthisruns", "notifyDataSetChanged  6");
+
+                    notifyDataSetChanged();
+
                 }
 
             });
@@ -322,7 +360,24 @@ try {
             // display a toast with person name on item click
             //  Toast.makeText(context, personNames.get(position), Toast.LENGTH_SHORT).show();
 
+            holder.travelsetting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+//        FragmentTransaction ft = mContext.getSupportFragmentManager().beginTransaction();
+//        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
+//        if (prev != null) {
+//            ft.remove(prev);
+//        }
+//        ft.addToBackStack(null);
+                    FragmentManager manager = ((AppCompatActivity) mContext).getSupportFragmentManager();
 
+                    // Create and show the dialog.
+                    DialogTravelSettingFragment newFragment = DialogTravelSettingFragment.newInstance("Name");
+                    newFragment.show(manager, "dialog");
+
+
+                }
+            });
             directionsbutton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -342,6 +397,7 @@ try {
 //TODO: Move data to there
                     View parentRow = (View) v.getParent();
 
+                    MapsActivity.pd.show();
 
                     TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
                     String place_id_text = place_id.getText().toString();
@@ -392,6 +448,7 @@ try {
                 public void onClick(View v) {
 //TODO: Move data to there
                     View parentRow = (View) v.getParent();
+                    MapsActivity.pd.show();
 
                     TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
                     String place_id_text = place_id.getText().toString();
@@ -425,6 +482,7 @@ try {
                 }
             });
         }
+        MapsActivity.pd.dismiss();
 
     }
 
@@ -449,7 +507,6 @@ try {
     }
 
 
-
     class MyViewHolder extends RecyclerView.ViewHolder {
         //NOTE:Add new items here to get
         // init the item view's
@@ -465,9 +522,16 @@ try {
         ImageView arrowimage;
         ImageView distanceimage;
         ImageView durationimage;
+        ImageView startingtimeimage;
+        ImageButton travelsetting;
+        ImageView localdistance;
+        TextView localdistancetext;
+        ImageView localduration;
+        TextView localdurationtext;
 
         TextView distance;
         TextView duration;
+        TextView departuretime;
 
         ImageView image;
         AdapterView.OnItemClickListener mItemClickListener;
@@ -485,9 +549,17 @@ try {
             selectedimage = (ImageView) itemView.findViewById(R.id.selectedimage);
             arrowimage = (ImageView) itemView.findViewById(R.id.arrow_down);
             durationimage = (ImageView) itemView.findViewById(R.id.duration);
+            startingtimeimage = (ImageView) itemView.findViewById(R.id.departuretime);
+            travelsetting = (ImageButton) itemView.findViewById(R.id.travelsettingbutton);
+            localdistance = (ImageView) itemView.findViewById(R.id.local_distance);
 
+            localdistancetext = (TextView) itemView.findViewById(R.id.local_distance_text);
+            localduration = (ImageView) itemView.findViewById(R.id.local_duration);
+
+            localdurationtext = (TextView) itemView.findViewById(R.id.local_duration_text);
             distance = (TextView) itemView.findViewById(R.id.distance_text);
             duration = (TextView) itemView.findViewById(R.id.duration_text);
+            departuretime = (TextView) itemView.findViewById(R.id.departure_text);
 
             distanceimage = (ImageView) itemView.findViewById(R.id.distance);
 
@@ -497,7 +569,7 @@ try {
                     Log.d("check", "hhhhhhhhhhhchecklocationtecycler");
 
 
-            //        v.setTag(getAdapterPosition());
+                    //        v.setTag(getAdapterPosition());
 
                     // mItemClickListener.onItemClick(getLayoutPosition(), v, id);
                 }

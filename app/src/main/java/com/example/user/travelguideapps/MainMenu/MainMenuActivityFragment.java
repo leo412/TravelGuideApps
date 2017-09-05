@@ -30,6 +30,7 @@ public class MainMenuActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         Log.d("BaserActivity", "fore main menu ");
+        getActivity().setTitle("Main Menu");
 
         View v=inflater.inflate(R.layout.fragment_main_menu, container, false);
         Button searchButton=(Button)v.findViewById(R.id.main_Menu_Search_Button);

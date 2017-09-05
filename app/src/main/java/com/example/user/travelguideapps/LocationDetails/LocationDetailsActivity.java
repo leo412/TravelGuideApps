@@ -350,6 +350,8 @@ return view;
 
             JSONArray jsonArray = null;
             JSONObject jsonObject;
+            Log.d(TAG, "runningdataparser " + " before details");
+
             DataParser dataParser=new DataParser();
         //Comment for single list to parse result
           placedetails=  dataParser.parse(result);

@@ -83,7 +83,7 @@ public class Location_RecyclerView extends Fragment {
     private static String keyword = "";
     private static AutoCompleteTextView auto;
     ImageButton foodbutton;
-    List<LinkedHashMap<String, Object>> nearbyPlacesList= new List<LinkedHashMap<String, Object>>() {
+    List<LinkedHashMap<String, Object>> nearbyPlacesList = new List<LinkedHashMap<String, Object>>() {
 
 
         @Override
@@ -207,7 +207,8 @@ public class Location_RecyclerView extends Fragment {
         }
     };
     private boolean recyclerviewvisible = false;
-//TODO: the recyclerview will appear for a while even after reset
+
+    //TODO: the recyclerview will appear for a while even after reset
     public Location_RecyclerView() {
         // Required empty public constructor
     }
@@ -248,7 +249,7 @@ public class Location_RecyclerView extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_location__recycler_view, container, false);
-       // final ArrayList waypoint = MapsActivity.getWayPointDetailsList();
+        // final ArrayList waypoint = MapsActivity.getWayPointDetailsList();
 
         nearbyPlacesList = MapsActivity.getNearbyPlacesList();
         System.out.println("insidefirst" + nearbyPlacesList);
@@ -379,7 +380,7 @@ public class Location_RecyclerView extends Fragment {
                                         Collections.sort(nearbyPlacesList, new Comparator<LinkedHashMap>() {
                                             @Override
                                             public int compare(LinkedHashMap o1, LinkedHashMap o2) {
-                                              //  System.out.println("dudeUhhhyeh 1111" + waypoint);
+                                                //  System.out.println("dudeUhhhyeh 1111" + waypoint);
 
                                                 System.out.println("dudeUhhhyeh 3333" + o1.toString());
                                                 System.out.println("dudeUhhhyeh 4444" + o2.toString());
@@ -389,13 +390,13 @@ public class Location_RecyclerView extends Fragment {
                                                 return o1.get("place_name").toString().compareTo(o2.get("place_name").toString());
                                             }
                                         });
-                            //            Collections.sort(nearbyPlacesList, new MapComparator("place_name"));
+                                        //            Collections.sort(nearbyPlacesList, new MapComparator("place_name"));
 //
-                                    //    MapsActivity.setWayPointDetailsList(waypoint);
+                                        //    MapsActivity.setWayPointDetailsList(waypoint);
 
                                         break;
                                     case 1:
-                                       // System.out.println("dudeUhhhyeh 2222" + waypoint);
+                                        // System.out.println("dudeUhhhyeh 2222" + waypoint);
                                         Collections.sort(nearbyPlacesList, new Comparator<LinkedHashMap>() {
                                             @Override
                                             public int compare(LinkedHashMap o1, LinkedHashMap o2) {
@@ -408,27 +409,26 @@ public class Location_RecyclerView extends Fragment {
                                                 return o2.get("rating").toString().compareTo(o1.get("rating").toString());
                                             }
                                         });
-                                //        Collections.sort(nearbyPlacesList, new MapComparator("rating"));
-                                       // MapsActivity.setWayPointDetailsList(waypoint);
-
+                                        //        Collections.sort(nearbyPlacesList, new MapComparator("rating"));
+                                        // MapsActivity.setWayPointDetailsList(waypoint);
 
 
                                         break;
                                     case 2:
-                                   //     System.out.println("dudeUhhhyeh 3333" + waypoint);
+                                        //     System.out.println("dudeUhhhyeh 3333" + waypoint);
 
 //
                                         break;
                                     case 3:
-                                       // System.out.println("dudeUhhhyeh 444" + waypoint);
+                                        // System.out.println("dudeUhhhyeh 444" + waypoint);
 
                                         break;
 
 
                                 }
-                           //     System.out.println("dudeUhhhyeh 2222" + waypoint);
+                                //     System.out.println("dudeUhhhyeh 2222" + waypoint);
 
-                          //      MapsActivity.setWayPointDetailsList(waypoint);
+                                //      MapsActivity.setWayPointDetailsList(waypoint);
                                 Locationadapter.notifyDataSetChanged();
 
                             }
@@ -440,7 +440,7 @@ public class Location_RecyclerView extends Fragment {
         });
         categories_expandable_layout.setOnClickListener(onClickListener);
         expandableLayout = (ExpandableLayout) view.findViewById(R.id.expandable_layout);
-expandableLayout.collapse();
+        expandableLayout.collapse();
 
         recyclerView = (RecyclerView) view.findViewById(R.id.poilistRecyclerView);
 
@@ -451,14 +451,12 @@ expandableLayout.collapse();
 
         recyclerView.setAdapter(Locationadapter);
         Locationadapter.notifyDataSetChanged();
-        System.out.println("checknearbyPlacesList1 "+nearbyPlacesList);
-        System.out.println("checknearbyPlacesList2 "+MapsActivity.getNearbyPlacesList());
-        System.out.println("checknearbyPlacesList3  "+recyclerviewvisible);
+        System.out.println("checknearbyPlacesList1 " + nearbyPlacesList);
+        System.out.println("checknearbyPlacesList2 " + MapsActivity.getNearbyPlacesList());
+        System.out.println("checknearbyPlacesList3  " + recyclerviewvisible);
 
 
 // Extend the Callback class
-
-
 
 
         if (recyclerviewvisible) {
@@ -477,7 +475,7 @@ expandableLayout.collapse();
 //                nearbyPlacesList.clear();
 //            }
             Locationadapter.notifyDataSetChanged();
-          //  recyclerView.setVisibility(View.GONE);
+            //  recyclerView.setVisibility(View.GONE);
 
         }
 
@@ -644,7 +642,8 @@ expandableLayout.collapse();
 
                                 if (LocationType.toString() == "" && keyword.equals("")) {
 
-                                    Toast.makeText(getActivity().getApplicationContext(), "Please Select at least one type or keyword", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getActivity().getApplicationContext(), "Please Select at least one type or keyword", Toast
+                                            .LENGTH_SHORT).show();
 
                                 } else {
 
@@ -720,9 +719,9 @@ expandableLayout.collapse();
                                 expandableLayout.collapse();
 
                                 //TODO:
-                         //08-25 10:42:05.085 28780-28780/com.example.user.travelguideapps W/art: /data/app/com.example.user
+                                //08-25 10:42:05.085 28780-28780/com.example.user.travelguideapps W/art: /data/app/com.example.user
                                 //        .travelguideapps-2/split_lib_dependencies_apk.apk has in excess of 100 dex files. Please consider
-                      //          coalescing and shrinking the number to  avoid runtime overhead.
+                                //          coalescing and shrinking the number to  avoid runtime overhead.
 
                                 MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);

@@ -1,0 +1,129 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                             xmlns:app="http://schemas.android.com/apk/res-auto"
+                                             xmlns:tools="http://schemas.android.com/tools"
+                                             android:id="@+id/edit_name"
+                                             android:layout_width="match_parent"
+                                             android:layout_height="match_parent"
+                                             android:layout_gravity="center"
+                                             android:orientation="vertical">
+
+
+    <TextView
+        android:id="@+id/transporttextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Transport Mode"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <RadioGroup
+        android:id="@+id/transitradiogroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/transporttextview">
+
+        <RadioButton
+            android:id="@+id/drivingradio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Driving"
+
+            />
+
+        <RadioButton
+            android:id="@+id/walkingradio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Walking"
+
+            />
+
+        <RadioButton
+            android:id="@+id/bicyclingradio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bicycling "
+
+            />
+        <RadioButton
+            android:id="@+id/transitradio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Transit"
+
+            />
+
+
+
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/avoidtextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Avoid"
+        app:layout_constraintLeft_toLeftOf="@+id/guideline"
+app:layout_constraintTop_toBottomOf="@id/transitradiogroup"
+
+        />
+
+<RadioGroup
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/avoidradio"
+    app:layout_constraintTop_toBottomOf="@id/avoidtextview"
+    >
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No"
+        android:id="@+id/noavoidradio"
+        android:checked="true"
+        />
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tolls"
+        android:id="@+id/tollsradio"
+android:checked="true"
+        />
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Highways"
+        android:id="@+id/highwaysradio"
+        />
+
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ferries"
+        android:id="@+id/ferriesradio"
+        />
+
+
+</RadioGroup>
+    <TextView
+        android:id="@+id/shoptextview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Shops"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+
+
+
+    <android.support.constraint.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="160dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"/>
+
+
+</android.support.constraint.ConstraintLayout>

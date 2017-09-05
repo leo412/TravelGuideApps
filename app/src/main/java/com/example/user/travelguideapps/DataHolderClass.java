@@ -13,6 +13,7 @@ public class DataHolderClass {
     private static DataHolderClass dataObject2 = null;
     private static DataHolderClass dataObject3 = null;
     private static DataHolderClass dataObjectarray = null;
+    private static DataHolderClass dataObject4 = null;
 
     private DataHolderClass() {
         // left blank intentionally
@@ -75,11 +76,7 @@ public class DataHolderClass {
         return dataObjectarray;
     }
 
-
     private static ArrayList distributor_idarray= new ArrayList();
-//ChIJgRkpDSxPzDERtOZ78kN6b74
-    //ChIJMwcN545JzDERT2W3Zya5af0
-    //ChIJgRkpDSxPzDERtOZ78kN6b74
 
     public String getDistributor_idarray() {
         Log.d("Dataholder", "dataholdercheck get 1 "+distributor_idarray);
@@ -103,5 +100,27 @@ public class DataHolderClass {
         Log.d("Dataholder", "dataholdercheck remove 1 "+distributor_idarray);
 
     }
+
+
+
+
+
+
+    public static DataHolderClass getInstance4() {
+        if (dataObject4 == null)
+            dataObject4 = new DataHolderClass();
+        return dataObject4;
+    }
+    private ArrayList distributor_id4;;
+
+    public ArrayList getDistributor_id4() {
+        return distributor_id4;
+    }
+
+    public void setDistributor_id4(ArrayList distributor_id4) {
+        this.distributor_id4 = distributor_id4;
+    }
+
+
 
 }

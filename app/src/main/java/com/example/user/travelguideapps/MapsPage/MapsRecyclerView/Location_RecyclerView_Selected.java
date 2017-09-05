@@ -62,6 +62,7 @@ public class Location_RecyclerView_Selected extends Fragment {
     public Location_RecyclerView_Selected() {
         // Required empty public constructor
     }
+//TODO: add empty file icon (Unimportant
 
     /**
      * Use this factory method to create a new instance of
@@ -96,7 +97,7 @@ public class Location_RecyclerView_Selected extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_location__recycler_view2, container, false);
+        View view = inflater.inflate(R.layout.fragment_location__recycler_view_selected, container, false);
         //     TextView tvLabel = (TextView) view.findViewById(R.id.tvLabel);
         //  tvLabel.setText(page + " -- " + title);
         Log.d(TAG, "recyclerview2 newinstance");
@@ -118,8 +119,11 @@ public class Location_RecyclerView_Selected extends Fragment {
         if (MapsActivity.getWaypointwithDateList().isEmpty()) {
             //TODO: might need to change it to call toast or something
             mapdirection.setEnabled(false);
+            sorting.setEnabled(false);
+
         } else {
             mapdirection.setEnabled(true);
+            sorting.setEnabled(true);
 
         }
 
@@ -129,7 +133,15 @@ public class Location_RecyclerView_Selected extends Fragment {
         loadfirebase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    MapsActivity.pd.show();
+                }catch (Exception e){
 
+                    Log.d(TAG, "Some error has occured!" + e);
+
+                    Toast.makeText(getActivity().getApplicationContext().getApplicationContext(), "Some error has occured!", Toast
+                            .LENGTH_SHORT).show();
+                }
                 android.app.FragmentManager manager = getActivity().getFragmentManager();
                 android.app.Fragment frag = manager.findFragmentByTag("fragment_edit_name");
                 if (frag != null) {
@@ -286,32 +298,27 @@ public class Location_RecyclerView_Selected extends Fragment {
                                                 System.out.println("waypointaddstarttime" + waypoint);
 
                                             }
+//
 
                                             Collections.sort(waypoint, new Comparator<HashMap>() {
                                                 @Override
                                                 public int compare(HashMap o1, HashMap o2) {
-                                                    System.out.println("waypointaddstarttimechecking" + o1.get("starttime"));
-                                                    System.out.println("waypointaddstarttimechecking" + o2.get("starttime"));
+                                                    if (o1 != null && o2 != null) {
+                                                        System.out.println("waypointaddstarttimechecking" + o1.get("starttime"));
+                                                        System.out.println("waypointaddstarttimechecking" + o2.get("starttime"));
 //TODO: seems to work, need testing
-                                                    if (o1.get("starttime").toString().equals("0") ) {
-                                                        return 1;
-                                                    }
-                                                    if (o2.get("starttime").toString().equals("0")) {
-                                                        return -1;
-                                                    }
-//                                                    if (o1.get("starttime").toString().equals("0") || o2.get("starttime").toString().equals("0")) {
-//
-//                                                        System.out.println("waypointaddstarttimechecking" + " Has not run here");
-//
-//                                                        return 0;
-//
-//                                                    } else {
-
+                                                        if (o1.get("starttime").toString().equals("0")) {
+                                                            return 1;
+                                                        }
+                                                        if (o2.get("starttime").toString().equals("0")) {
+                                                            return -1;
+                                                        }
                                                         System.out.println("waypointaddstarttimechecking" + " Has run here");
 
                                                         return o1.get("starttime").toString().compareTo(o2.get("starttime").toString());
-                                              //      }
-
+                                                    } else {
+                                                        return 0;
+                                                    }
                                                 }
 
 

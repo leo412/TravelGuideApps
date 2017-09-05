@@ -18,8 +18,8 @@ android:background="@drawable/list_selector"
         android:id="@+id/list_image"
         android:layout_width="100dip"
         android:layout_height="100dip"
-        android:scaleType="matrix"
-
+        android:adjustViewBounds="true"
+        android:padding="3dp"
 
 
         />

@@ -21,7 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:isScrollContainer="true"
-        android:paddingBottom="300dp"
+        android:paddingBottom="320dp"
         >
 
         <TextView
@@ -61,6 +61,7 @@ android:id="@+id/addressicon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:paddingRight="50dp"
             android:text="Place Address PlaceHolder"
             android:textColor="?android:textColorSecondary"
             android:visibility="visible"
@@ -211,7 +212,8 @@ android:id="@+id/phoneicon"
             android:text="This place does not show opening hours"
             android:textColor="?android:textColorSecondary"
             android:visibility="visible"
-
+            android:paddingRight="50dp"
+android:textSize="20dp"
             app:layout_constraintLeft_toLeftOf="@+id/textViewAddressText"
             app:layout_constraintTop_toBottomOf="@+id/textViewOpenNowText"
             app:layout_gravity="fill_horizontal"

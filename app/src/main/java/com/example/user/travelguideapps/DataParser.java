@@ -4,19 +4,25 @@ package com.example.user.travelguideapps;
  * Created by User on 3/1/2017.
  */
 
+import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import static android.content.ContentValues.TAG;
 //Get Places (Why name Datapasers
 
-public class DataParser {
+public class DataParser extends Activity{
     //TODO: Make it obtain all data available?
     //TODO:seems to run twice when clicking view deatails and set places, possible to made it directly obtain previous data?
 //This is where Data is obtain from the internet
@@ -25,7 +31,6 @@ public class DataParser {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject;
         //placenumber 0 = many 1= single
-
         int placenumber = 0;
         try {
             jsonObject = new JSONObject((String) jsonData);
@@ -275,7 +280,6 @@ public class DataParser {
                     int i = jPlace.getJSONArray("reviews").length();
                     for (int j = 0; j < i; j++) {
 
-                        //Trying to get multipole photo checking
                         review_time_description.add(jPlace.getJSONArray("reviews").getJSONObject(j).getString("relative_time_description"));
 
 
@@ -413,7 +417,14 @@ public class DataParser {
             place.put("durationtonext", "");
             place.put("distancetonext", "");
 
-            Log.d(TAG, "placeeee " + place.toString());
+
+
+
+//setDistanceURL(getApplicationContext());
+
+
+//why runniing triple
+            Log.d(TAG, "runningdataparser " + place.toString());
 
             if (placenumber == 1) {
                 place.put("formatted_address", formatted_address);
@@ -433,4 +444,53 @@ public class DataParser {
         }
         return place;
     }
+    public static void setDistanceURL(Context mContext) {
+        Log.d("MapsAcitivity", "Setdistance inside");
+
+        try {
+            for (int i = 0; i < MapsActivity.getWaypointwithDateList().size(); i++) {
+                StringBuilder url = new StringBuilder();
+
+                HashMap h =  MapsActivity.getWaypointwithDateList().get(i);
+                HashMap end = new HashMap();
+                if (i + 1 <  MapsActivity.getWaypointwithDateList().size()) {
+                    end =  MapsActivity.getWaypointwithDateList().get(i + 1);
+                } else {
+                    end.put("place_id", "null");
+                }
+                //start 0 1
+                // 1 1
+                Log.d("A", "WaypointwithDateLigethash 1 " +  MapsActivity.getWaypointwithDateList());
+                Log.d("A", "WaypointwithDateLigethash 2 " + i);
+                Log.d("A", "WaypointwithDateLigethash 3 " + h);
+
+                Log.d("A", "WaypointwithDateLigethash 4 " + end);
+                Log.d(TAG, "WaypointwithDateLigethash 5" + url.toString());
+                ArrayList array = DataHolderClass.getInstance4().getDistributor_id4();
+
+                url.append("https://maps.googleapis.com/maps/api/distancematrix/json?");
+                url.append("origins=place_id:" + h.get("place_id") + "&destinations=place_id:" + end.get("place_id"));
+                if (array != null && !array.isEmpty()) {
+
+                    url.append("&mode=" + array.get(0));
+                    url.append("&avoid=" + array.get(1));
+                }
+                url.append("&key=AIzaSyD5XXsvbPu_ZMHr6D_nLfRmcIj7bESfzYk");
+                Log.d(TAG, "WaypointwithDateLigethash 6  " + url.toString());
+                if (!end.get("place_id").equals(null)) {
+                    MapsActivity.downloadDistanceurl download = new MapsActivity.downloadDistanceurl(mContext);
+                    download.execute(url.toString());
+
+                }
+            }
+//
+        } catch (Exception e) {
+            Log.d(TAG, "Server is busy, Please try agai 22222" + e.toString());
+
+            Toast.makeText(mContext.getApplicationContext().getApplicationContext(), "Server is busy, Please try again!", Toast
+                    .LENGTH_SHORT).show();
+
+        }
+    }
+
 }

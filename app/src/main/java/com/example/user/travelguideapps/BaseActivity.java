@@ -68,8 +68,6 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
         Log.d("BaseActivity", "Baserunning");
 
 
-
-
         setContentView(R.layout.activity_base);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
