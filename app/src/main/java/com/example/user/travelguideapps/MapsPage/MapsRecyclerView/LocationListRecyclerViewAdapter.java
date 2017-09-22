@@ -3,6 +3,7 @@ package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -55,6 +56,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 
         //mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        //  MapsActivity.setNextDistanceURL(mContext);
 
     }
 
@@ -110,7 +112,8 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         // set the data in items
         final Context mContext = holder.itemView.getContext();
         Log.d("LocationListRecyc", "LocationListRecycOnBindviewholder");
-
+        Log.d("A", "ttryginsytoseee   )" + holder.getAdapterPosition());
+        //  Log.d("A", "ttryginsytoseee   )" +mDataSource.get(holder.getAdapterPosition()).get("duration").toString());
 
         String singlephotoreference = mDataSource.get(position).get("photo_reference").toString();
         //Well this helps when comning back from other page sooo....so that i didnt reset to old one or some shit
@@ -159,6 +162,8 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         holder.lat.setText(mDataSource.get(position).get("lat").toString());
         holder.lng.setText(mDataSource.get(position).get("lng").toString());
 
+        holder.localdistancetext.setText(mDataSource.get(holder.getAdapterPosition()).get("distance").toString());
+        holder.localdurationtext.setText(mDataSource.get(holder.getAdapterPosition()).get("duration").toString());
 
         holder.vicinity.setText(mDataSource.get(position).get("vicinity").toString());
 
@@ -174,7 +179,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         //      +"&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().into(thumbnailImageView);
         //TODO: can change image to different type
         Log.d("A", "checkimagelocation" + list);
-        final ImageButton b = (ImageButton) holder.itemView.findViewById(R.id.details_btn);
+        final ImageButton detailsbutton = (ImageButton) holder.itemView.findViewById(R.id.details_btn);
         final ImageButton directionsbutton = (ImageButton) holder.itemView.findViewById(R.id.directions_btn);
         final ImageButton googlemapsbutton = (ImageButton) holder.itemView.findViewById(R.id.google_details_btn);
         //  final ImageButton timebutton = (ImageButton) holder.itemView.findViewById(R.id.time_btn);
@@ -197,15 +202,18 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 
             Picasso.with(mContext).load(R.drawable.googlemapsicon).fit().into
                     (googlemapsbutton);
-
+            Picasso.with(mContext).load(R.drawable.distanceicon).fit().into
+                    (holder.localdistance);
+            Picasso.with(mContext).load(R.drawable.durationicon).fit().into
+                    (holder.localduration);
             Picasso.with(mContext).load(R.drawable.viewdetails).fit().into
-                    (b);
+                    (detailsbutton);
             Picasso.with(mContext).load(R.drawable.directionsicon).fit().into
                     (directionsbutton);
 //            Picasso.with(mContext).load(R.drawable.timeicon).fit().into
 //                    (timebutton);
         } catch (Exception e) {
-
+//roxasshestikersherxion runs away fromhim
             Toast.makeText(mContext, "An exception has occured (Picasso)" + e, Toast.LENGTH_SHORT).show();
         }
         // implement setOnClickListener event on item view.
@@ -215,7 +223,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         final String lng = holder.lng.getText().toString();
         holder2 = holder;
         Log.d("A", "DujjjjjjjonbidViewholder" + holder2);
-        b.setVisibility(View.VISIBLE);
+        detailsbutton.setVisibility(View.VISIBLE);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
 
@@ -225,7 +233,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
                 //Allow single selection hack,...
                 notifyDataSetChanged();
                 //TODO: uhhhh this one is not really that important anyway....
-                //   b.setVisibility(View.VISIBLE);
+                //   detailsbutton.setVisibility(View.VISIBLE);
 
                 ArrayList<Marker> mapMarkers = MapsActivity.getMapMarkers();
                 clickedView = view;
@@ -285,12 +293,20 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
                 mContext.startActivity(intent);
             }
         });
-        b.setOnClickListener(new View.OnClickListener() {
+        detailsbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 //TODO: Move data to there
+                detailsbutton.setEnabled(false);
                 View parentRow = (View) v.getParent();
-                //tODO:CHECK
+                //tODO:CHECK  java.lang.RuntimeException: Could not read input channel file descriptors from parcel.
+//disabled for .... reasons
+
+
+                if (MapsActivity.pd.isShowing()) {
+                    MapsActivity.pd.dismiss();
+                }
+
                 MapsActivity.pd.show();
 
 
@@ -319,7 +335,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
                 fragmentTransaction.addToBackStack(null);
                 fragmentTransaction.commit();
 
-
+                detailsbutton.setEnabled(true);
             }
         });
 //        timebutton.setOnClickListener(new View.OnClickListener() {
@@ -327,7 +343,8 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 //            public void onClick(View v) {
 ////TODO: Move data to there
 //                View parentRow = (View) v.getParent();
-//                MapsActivity.pd.show();
+//                if(MapsActivity.pd.isShowing()){      MapsActivity.pd.dismiss();  }                  if (MapsActivity.pd.isShowing()) {
+//           MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
 //
 //
 //                TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
@@ -360,7 +377,17 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 //
 //            }
 //        });
-MapsActivity.pd.dismiss();
+        //MapsActivity.pd.dismiss();
+        Runnable progressRunnable = new Runnable() {
+
+            @Override
+            public void run() {
+                MapsActivity.pd.dismiss();
+            }
+        };
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 1000);
+//noshiti widk i was yeethe raoty ewhen that everyne hangingeve
     }
 
 
@@ -389,7 +416,11 @@ MapsActivity.pd.dismiss();
         TextView lng;
         ImageView selectedimage;
         TextView Selected;
+        TextView localdistancetext;
+        TextView localdurationtext;
+        ImageView localdistance;
 
+        ImageView localduration;
         ImageView image;
         AdapterView.OnItemClickListener mItemClickListener;
 
@@ -406,6 +437,10 @@ MapsActivity.pd.dismiss();
             selectedimage = (ImageView) itemView.findViewById(R.id.selectedimage);
             Picasso.with(mContext).load(R.drawable.selected).fit().into
                     (selectedimage);
+            localdurationtext = (TextView) itemView.findViewById(R.id.local_duration_text);
+            localdistancetext = (TextView) itemView.findViewById(R.id.local_distance_text);
+            localdistance = (ImageView) itemView.findViewById(R.id.local_distance);
+            localduration = (ImageView) itemView.findViewById(R.id.local_duration);
 
         }
     }

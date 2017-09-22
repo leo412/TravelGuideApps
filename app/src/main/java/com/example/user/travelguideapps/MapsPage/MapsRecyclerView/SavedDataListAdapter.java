@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.example.user.travelguideapps.BaseActivity;
 import com.example.user.travelguideapps.ConfirmationDialog;
+import com.example.user.travelguideapps.DataHolderClass;
 import com.example.user.travelguideapps.LoginPage.LoginActivity;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.MapsPage.MapsRecyclerView.SavedDataListFragment.OnListFragmentInteractionListener;
@@ -204,7 +205,7 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
             @Override
             public void onClick(View v) {
 
-                MapsActivity.pd.show();
+                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
 
 
                 final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -220,7 +221,7 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         System.out.println("THIS IS IT" + dataSnapshot.getValue());
                    //     Toast.makeText(mContext, "Location Loaded ",  Toast.LENGTH_SHORT).show();
-                        MapsActivity.pd.show();
+                                         if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
                         ArrayList<HashMap> post = new ArrayList<HashMap>();
                         ArrayList<HashMap> nostarttime = new ArrayList<HashMap>();
 
@@ -251,7 +252,7 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                             //   ArrayList<HashMap> post = (ArrayList<HashMap>) dataSnapshot.getValue();
                             ArrayList array = new ArrayList();
                             array.add(post.get(0));
-                            System.out.println("THIS IS IT" + post);
+                            System.out.println("THISisthepostthat" + post);
 
 
                             System.out.println("THIS IS IT array" + array);
@@ -259,17 +260,17 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
 
                             //Why should i have made this get 0...
                             MapsActivity.setWaypointwithDateList(post);
-                            //Cannot directly update, findways to reset details,,,,
+                            //Cannot directly update, findways to reset details
 
                             System.out.println("waypointdetailsList: " + MapsActivity
                                     .getWayPointDetailsList());
                             System.out.println("waypointdetailsList222: " + MapsActivity
                                     .getWaypointwithDateList());
-                            System.out.println("waypointdetailsList222: " + MapsActivity
-                                    .getWayPointDetailsList());
+
                             //TODO changed from normal to support,( nope still might have error
                             //TODO:Must solved this too random
 
+                            DataHolderClass.getBooleanhaschanges().setdistributor_idbooleanhaschanges(true);
 
                             if (fragmentManager.getBackStackEntryCount() > 0) {
 

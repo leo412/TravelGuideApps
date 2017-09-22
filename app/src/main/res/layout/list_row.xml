@@ -18,8 +18,8 @@
         android:layout_width="100dip"
         android:layout_height="100dip"
         android:adjustViewBounds="true"
+        android:background="#f4c542"
         android:padding="3dp"
-android:background="#f4c542"
         />
 
     <!-- Title Of Song-->
@@ -94,6 +94,68 @@ android:background="#f4c542"
         tools:layout_constraintTop_creator="1"
         />
 
+    <ImageView
+        android:id="@+id/local_distance"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+
+        android:adjustViewBounds="true"
+
+        android:background="#00000000"
+        android:focusable="false"
+        android:scaleType="fitStart"
+        android:visibility="visible"
+        app:layout_constraintLeft_toLeftOf="@+id/title"
+        app:layout_constraintTop_toBottomOf="@+id/ratingBar"/>
+
+    <TextView
+        android:id="@+id/local_distance_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="distance"
+        android:textColor="#10bcc9"
+        android:textSize="10dip"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/local_distance"
+        app:layout_constraintLeft_toRightOf="@+id/local_distance"
+        app:layout_constraintTop_toTopOf="@+id/local_distance"
+
+
+        />
+
+    <ImageView
+        android:id="@+id/local_duration"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+
+        android:adjustViewBounds="true"
+
+        android:background="#00000000"
+        android:focusable="false"
+        android:scaleType="fitStart"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/local_distance"
+        app:layout_constraintLeft_toRightOf="@+id/local_distance_text"
+        app:layout_constraintTop_toTopOf="@+id/local_distance"
+
+
+        />
+
+    <TextView
+        android:id="@+id/local_duration_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="distance"
+        android:textColor="#10bcc9"
+        android:textSize="10dip"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/local_distance"
+        app:layout_constraintLeft_toRightOf="@+id/local_duration"
+        app:layout_constraintTop_toTopOf="@+id/local_distance"
+
+
+        />
+
     <TextView
         android:id="@+id/lat"
         android:layout_width="wrap_content"
@@ -112,8 +174,6 @@ android:background="#f4c542"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintRight_creator="1"
         tools:layout_constraintTop_creator="1"/>
-
-
 
 
     <TextView
@@ -154,15 +214,15 @@ android:background="#f4c542"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginTop="5dp"
+        android:adjustViewBounds="true"
         android:background="#FFFFFF"
         android:focusable="false"
         android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
         android:text="View Details"
 
         app:layout_constraintLeft_toLeftOf="@id/title"
         app:layout_constraintLeft_toRightOf="@id/list_image"
-        app:layout_constraintTop_toBottomOf="@id/locationvisittime"/>
+        app:layout_constraintTop_toBottomOf="@id/local_distance"/>
 
 
     <ImageButton
@@ -171,30 +231,31 @@ android:background="#f4c542"
 
         android:layout_height="30dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="5dp"
-        android:background= "#00000000"
+        android:adjustViewBounds="true"
+        android:background="#00000000"
         android:focusable="false"
         android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
 
         android:text="View Details"
         app:layout_constraintLeft_toRightOf="@id/details_btn"
-        app:layout_constraintTop_toBottomOf="@id/locationvisittime"/>
+        app:layout_constraintTop_toTopOf="@id/details_btn"
+
+        />
 
     <ImageButton
         android:id="@+id/google_details_btn"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginLeft="15dp"
-        android:layout_marginTop="5dp"
-        android:background= "#00000000"
+        android:adjustViewBounds="true"
+        android:background="#00000000"
         android:focusable="false"
         android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
 
         android:text="View Details"
         app:layout_constraintLeft_toRightOf="@id/directions_btn"
-        app:layout_constraintTop_toBottomOf="@id/locationvisittime"/>
+        app:layout_constraintTop_toTopOf="@id/details_btn"
+        />
 
 
     <ImageView
@@ -203,11 +264,11 @@ android:background="#f4c542"
         android:layout_height="30dp"
         android:layout_marginRight="10dp"
         android:adjustViewBounds="true"
-        android:background= "#00000000"
+        android:background="#00000000"
 
         android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ratingBar"
+        app:layout_constraintTop_toTopOf="@id/details_btn"
         />
 
 

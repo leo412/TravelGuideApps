@@ -413,7 +413,6 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         super.onStart();
 
-
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         //      AppIndex.AppIndexApi.start(mGoogleApiClient, getIndexApiAction());

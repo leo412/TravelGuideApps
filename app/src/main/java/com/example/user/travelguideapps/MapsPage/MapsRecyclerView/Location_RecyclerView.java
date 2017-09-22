@@ -380,18 +380,14 @@ public class Location_RecyclerView extends Fragment {
                                         Collections.sort(nearbyPlacesList, new Comparator<LinkedHashMap>() {
                                             @Override
                                             public int compare(LinkedHashMap o1, LinkedHashMap o2) {
-                                                //  System.out.println("dudeUhhhyeh 1111" + waypoint);
 
-                                                System.out.println("dudeUhhhyeh 3333" + o1.toString());
-                                                System.out.println("dudeUhhhyeh 4444" + o2.toString());
-                                                System.out.println("dudeUhhhyeh 5555555" + o2.get("rating").toString().compareTo(o1.get("rating")
-                                                        .toString()));
 
                                                 return o1.get("place_name").toString().compareTo(o2.get("place_name").toString());
                                             }
                                         });
                                         //            Collections.sort(nearbyPlacesList, new MapComparator("place_name"));
-//
+
+
                                         //    MapsActivity.setWayPointDetailsList(waypoint);
 
                                         break;
@@ -401,10 +397,6 @@ public class Location_RecyclerView extends Fragment {
                                             @Override
                                             public int compare(LinkedHashMap o1, LinkedHashMap o2) {
 
-                                                System.out.println("dudeUhhhyeh 3333" + o1.toString());
-                                                System.out.println("dudeUhhhyeh 4444" + o2.toString());
-                                                System.out.println("dudeUhhhyeh 5555555" + o2.get("rating").toString().compareTo(o1.get("rating")
-                                                        .toString()));
 
                                                 return o2.get("rating").toString().compareTo(o1.get("rating").toString());
                                             }
@@ -450,7 +442,7 @@ public class Location_RecyclerView extends Fragment {
         recyclerView.addItemDecoration(new SpacesItemDecoration(50));
 
         recyclerView.setAdapter(Locationadapter);
-        Locationadapter.notifyDataSetChanged();
+        // Locationadapter.notifyDataSetChanged();
         System.out.println("checknearbyPlacesList1 " + nearbyPlacesList);
         System.out.println("checknearbyPlacesList2 " + MapsActivity.getNearbyPlacesList());
         System.out.println("checknearbyPlacesList3  " + recyclerviewvisible);
@@ -648,7 +640,7 @@ public class Location_RecyclerView extends Fragment {
                                 } else {
 
                                     expandableLayout.collapse();
-                                    MapsActivity.pd.show();
+                                                     if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
                                     StringBuilder a = nearbyListBuilder(LocationType);
                                     //  emptyview.setVisibility(View.GONE);
                                     recyclerviewvisible = true;
@@ -684,7 +676,7 @@ public class Location_RecyclerView extends Fragment {
                                 StringBuilder s = new StringBuilder();
                                 s.append("amusement_park|aquarium|bowling_alley|campground|library");
                                 expandableLayout.collapse();
-                                MapsActivity.pd.show();
+                                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);
                                 //  emptyview.setVisibility(View.GONE);
                                 recyclerviewvisible = true;
@@ -723,7 +715,7 @@ public class Location_RecyclerView extends Fragment {
                                 //        .travelguideapps-2/split_lib_dependencies_apk.apk has in excess of 100 dex files. Please consider
                                 //          coalescing and shrinking the number to  avoid runtime overhead.
 
-                                MapsActivity.pd.show();
+                                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);
                                 //  emptyview.setVisibility(View.GONE);
                                 recyclerviewvisible = true;
@@ -756,7 +748,7 @@ public class Location_RecyclerView extends Fragment {
                                 StringBuilder s = new StringBuilder();
                                 s.append("restaurant|bakery|bar|cafe");
                                 expandableLayout.collapse();
-                                MapsActivity.pd.show();
+                                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);
                                 //  emptyview.setVisibility(View.GONE);
                                 recyclerviewvisible = true;
@@ -775,6 +767,7 @@ public class Location_RecyclerView extends Fragment {
                         recyclerviewvisible = false;
                         recyclerView.setVisibility(View.GONE);
                         Locationadapter.notifyDataSetChanged();
+
 //                        Fragment frg = null;
 //                        frg = getFragmentManager().findFragmentByTag("Your_Fragment_TAG");
 //                        ft = getFragmentManager().beginTransaction();

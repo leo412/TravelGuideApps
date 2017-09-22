@@ -127,8 +127,8 @@ public class Time_Selection_Fragment extends Fragment {
     boolean executesave = false;
     LinkedHashMap waypointwithdateafter = new LinkedHashMap();
 
+    //e
     public static void setDuration(long duration) {
-        Log.d(TAG, "Set Duration");
 
         timeduration = duration;
 
@@ -190,7 +190,7 @@ public class Time_Selection_Fragment extends Fragment {
 //to get the "saved" data and display it when showing in the view
                 //same id : remove image, show the
 
-                if (waypointwithdatelist.get(i).get("place_id").equals(placedetail.get("place_id"))){
+                if (waypointwithdatelist.get(i).get("place_id").equals(placedetail.get("place_id"))) {
 //The single placeid, date for 1 location
                     waypointwithdate = waypointwithdatelist.get(i);
                     Log.d(TAG, " waypointwithdate" + waypointwithdate);
@@ -228,7 +228,7 @@ public class Time_Selection_Fragment extends Fragment {
                         selectedduration.setText(days + "days and " + hours + " hours and " + minutes + " minutes");
 
                         long endtime = Long.parseLong(waypointwithdatelist.get(i).get("starttime").toString()) * 1000 + timestamp * 1000;
-                      //  Log.d("haha", "craps" + Long.parseLong(waypointwithdatelist.get(i).get(1).toString()));
+                        //  Log.d("haha", "craps" + Long.parseLong(waypointwithdatelist.get(i).get(1).toString()));
                         Log.d("haha", "craps" + endtime);
                         SimpleDateFormat outputFormat = new SimpleDateFormat("dd-MMM-yyyy HH:mm");
                         Date date = new Date(endtime);
@@ -836,8 +836,6 @@ public class Time_Selection_Fragment extends Fragment {
                         checkisopened = showSelectionDialog(getActivity(), "The location is not opened at the time selected!\n End Time: " +
                                 " " + timeformat2.format(timeformat.parse(newStartArray.get(i + 2).toString())) + "\nYour End Selected Time: " +
                                 "" + timeformat2.format(timeformat.parse(endtime.substring(4).toString())));
-
-
 
 
                         break;

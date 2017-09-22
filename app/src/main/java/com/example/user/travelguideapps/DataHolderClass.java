@@ -3,6 +3,7 @@ package com.example.user.travelguideapps;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by User on 5/31/2017.
@@ -14,6 +15,9 @@ public class DataHolderClass {
     private static DataHolderClass dataObject3 = null;
     private static DataHolderClass dataObjectarray = null;
     private static DataHolderClass dataObject4 = null;
+
+    private static DataHolderClass arraylistofradio = null;
+    private static DataHolderClass booleanhaschanges = null;
 
     private DataHolderClass() {
         // left blank intentionally
@@ -123,4 +127,35 @@ public class DataHolderClass {
 
 
 
+
+    public static DataHolderClass getInstancearraylistofradio() {
+        if (arraylistofradio == null)
+            arraylistofradio = new DataHolderClass();
+        return arraylistofradio;
+    }
+    private HashMap<Integer,ArrayList> distributor_idarraylistofradio;
+
+    public HashMap<Integer,ArrayList>getDistributor_idarraylistofradio() {
+        return distributor_idarraylistofradio;
+    }
+
+    public void setDistributor_idarraylistofradio( HashMap<Integer,ArrayList> distributor_idarraylistofradio) {
+        this.distributor_idarraylistofradio = distributor_idarraylistofradio;
+    }
+
+
+    public static DataHolderClass getBooleanhaschanges() {
+        if (booleanhaschanges == null)
+            booleanhaschanges = new DataHolderClass();
+        return booleanhaschanges;
+    }
+    private boolean distributor_idbooleanhaschanges;
+
+    public boolean getbooleanhaschanges() {
+        return distributor_idbooleanhaschanges;
+    }
+
+    public void setdistributor_idbooleanhaschanges( boolean distributor_idbooleanhaschanges) {
+        this.distributor_idbooleanhaschanges = distributor_idbooleanhaschanges;
+    }
 }

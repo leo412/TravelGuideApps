@@ -16,13 +16,14 @@
     <ImageView
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/list_image"
-        android:layout_width="100dip"
-        android:layout_height="100dip"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:adjustViewBounds="true"
         android:background="#f4c542"
         android:padding="3dp"
 
-        />
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="0dp"/>
 
     <!-- Title Of Song-->
     <TextView
@@ -30,6 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="5dp"
+        android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:ellipsize="marquee"
         android:focusable="true"
@@ -39,13 +41,12 @@
         android:textSize="15dip"
         android:textStyle="bold"
         android:typeface="sans"
-        app:layout_constraintLeft_toRightOf="@id/list_image"
+        app:layout_constraintLeft_toRightOf="@+id/list_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:layout_constraintLeft_creator="1"
-        tools:layout_constraintTop_creator="1"
 
 
-        />
+        tools:layout_constraintTop_creator="1"/>
 
     <!-- Artist Name -->
     <TextView
@@ -61,8 +62,7 @@
         android:text="vicinity"
         android:textColor="#343434"
         android:textSize="10dip"
-        app:layout_constraintLeft_toLeftOf="@+id/title"
-        app:layout_constraintLeft_toRightOf="@id/list_image"
+        app:layout_constraintLeft_toRightOf="@+id/list_image"
         app:layout_constraintTop_toBottomOf="@+id/title"
         tools:layout_constraintLeft_creator="1"
         tools:layout_constraintTop_creator="1"
@@ -93,8 +93,8 @@
         android:focusable="false"
         android:scaleType="fitStart"
         android:visibility="visible"
-        app:layout_constraintLeft_toLeftOf="@id/title"
-        app:layout_constraintTop_toBottomOf="@id/ratingBar"/>
+        app:layout_constraintLeft_toLeftOf="@+id/title"
+        app:layout_constraintTop_toBottomOf="@+id/ratingBar"/>
 
     <TextView
         android:id="@+id/local_distance_text"
@@ -104,12 +104,13 @@
         android:textColor="#10bcc9"
         android:textSize="10dip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/local_distance"
-        app:layout_constraintLeft_toRightOf="@id/local_distance"
-        app:layout_constraintTop_toTopOf="@id/local_distance"
+        app:layout_constraintBottom_toBottomOf="@+id/local_distance"
+        app:layout_constraintLeft_toRightOf="@+id/local_distance"
+        app:layout_constraintTop_toTopOf="@+id/local_distance"
 
 
         />
+
     <ImageView
         android:id="@+id/local_duration"
         android:layout_width="20dp"
@@ -121,9 +122,9 @@
         android:focusable="false"
         android:scaleType="fitStart"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="@id/local_distance"
-        app:layout_constraintLeft_toRightOf="@id/local_distance_text"
-        app:layout_constraintTop_toTopOf="@id/local_distance"
+        app:layout_constraintBottom_toBottomOf="@+id/local_distance"
+        app:layout_constraintLeft_toRightOf="@+id/local_distance_text"
+        app:layout_constraintTop_toTopOf="@+id/local_distance"
 
 
         />
@@ -136,12 +137,14 @@
         android:textColor="#10bcc9"
         android:textSize="10dip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/local_distance"
-        app:layout_constraintLeft_toRightOf="@id/local_duration"
-        app:layout_constraintTop_toTopOf="@id/local_distance"
+        app:layout_constraintBottom_toBottomOf="@+id/local_distance"
+        app:layout_constraintLeft_toRightOf="@+id/local_duration"
+        app:layout_constraintTop_toTopOf="@+id/local_distance"
 
 
         />
+
+
     <TextView
         android:id="@+id/lat"
         android:layout_width="wrap_content"
@@ -206,9 +209,8 @@
         android:scaleType="fitCenter"
         android:text="View Details"
 
-        app:layout_constraintLeft_toLeftOf="@id/title"
-        app:layout_constraintLeft_toRightOf="@id/list_image"
-        app:layout_constraintTop_toBottomOf="@id/local_distance"/>
+        app:layout_constraintLeft_toRightOf="@+id/list_image"
+        app:layout_constraintTop_toBottomOf="@+id/local_distance"/>
 
 
     <ImageButton
@@ -217,73 +219,84 @@
 
         android:layout_height="30dp"
         android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
         android:adjustViewBounds="true"
         android:background="#00000000"
         android:focusable="false"
+
         android:scaleType="fitCenter"
-
         android:text="View Details"
-        app:layout_constraintLeft_toRightOf="@id/details_btn"
-        app:layout_constraintTop_toTopOf="@id/details_btn"
+        app:layout_constraintLeft_toRightOf="@+id/details_btn"
 
 
-        />
+        app:layout_constraintTop_toTopOf="@+id/details_btn"/>
 
     <ImageButton
         android:id="@+id/google_details_btn"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
         android:adjustViewBounds="true"
         android:background="#00000000"
         android:focusable="false"
-        android:scaleType="fitCenter"
 
+        android:scaleType="fitCenter"
         android:text="View Details"
-        app:layout_constraintLeft_toRightOf="@id/directions_btn"
-        app:layout_constraintTop_toTopOf="@id/details_btn"/>
+        app:layout_constraintLeft_toRightOf="@+id/directions_btn"
+        app:layout_constraintTop_toTopOf="@+id/details_btn"/>
 
     <ImageButton
         android:id="@+id/time_btn"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_marginLeft="15dp"
+        android:layout_marginStart="15dp"
         android:adjustViewBounds="true"
         android:background="#00000000"
         android:focusable="false"
         android:scaleType="fitCenter"
-        android:text="View Details"
 
-        app:layout_constraintLeft_toRightOf="@id/google_details_btn"
-        app:layout_constraintTop_toTopOf="@id/details_btn"/>
+        android:text="View Details"
+        app:layout_constraintLeft_toRightOf="@+id/google_details_btn"
+        app:layout_constraintTop_toTopOf="@+id/details_btn"/>
 
     <ImageView
         android:id="@+id/selectedimage"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_marginRight="10dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:adjustViewBounds="true"
         android:background="#00000000"
 
         android:visibility="gone"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="@id/details_btn"/>
+        app:layout_constraintTop_toTopOf="@+id/details_btn"/>
     />
-
     <ImageView
-        android:id="@+id/arrow_down"
-        android:layout_width="50dp"
-        android:layout_height="130dp"
+        android:id="@+id/selectedimage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:adjustViewBounds="true"
         android:background="#00000000"
+
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/details_btn"/>
+    />
+    <ImageView
+        android:id="@+id/arrow_down"
+        android:layout_width="match_parent"
+        android:layout_height="130dp"
+        android:adjustViewBounds="true"
+        android:background="#f3f3f3"
         android:focusable="false"
+        android:paddingTop="10dp"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:layout_constraintLeft_toLeftOf="@+id/list_image"
+        app:layout_constraintRight_toRightOf="@+id/list_image"
 
-        android:scaleType="fitStart"
-        android:visibility="visible"
-        app:layout_constraintLeft_toLeftOf="@id/list_image"
-        app:layout_constraintRight_toRightOf="@id/list_image"
-
-        app:layout_constraintTop_toBottomOf="@id/list_image"
+        app:layout_constraintTop_toBottomOf="@+id/details_btn"
         />
 
 
@@ -293,27 +306,28 @@
         android:layout_height="50dp"
 
         android:adjustViewBounds="true"
-
-        android:background="#00000000"
+android:paddingLeft="10dp"
+        android:background="#80ffffff"
         android:focusable="false"
         android:scaleType="fitStart"
         android:visibility="visible"
-        app:layout_constraintLeft_toRightOf="@id/arrow_down"
+        app:layout_constraintLeft_toLeftOf="@+id/list_image"
 
-        app:layout_constraintTop_toTopOf="@id/arrow_down"
+        app:layout_constraintTop_toBottomOf="@+id/details_btn"
         />
 
     <TextView
         android:id="@+id/distance_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="distance"
+        android:layout_height="match_parent"
+        android:text="Loading..."
         android:textColor="#10bcc9"
         android:textSize="10dip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/distance"
-        app:layout_constraintLeft_toRightOf="@id/distance"
-        app:layout_constraintTop_toTopOf="@id/distance"
+        app:layout_constraintBottom_toBottomOf="@+id/distance"
+        app:layout_constraintLeft_toRightOf="@+id/distance"
+        app:layout_constraintTop_toTopOf="@+id/distance"
+        android:background="#80ffffff"
 
 
         />
@@ -323,56 +337,69 @@
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:adjustViewBounds="true"
-        android:background="#00000000"
+        android:background="#80ffffff"
         android:focusable="false"
         android:scaleType="fitStart"
         android:visibility="visible"
-        app:layout_constraintLeft_toRightOf="@id/arrow_down"
+        app:layout_constraintLeft_toLeftOf="@+id/distance"
 
-        app:layout_constraintTop_toBottomOf="@id/distance"
+        app:layout_constraintTop_toBottomOf="@+id/distance"
         />
 
     <TextView
         android:id="@+id/duration_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="duration"
+        android:layout_height="match_parent"
+        android:text="Loading..."
         android:textColor="#10bcc9"
         android:textSize="10dip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/duration"
-        app:layout_constraintLeft_toRightOf="@id/duration"
-        app:layout_constraintTop_toTopOf="@id/duration"
+        app:layout_constraintBottom_toBottomOf="@+id/duration"
+        app:layout_constraintLeft_toRightOf="@+id/duration"
+        app:layout_constraintTop_toTopOf="@+id/duration"
+        android:background="#80ffffff"
 
 
         />
+    <ImageButton
+        android:id="@+id/travellocalsettingbutton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:adjustViewBounds="true"
+        android:background="#00000000"
+        android:focusable="false"
 
+        android:scaleType="fitStart"
+        app:layout_constraintBottom_toBottomOf="@id/local_distance"
+app:layout_constraintLeft_toRightOf="@id/local_duration_text"
+        />
     <ImageView
         android:id="@+id/departuretime"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:adjustViewBounds="true"
-        android:background="#00000000"
+        android:background="#80ffffff"
         android:focusable="false"
         android:scaleType="fitStart"
         android:visibility="visible"
-        app:layout_constraintLeft_toRightOf="@id/distance_text"
+        app:layout_constraintLeft_toRightOf="@+id/distance_text"
 
-        app:layout_constraintTop_toTopOf="@id/distance"
+        app:layout_constraintTop_toTopOf="@+id/distance"
         />
 
     <TextView
         android:id="@+id/departure_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="duration"
+        android:layout_height="match_parent"
+        android:text="Loading..."
         android:textColor="#10bcc9"
         android:textSize="10dip"
         android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="@id/departuretime"
-        app:layout_constraintLeft_toRightOf="@id/departuretime"
-        app:layout_constraintTop_toTopOf="@id/departuretime"
+        app:layout_constraintBottom_toBottomOf="@+id/departuretime"
+        app:layout_constraintLeft_toRightOf="@+id/departuretime"
+        app:layout_constraintTop_toTopOf="@+id/departuretime"
 
+        android:background="#80ffffff"
 
         />
 

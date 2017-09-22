@@ -22,7 +22,7 @@ import java.util.LinkedHashMap;
 import static android.content.ContentValues.TAG;
 //Get Places (Why name Datapasers
 
-public class DataParser extends Activity{
+public class DataParser extends Activity {
     //TODO: Make it obtain all data available?
     //TODO:seems to run twice when clicking view deatails and set places, possible to made it directly obtain previous data?
 //This is where Data is obtain from the internet
@@ -113,10 +113,8 @@ public class DataParser extends Activity{
         String multiple_photo_references = "";
         String review = "";
 
-        String distancetonext="";
-        String durationtonext="";
-
-
+        String distancetonext = "";
+        String durationtonext = "";
 
 
         //Single Location Details
@@ -234,7 +232,7 @@ public class DataParser extends Activity{
 
 
                     }
-
+//it would bethe threat as 20 ear s i was i coul
 
                 } else {
                     photo_reference.add("Empty");
@@ -395,6 +393,19 @@ public class DataParser extends Activity{
 
             latitude = jPlace.getJSONObject("geometry").getJSONObject("location").getString("lat");
 
+
+//            MapsActivity.downloadDistanceurl downloadlocal = new MapsActivity.downloadDistanceurl(getApplicationContext(), true);
+//            StringBuilder localurl = new StringBuilder();
+//
+//            localurl.append("https://maps.googleapis.com/maps/api/distancematrix/json?");
+//
+//            localurl.append("origins=" + BaseActivity.getCurrentLocation().getLatitude() + "," +
+//                    BaseActivity.getCurrentLocation().getLongitude() +
+//                    "&destinations=place_id:" + place_id);
+//            localurl.append("&key=AIzaSyD5XXsvbPu_ZMHr6D_nLfRmcIj7bESfzYk");
+//            downloadlocal.execute(localurl.toString());
+
+
             reference = jPlace.getString("reference");
             place.put("place_name", placeName);
             place.put("vicinity", vicinity);
@@ -414,16 +425,15 @@ public class DataParser extends Activity{
             place.put("opening_hours", opening_hours.toString());
             place.put("opening_hours_text", opening_hours_Text.toString());
 
-            place.put("durationtonext", "");
-            place.put("distancetonext", "");
+            place.put("durationtonext", 0L);
+            place.put("distancetonext", 0L);
+            place.put("timetostarttravel", 0L);
+
+            place.put("duration", "N/A");
+            place.put("distance", "N/A");
+            place.put("starttime", 0L);
 
 
-
-
-//setDistanceURL(getApplicationContext());
-
-
-//why runniing triple
             Log.d(TAG, "runningdataparser " + place.toString());
 
             if (placenumber == 1) {
@@ -444,6 +454,7 @@ public class DataParser extends Activity{
         }
         return place;
     }
+
     public static void setDistanceURL(Context mContext) {
         Log.d("MapsAcitivity", "Setdistance inside");
 
@@ -451,16 +462,16 @@ public class DataParser extends Activity{
             for (int i = 0; i < MapsActivity.getWaypointwithDateList().size(); i++) {
                 StringBuilder url = new StringBuilder();
 
-                HashMap h =  MapsActivity.getWaypointwithDateList().get(i);
+                HashMap h = MapsActivity.getWaypointwithDateList().get(i);
                 HashMap end = new HashMap();
-                if (i + 1 <  MapsActivity.getWaypointwithDateList().size()) {
-                    end =  MapsActivity.getWaypointwithDateList().get(i + 1);
+                if (i + 1 < MapsActivity.getWaypointwithDateList().size()) {
+                    end = MapsActivity.getWaypointwithDateList().get(i + 1);
                 } else {
                     end.put("place_id", "null");
                 }
                 //start 0 1
                 // 1 1
-                Log.d("A", "WaypointwithDateLigethash 1 " +  MapsActivity.getWaypointwithDateList());
+                Log.d("A", "WaypointwithDateLigethash 1 " + MapsActivity.getWaypointwithDateList());
                 Log.d("A", "WaypointwithDateLigethash 2 " + i);
                 Log.d("A", "WaypointwithDateLigethash 3 " + h);
 
@@ -478,8 +489,8 @@ public class DataParser extends Activity{
                 url.append("&key=AIzaSyD5XXsvbPu_ZMHr6D_nLfRmcIj7bESfzYk");
                 Log.d(TAG, "WaypointwithDateLigethash 6  " + url.toString());
                 if (!end.get("place_id").equals(null)) {
-                    MapsActivity.downloadDistanceurl download = new MapsActivity.downloadDistanceurl(mContext);
-                    download.execute(url.toString());
+//                    MapsActivity.downloadDistanceurl download = new MapsActivity.downloadDistanceurl(mContext);
+//                    download.execute(url.toString());
 
                 }
             }

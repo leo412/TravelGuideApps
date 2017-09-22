@@ -1,9 +1,9 @@
 package com.example.user.travelguideapps.MapsPage.MapsRecyclerView;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -42,12 +42,11 @@ import static com.example.user.travelguideapps.MapsPage.MapsActivity.CurrentLoca
 //TODO: Edit2 Yeeeppp this is probably needed, because they need different function in finding setchecked..
 //TODO: most probably this is not needed, change if only needed .... called from LocationRecyclerVIew1/2
 public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapter<SelectedLocationListRecyclerViewAdapter.MyViewHolder> {
-    private Context mContext;
     private LayoutInflater mInflater;
     private static List<LinkedHashMap<String, Object>> mDataSource;
     private static List<LinkedHashMap<String, Object>> mDataSourceforSend;
 
-    private int Position;
+    private int position;
     private static RecyclerView.ViewHolder holder2;
     private ProgressDialog pDialog;
 
@@ -55,23 +54,18 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
     private static ArrayList distance = new ArrayList();
 
 
-    public SelectedLocationListRecyclerViewAdapter(Context context, ArrayList<LinkedHashMap<String, Object>> items) {
-        mContext = context;
-
-        mDataSourceforSend = items;
+    public SelectedLocationListRecyclerViewAdapter(ArrayList<LinkedHashMap<String, Object>> items) {
         mDataSource = items;
-
-        mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        //   mInflater = (LayoutInflater) holder.itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 
     }
-    //1
 
 
     //2
     //  @Override
-    //public Object getItem(int position) {
-    //     return mDataSource.get(position);
+    //public Object getItem(int holder.getAdapterPosition()) {
+    //     return mDataSource.get(holder.getAdapterPosition());
     // }
 
     //3
@@ -80,11 +74,6 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
         return position;
     }
 
-    public static List<LinkedHashMap<String, Object>> getItem() {
-
-
-        return mDataSourceforSend;
-    }
 
     public static RecyclerView.ViewHolder getHolder2() {
         return holder2;
@@ -103,7 +92,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
         return vh;
     }
 
-    int globalPosition = -1;
+    int globalposition = -1;
     boolean completedloop = false;
     int previousposition = -1;
     ArrayList previousarray = new ArrayList();
@@ -114,42 +103,42 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 //new box(except of events cards
 //        duration.clear();
 //        distance.clear();
+        Log.d("A", "selectedwaypoinaskdakjsd " + mDataSource);
 
 
-        Log.d("A", "testingforpositionrunnning fort positions" + previousposition + "><" + position);
-
-        if (previousarray.contains(position)) {
+        if (previousarray.contains(holder.getAdapterPosition())) {
             //becomes false = don't run notify
             completedloop = true;
-            Log.d("A", "testingforposition" + "TOPPPPPPPP" + distance);
+            Log.d("A", "testingforholder.getAdapterPosition()" + "TOPPPPPPPP" + distance);
 
 
         } else {
             //Run notify??
-            Log.d("A", "testingforposition" + "BOTTTTTTOM" + distance);
+            Log.d("A", "testingforholder.getAdapterPosition()" + "BOTTTTTTOM" + distance);
 
             completedloop = false;
 
         }
-        previousarray.add(position);
+        previousarray.add(holder.getAdapterPosition());
 //
         previousposition = position;
-        Log.d("A", "testingforposition" + MapsActivity.getWayPointDetailsList().size());
+        Log.d("A", "testingforholder.getAdapterPosition()" + MapsActivity.getWayPointDetailsList().size());
+        Log.d("A", "ttryginsytoseee  for selected )" + holder.getAdapterPosition());
 
         Log.d("A", "calculatethesize" + completedloop);
-        Log.d("A", "calculatethesizewhatistheitem" + position);
+        Log.d("A", "calculatethesizewhatistheitem" + holder.getAdapterPosition());
 //
         if (MapsActivity.getWayPointDetailsList().size() == mDataSource.size()) {
             //TODO: can add travel mode/avoid
 
-            String place_id = mDataSource.get(position).toString();
-
-            String singlephotoreference = mDataSource.get(position).get("photo_reference").toString();
+            String place_id = mDataSource.get(holder.getAdapterPosition()).toString();
+//
+            String singlephotoreference = mDataSource.get(holder.getAdapterPosition()).get("photo_reference").toString();
 
             Log.d("A", "singlephotoreferenceahaha" + singlephotoreference);
 
 //Well this helps when comning back from other page sooo....
-            if (position == globalPosition) {
+            if (holder.getAdapterPosition() == globalposition) {
 
                 //change color like
                 holder.itemView.setSelected(true);
@@ -160,13 +149,14 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                 holder.itemView.setSelected(false);
             }
 
+
             ArrayList<HashMap> waypoint = MapsActivity.getWaypointwithDateList();
 
             for (int i = 0; i < waypoint.size(); i++) {
 
                 Log.d("A", "selectedwaypointcheck" + waypoint.get(i).get("place_id"));
 
-                if (waypoint.get(i).get("place_id").equals(mDataSource.get(position).get("place_id"))) {
+                if (waypoint.get(i).get("place_id").equals(mDataSource.get(holder.getAdapterPosition()).get("place_id"))) {
 
                     holder.selectedimage.setVisibility(View.VISIBLE);
 
@@ -183,79 +173,92 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
             String list = myList.get(0).replace("[", "").replace("]", "");
 
-            holder.lat.setText(mDataSource.get(position).get("lat").toString());
-            holder.lng.setText(mDataSource.get(position).get("lng").toString());
+            holder.lat.setText(mDataSource.get(holder.getAdapterPosition()).get("lat").toString());
+            holder.lng.setText(mDataSource.get(holder.getAdapterPosition()).get("lng").toString());
 
-            Log.d("A", "selectedwaypointcheckwtfhere 1 " + mDataSource.get(position).get("distance"));
-
+            Log.d("A", "okaytryingtinfindout Position " + holder.getAdapterPosition() + "   " + mDataSource.get(holder.getAdapterPosition()).get
+                    ("distance"));
+            Log.d("A", "okaytryingtinfindout Position " + holder.getAdapterPosition() + "   " + mDataSource.get(holder.getAdapterPosition()).get
+                    ("distancetonext"));
             try {
-                Log.d("A", "selectedwaypointcheckwtfhere 2 " + mDataSource.get(position).get("distance"));
+                holder.distance.setText(mDataSource.get(holder.getAdapterPosition()).get("distancetonext").toString());
+                holder.duration.setText(mDataSource.get(holder.getAdapterPosition()).get("durationtonext").toString());
+                Log.d("A", "selectedwaypointgfhh " + mDataSource.get(holder.getAdapterPosition()).get("distancetonext"));
 
-                holder.distance.setText(mDataSource.get(position).get("distancetonext").toString());
-                holder.duration.setText(mDataSource.get(position).get("durationtonext").toString());
-                holder.departuretime.setText(mDataSource.get(position).get("timetostart").toString());
+                Log.d("A", "selectedwaypointgfhh " + mDataSource.get(holder.getAdapterPosition()).get("timetostarttravel"));
+
+                holder.localdistancetext.setText(mDataSource.get(holder.getAdapterPosition()).get("distance").toString());
+                holder.localdurationtext.setText(mDataSource.get(holder.getAdapterPosition()).get("duration").toString());
+
+                holder.departuretime.setText(mDataSource.get(holder.getAdapterPosition()).get("timetostarttravel").toString());
 
 
-
-                holder.localdistancetext.setText(mDataSource.get(position).get("distance").toString());
-                holder.localdurationtext.setText(mDataSource.get(position).get("duration").toString());
-                Log.d("A", "selectedwaypointcheckwtfhere 3 " + mDataSource.get(position).get("distancetonext"));
+                Log.d("A", "selectedwaypointcheckwtfhere 3 " + mDataSource.get(holder.getAdapterPosition()).get("distancetonext"));
 
             } catch (Exception e) {
 
                 Log.d("SelectedLocationList", "Line 223 " + e);
-
+//rrrwhen i was 7 www
             }
 
 
-            //      Log.d("A", "checkdistancetonext" + mDataSource.get(position).get("distancetonext").toString());
+            //      Log.d("A", "checkdistancetonext" + mDataSource.get(holder.getAdapterPosition()).get("distancetonext").toString());
 
-            Log.d("A", "distancedurationonly  in adapter" + mDataSource.get(position).get("distancetonext").toString());
-
-
-            // holder.distance.setText(mDataSource.get(position).get("distancetonext").toString());
-            //holder.duration.setText(mDataSource.get(position).get("durationtonext").toString());
-            Log.d("A", "pherw" + mDataSource.get(position).get("distancetonext").toString());
-            Log.d("A", "pherw" + mDataSource.get(position).get("durationtonext").toString());
+            Log.d("A", "distancedurationonly  in adapter" + mDataSource.get(holder.getAdapterPosition()).get("distancetonext").toString());
 
 
-            holder.vicinity.setText(mDataSource.get(position).get("vicinity").toString());
+            // holder.distance.setText(mDataSource.get(holder.getAdapterPosition()).get("distancetonext").toString());
+            //holder.duration.setText(mDataSource.get(holder.getAdapterPosition()).get("durationtonext").toString());
+            Log.d("A", "pherw " + mDataSource.get(holder.getAdapterPosition()).get("distancetonext").toString() + " Position " + holder
+                    .getAdapterPosition
+                            ());
 
-            holder.place_id.setText(mDataSource.get(position).get("place_id").toString());
 
-            if (mDataSource.get(position).get("rating").toString() != "No Rating") {
-                holder.ratingBar.setRating(Float.parseFloat(mDataSource.get(position).get("rating").toString()));
+            holder.vicinity.setText(mDataSource.get(holder.getAdapterPosition()).get("vicinity").toString());
+
+            holder.place_id.setText(mDataSource.get(holder.getAdapterPosition()).get("place_id").toString());
+
+            if (mDataSource.get(holder.getAdapterPosition()).get("rating").toString() != "No Rating") {
+                holder.ratingBar.setRating(Float.parseFloat(mDataSource.get(holder.getAdapterPosition()).get("rating").toString()));
             }
             final ImageButton detailsbutton = (ImageButton) holder.itemView.findViewById(R.id.details_btn);
             final ImageButton directionsbutton = (ImageButton) holder.itemView.findViewById(R.id.directions_btn);
             final ImageButton googlemapsbutton = (ImageButton) holder.itemView.findViewById(R.id.google_details_btn);
             final ImageButton timebutton = (ImageButton) holder.itemView.findViewById(R.id.time_btn);
 
-            int add = position + 1;
-            holder.name.setText(add + ") " + mDataSource.get(position).get("place_name").toString());
-            //   holder.image.setImageResource("https://maps.googleapis.com/maps/api/place/photo?photoreference="+list
-            //      +"&sensor=false&maxheight=1000&maxwidth=1000&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().into(thumbnailImageView);
-            Log.d("A", "checkimageselected" + list);
+            int add = holder.getAdapterPosition() + 1;
+            holder.name.setText(add + ") " + mDataSource.get(holder.getAdapterPosition()).get("place_name").toString());
+
             try {
 
-                Picasso.with(mContext).load(R.drawable.selected).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.selected).fit().into
                         (holder.selectedimage);
-                Picasso.with(mContext).load(R.drawable.distanceicon).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.distanceicon).fit().into
                         (holder.localdistance);
-
-                Picasso.with(mContext).load(R.drawable.durationicon).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.durationicon).fit().into
                         (holder.localduration);
-                if (!holder.distance.getText().equals("")) {
-                    Picasso.with(mContext).load(R.drawable.durationicon).fit().into
+                Log.d("A", "randomlygetitgher" + mDataSource.get(holder.getAdapterPosition()).get("durationtonext"));
+                Log.d("A", "randomlygetitgherthewhole" + mDataSource.get(holder.getAdapterPosition()));
+
+                if (!mDataSource.get(holder.getAdapterPosition()).get("durationtonext").toString().equals("0") && !Location_RecyclerView_Selected
+                        .getissorted()) {
+
+                    Log.d("A", "Loading...  isskashdkja" + Location_RecyclerView_Selected
+                            .getissorted());
+
+                    Picasso.with(holder.itemView.getContext()).load(R.drawable.durationicon).fit().into
                             (holder.durationimage);
-                    Picasso.with(mContext).load(R.drawable.distanceicon).fit().into
+                    Picasso.with(holder.itemView.getContext()).load(R.drawable.distanceicon).fit().into
                             (holder.distanceimage);
-                    Picasso.with(mContext).load(R.drawable.arrowdownicon).fit().into
+                    Picasso.with(holder.itemView.getContext()).load(R.drawable.down_arrow).fit().into
                             (holder.arrowimage);
-                    Picasso.with(mContext).load(R.drawable.roadicon).fit().into
+                    Picasso.with(holder.itemView.getContext()).load(R.drawable.roadicon).fit().into
                             (holder.startingtimeimage);
-                    Picasso.with(mContext).load(R.drawable.settingsicon).fit().into
+                    Picasso.with(holder.itemView.getContext()).load(R.drawable.settingsicon).fit().into
                             (holder.travelsetting);
+                    Picasso.with(holder.itemView.getContext()).load(R.drawable.settingsicon).fit().into
+                            (holder.travellocalsetting);
+
                     holder.distanceimage.setVisibility(View.VISIBLE);
                     holder.durationimage.setVisibility(View.VISIBLE);
                     holder.arrowimage.setVisibility(View.VISIBLE);
@@ -263,10 +266,14 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     holder.duration.setVisibility(View.VISIBLE);
                     holder.startingtimeimage.setVisibility(View.VISIBLE);
                     holder.departuretime.setVisibility(View.VISIBLE);
+                    holder.travelsetting.setVisibility(View.VISIBLE);
+                    holder.travellocalsetting.setVisibility(View.VISIBLE);
 
                     //TODO working but need some adjustment
                 } else {
 
+                    Log.d("A", "Loading...for  inviisble" + holder.getAdapterPosition());
+                    holder.travellocalsetting.setVisibility(View.GONE);
 
                     holder.distanceimage.setVisibility(View.GONE);
                     holder.durationimage.setVisibility(View.GONE);
@@ -275,28 +282,29 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     holder.duration.setVisibility(View.GONE);
 
                     holder.startingtimeimage.setVisibility(View.GONE);
-
                     holder.departuretime.setVisibility(View.GONE);
+                    holder.travelsetting.setVisibility(View.GONE);
+
 
                 }
 
 
-                Picasso.with(mContext).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
+                Picasso.with(holder.itemView.getContext()).load("https://maps.googleapis.com/maps/api/place/photo?photoreference=" + list
                         + "&sensor=false&maxheight=100&maxwidth=100&key=AIzaSyDSF5Cc8Vu9gn-OzTtrzWMA5kXX-g--NMk").fit().error(R.drawable
                         .noimage)
                         .placeholder(R
                                 .drawable
                                 .loading_gif).into(holder.image);
 
-                Picasso.with(mContext).load(R.drawable.googlemapsicon).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.googlemapsicon).fit().into
                         (googlemapsbutton);
 
 
-                Picasso.with(mContext).load(R.drawable.viewdetails).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.viewdetails).fit().into
                         (detailsbutton);
-                Picasso.with(mContext).load(R.drawable.directionsicon).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.directionsicon).fit().into
                         (directionsbutton);
-                Picasso.with(mContext).load(R.drawable.timeicon).fit().into
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.timeicon).fit().into
                         (timebutton);
             } catch (Exception e) {
 
@@ -327,16 +335,17 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
                     view.setSelected(true);
 
-                    globalPosition = position;
+                    globalposition = holder.getAdapterPosition();
 
                     //For each marker in the map...where the lat equals to the lat provided by the  recycle view?
                     if (mapMarkers != null) {
                         for (Marker c : mapMarkers) {
 
-                            if (lat.equals(String.valueOf(c.getPosition().latitude)) && lng.equals(String.valueOf(c.getPosition().longitude))) {
+                            if (lat.equals(String.valueOf(c.getPosition().latitude)) && lng.equals(String.valueOf(c.getPosition()
+                                    .longitude))) {
 //MapsActivity m= new MapsActivity();
                                 String s = MapsActivity.showPath(c);
-                                MapsActivity.downloadUrl download = new MapsActivity.downloadUrl(mContext);
+                                MapsActivity.downloadUrl download = new MapsActivity.downloadUrl(holder.itemView.getContext());
                                 download.execute(s);
                                 Log.d("Checkruntimes", "Runningdownloadurl  6");
 //This
@@ -358,26 +367,23 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
 
             // display a toast with person name on item click
-            //  Toast.makeText(context, personNames.get(position), Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(context, personNames.get(holder.getAdapterPosition()), Toast.LENGTH_SHORT).show();
 
             holder.travelsetting.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//        FragmentTransaction ft = mContext.getSupportFragmentManager().beginTransaction();
-//        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("dialog");
-//        if (prev != null) {
-//            ft.remove(prev);
-//        }
-//        ft.addToBackStack(null);
-                    FragmentManager manager = ((AppCompatActivity) mContext).getSupportFragmentManager();
+
+                    FragmentManager manager = ((AppCompatActivity) holder.itemView.getContext()).getSupportFragmentManager();
 
                     // Create and show the dialog.
-                    DialogTravelSettingFragment newFragment = DialogTravelSettingFragment.newInstance("Name");
+                    DialogTravelSettingFragment newFragment = DialogTravelSettingFragment.newInstance(holder.getAdapterPosition());
                     newFragment.show(manager, "dialog");
 
 
                 }
             });
+
+//i was house-sitting there werewe call tmy best friend til i am
             directionsbutton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -386,9 +392,9 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + lat + "," + lng +
                             "&destination=A&destination_place_id=" + holder.place_id.getText()
                     ));
-                    mContext.startActivity(intent);
+                    holder.itemView.getContext().startActivity(intent);
 
-
+//causing hism to symbke if you block, dodge
                 }
             });
             timebutton.setOnClickListener(new View.OnClickListener() {
@@ -397,6 +403,9 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 //TODO: Move data to there
                     View parentRow = (View) v.getParent();
 
+                    if (MapsActivity.pd.isShowing()) {
+                        MapsActivity.pd.dismiss();
+                    }
                     MapsActivity.pd.show();
 
                     TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
@@ -420,9 +429,10 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                         e.printStackTrace();
                     }
 
-                    FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
+                    FragmentManager fragmentManager = ((FragmentActivity) holder.itemView.getContext()).getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.flContent2, fragment);
+                    //TODO:Note this one is originally replace, change to add to allow not refreash
+                    fragmentTransaction.add(R.id.flContent2, fragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
 
@@ -440,14 +450,18 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                             ".com/maps/search/?api=1&query=" + lat + "," + lng + "&query_place_id=" + holder.place_id.getText()
 
                     ));
-                    mContext.startActivity(intent);
+                    holder.itemView.getContext().startActivity(intent);
                 }
             });
             detailsbutton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-//TODO: Move data to there
+
+                    detailsbutton.setEnabled(false);
                     View parentRow = (View) v.getParent();
+                    if (MapsActivity.pd.isShowing()) {
+                        MapsActivity.pd.dismiss();
+                    }
                     MapsActivity.pd.show();
 
                     TextView place_id = (TextView) parentRow.findViewById(R.id.place_id);
@@ -469,21 +483,31 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }
-
-                    FragmentManager fragmentManager = ((FragmentActivity) mContext).getSupportFragmentManager();
+//TODO: somehow change the holder.itemView.getContext() to this one works....
+                    FragmentManager fragmentManager = ((FragmentActivity) holder.itemView.getContext()).getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-                    fragmentTransaction.replace(R.id.flContent2, fragment);
+                    //TODO:Note this one is originally replace, change to add to allow not refresh
+                    fragmentTransaction.add(R.id.flContent2, fragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
 
+                    detailsbutton.setEnabled(true);
 
                     //   fragmentManager.beginTransaction().replace(R.id.flContent2, fragment).commit();
 
                 }
             });
         }
-        MapsActivity.pd.dismiss();
+        // MapsActivity.pd.dismiss();
+        Runnable progressRunnable = new Runnable() {
 
+            @Override
+            public void run() {
+                MapsActivity.pd.dismiss();
+            }
+        };
+        Handler pdCanceller = new Handler();
+        pdCanceller.postDelayed(progressRunnable, 1000);
     }
 
 
@@ -524,8 +548,11 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
         ImageView durationimage;
         ImageView startingtimeimage;
         ImageButton travelsetting;
-        ImageView localdistance;
+        ImageButton travellocalsetting;
+
         TextView localdistancetext;
+        ImageView localdistance;
+
         ImageView localduration;
         TextView localdurationtext;
 
@@ -551,6 +578,8 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
             durationimage = (ImageView) itemView.findViewById(R.id.duration);
             startingtimeimage = (ImageView) itemView.findViewById(R.id.departuretime);
             travelsetting = (ImageButton) itemView.findViewById(R.id.travelsettingbutton);
+            travellocalsetting = (ImageButton) itemView.findViewById(R.id.travellocalsettingbutton);
+
             localdistance = (ImageView) itemView.findViewById(R.id.local_distance);
 
             localdistancetext = (TextView) itemView.findViewById(R.id.local_distance_text);
@@ -569,9 +598,9 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     Log.d("check", "hhhhhhhhhhhchecklocationtecycler");
 
 
-                    //        v.setTag(getAdapterPosition());
+                    //        v.setTag(getAdapterholder.getAdapterPosition()());
 
-                    // mItemClickListener.onItemClick(getLayoutPosition(), v, id);
+                    // mItemClickListener.onItemClick(getLayoutholder.getAdapterPosition()(), v, id);
                 }
             });
 

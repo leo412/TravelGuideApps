@@ -5,7 +5,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
@@ -56,6 +58,7 @@ public class Location_RecyclerView_Selected extends Fragment {
     private String mParam1;
     private String mParam2;
     private DatabaseReference mDatabase;
+    private static boolean issorted = false;
 
     private Location_RecyclerView.OnFragmentInteractionListener mListener;
 
@@ -100,7 +103,7 @@ public class Location_RecyclerView_Selected extends Fragment {
         View view = inflater.inflate(R.layout.fragment_location__recycler_view_selected, container, false);
         //     TextView tvLabel = (TextView) view.findViewById(R.id.tvLabel);
         //  tvLabel.setText(page + " -- " + title);
-        Log.d(TAG, "recyclerview2 newinstance");
+        Log.d(TAG, "rthishabehfunance");
 
         final ArrayList<LinkedHashMap<String, Object>> waypoint = MapsActivity.getWayPointDetailsList();
 
@@ -128,14 +131,14 @@ public class Location_RecyclerView_Selected extends Fragment {
         }
 
 
-        Locationadapter = new SelectedLocationListRecyclerViewAdapter(getActivity(), waypoint);
+        Locationadapter = new SelectedLocationListRecyclerViewAdapter(waypoint);
 
         loadfirebase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 try {
-                    MapsActivity.pd.show();
-                }catch (Exception e){
+                                     if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                } catch (Exception e) {
 
                     Log.d(TAG, "Some error has occured!" + e);
 
@@ -241,38 +244,83 @@ public class Location_RecyclerView_Selected extends Fragment {
             public void onClick(View v) {
 //TODO: add saying that                 builder.setMessage("*Sorting is only for viewing purpose only and will not be saved");
                 try {
+                    System.out.println("checkwhatisthiswaypointn" + " start");
+
+                    for (HashMap h : waypoint) {
+
+                        System.out.println("checkwhatisthiswaypointn" + h.get("place_name") + "    " + h.get("timetostarttravel"));
+
+                    }
+
+                    System.out.println("checkwhatisthiswaypointn" + " end ");
+                    System.out.println("checkwhatisthclapclap" + waypoint);
+
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle("Sorting");
                     builder.setItems(new CharSequence[]
-                                    {"By Name", "By rating", "By Time", "button 4"},
+                                    {"By Time", "By Rating", "By Name", "button 4"},
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // The 'which' argument contains the index position
                                     // of the selected item
                                     switch (which) {
                                         case 0:
-                                            System.out.println("debuyaooh 1111" + waypoint);
-
+//
+                                            issorted = false;
+//                                            for (int i = 0; i < MapsActivity.getWaypointwithDateList().size(); i++) {
+//                                                System.out.println(i + "  added for placeid 1st" + MapsActivity.getWaypointwithDateList().get(i).get
+//                                                        ("place_id"));
+//
+//                                                System.out.println(i + "  added for placeid 2nd " + waypoint.get(i).get
+//                                                        ("place_id"));
+////
+//                                                if (MapsActivity.getWaypointwithDateList().get(i).get("place_id").equals(waypoint.get(i).get
+//                                                        ("place_id"))) {
+//                                                    waypoint.get(i).put("starttime", MapsActivity.getWaypointwithDateList().get(i).get("starttime"));
+//                                                    System.out.println(i + "  added for first " + MapsActivity.getWaypointwithDateList().get(i).get
+//                                                            ("starttime"));
+//
+//                                                    System.out.println(i + "  added for second " + waypoint.get(i).get("starttime"));
+//
+//                                                }
+//                                                System.out.println("holysj s" + MapsActivity.getWaypointwithDateList().get(i).get
+//                                                        ("starttime"));
+//
+//                                                System.out.println("wtfcheckthssd" + waypoint.get(i).get("starttime"));
+//
+//                                            }
                                             Collections.sort(waypoint, new Comparator<HashMap>() {
+                                                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                                                 @Override
                                                 public int compare(HashMap o1, HashMap o2) {
+                                                    if ((long) o1.get("starttime") == 0 && (long) o1.get("starttime") < (long) o2.get("starttime")) {
+                                                        return 1;
+                                                    }
+                                                    if ((long) o2.get("starttime") == 0) {
+                                                        return -1;
+                                                    }
+                                                    System.out.println("wannaknowlong" + Long.compare((long) o1.get("starttime"), (long) o2.get
+                                                            ("starttime")));
 
 
-                                                    return o1.get("place_name").toString().compareTo(o2.get("place_name").toString());
+                                                    return Long.compare((long) o1.get("starttime"), (long) o2.get("starttime"));
+
+                                                    //    return o1.get("starttime").toString().compareTo(o2.get("starttime").toString());
                                                 }
 
 
                                             });
+
                                             MapsActivity.setWayPointDetailsList(waypoint);
 
                                             break;
                                         case 1:
                                             //    Collections.sort(waypoint, new MapComparator("rating"));
-
                                             Collections.sort(waypoint, new Comparator<HashMap>() {
                                                 @Override
                                                 public int compare(HashMap o1, HashMap o2) {
 
+                                                    issorted = true;
 
                                                     return o2.get("rating").toString().compareTo(o1.get("rating").toString());
                                                 }
@@ -284,45 +332,18 @@ public class Location_RecyclerView_Selected extends Fragment {
 
                                             break;
                                         case 2:
-
-                                            for (int i = 0; i < MapsActivity.getWaypointwithDateList().size(); i++) {
-                                                if (MapsActivity.getWaypointwithDateList().get(i).get("place_id").equals(waypoint.get(i).get
-                                                        ("place_id"))) {
-                                                    waypoint.get(i).put("starttime", MapsActivity.getWaypointwithDateList().get(i).get("starttime"));
-                                                    System.out.println("waypointaddstarttime" + "  Success");
-                                                }
-                                                System.out.println("waypointaddstarttime" + MapsActivity.getWaypointwithDateList().get(i).get
-                                                        ("starttime"));
-
-
-                                                System.out.println("waypointaddstarttime" + waypoint);
-
-                                            }
-//
-
                                             Collections.sort(waypoint, new Comparator<HashMap>() {
                                                 @Override
                                                 public int compare(HashMap o1, HashMap o2) {
-                                                    if (o1 != null && o2 != null) {
-                                                        System.out.println("waypointaddstarttimechecking" + o1.get("starttime"));
-                                                        System.out.println("waypointaddstarttimechecking" + o2.get("starttime"));
-//TODO: seems to work, need testing
-                                                        if (o1.get("starttime").toString().equals("0")) {
-                                                            return 1;
-                                                        }
-                                                        if (o2.get("starttime").toString().equals("0")) {
-                                                            return -1;
-                                                        }
-                                                        System.out.println("waypointaddstarttimechecking" + " Has run here");
+                                                    issorted = true;
 
-                                                        return o1.get("starttime").toString().compareTo(o2.get("starttime").toString());
-                                                    } else {
-                                                        return 0;
-                                                    }
+
+                                                    return o1.get("place_name").toString().compareTo(o2.get("place_name").toString());
                                                 }
 
 
                                             });
+
                                             break;
                                         case 3:
                                             break;
@@ -350,10 +371,15 @@ public class Location_RecyclerView_Selected extends Fragment {
         ItemTouchHelper ith = new ItemTouchHelper(_ithCallback);
         ith.attachToRecyclerView(recyclerView);
 
+        //  MapsActivity.pd.dismiss();
 
         return view;
     }
 
+    public static boolean getissorted() {
+
+        return issorted;
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {

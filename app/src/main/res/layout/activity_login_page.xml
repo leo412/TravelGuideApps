@@ -6,6 +6,7 @@
                                              android:gravity="center_horizontal"
                                              android:orientation="vertical"
                                              android:background="@drawable/login_background_edited"
+                                             android:id="@+id/login_page"
 
                                              tools:context="com.example.user.travelguideapps.LoginPage.LoginActivity"
                                              tools:layout_editor_absoluteY="25dp"
@@ -71,7 +72,6 @@ android:textSize="30dp"
         android:id="@+id/imageView4"
         android:layout_width="53dp"
         android:layout_height="53dp"
-        app:srcCompat="@android:drawable/ic_dialog_email"
         app:layout_constraintRight_toLeftOf="@+id/email"
         app:layout_constraintTop_toTopOf="@+id/email"
         app:layout_constraintLeft_toLeftOf="parent"/>
@@ -81,7 +81,6 @@ android:textSize="30dp"
         android:layout_width="53dp"
         android:layout_height="53dp"
 
-        app:srcCompat="@android:drawable/ic_lock_idle_lock"
         app:layout_constraintRight_toLeftOf="@+id/password"
         app:layout_constraintTop_toTopOf="@+id/password"
 

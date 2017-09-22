@@ -206,7 +206,7 @@ static String TAG="LocationDetailsActivity";
 
                                             fragmentManager.popBackStack();
                                         }
-                                        Toast.makeText(getActivity().getApplicationContext(), "Location set....!", Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(getActivity().getApplicationContext(), "Location Added!!", Toast.LENGTH_SHORT).show();
 
 
                                     }
@@ -217,10 +217,7 @@ static String TAG="LocationDetailsActivity";
 
 
                                 }
-                              //  break;
-                      //  }
-                   // }
-           //     };
+
 //TODO: See if needed to add the dialog box back in....?
 //                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
 //                builder.setMessage("Do you want to set the time now?").setPositiveButton("Yes", dialogClickListener)

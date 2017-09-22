@@ -49,6 +49,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.squareup.leakcanary.LeakCanary;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -80,6 +81,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private UserLoginTask mAuthTask = null;
 
     // UI references.
+
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
@@ -105,8 +107,7 @@ private static String userId;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-
-setupLeakCanary();
+       setupLeakCanary();
         // Normal app init code...
 
         pd = new ProgressDialog(this);
@@ -157,6 +158,17 @@ setupLeakCanary();
                 return false;
             }
         });
+       // final ConstraintLayout c= (ConstraintLayout) findViewById(R.id.login_page);
+//        ConstraintLayout mCustomLayout = (ConstraintLayout)findViewById(R.id.login_page);
+        ImageView i1= (ImageView) findViewById(R.id.imageView4);
+        ImageView i2= (ImageView) findViewById(R.id.imageView5);
+
+        Picasso.with(this).load(android.R.drawable.ic_dialog_email).into(i1);
+        Picasso.with(this).load(android.R.drawable.ic_lock_idle_lock).into(i2);
+
+
+
+
 //TODO: Put Access for location access,else just plain stop user from logging in
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
 

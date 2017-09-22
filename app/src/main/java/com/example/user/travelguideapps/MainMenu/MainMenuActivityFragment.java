@@ -55,9 +55,25 @@ public class MainMenuActivityFragment extends Fragment {
 
                 FragmentManager fragmentManager = getFragmentManager();
                 FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
+            //    fragmentTransaction.replace(R.id.flContent2, fragment);
+             //   fragmentTransaction.addToBackStack(null);
+//
+                Log.d("BaserActivity", "hereitisrunning before");
 
-                fragmentTransaction.replace(R.id.flContent2, fragment);
-                fragmentTransaction.addToBackStack(null);
+                if(fragment.isAdded())
+                {
+                    Log.d("BaserActivity", "hereitisrunning previouslyadded");
+
+                    fragmentTransaction.show(fragment);
+                }
+                else
+                {
+                    Log.d("BaserActivity", "hereitisrunning added");
+
+                    fragmentTransaction.replace(R.id.flContent2, fragment);
+                    fragmentTransaction.addToBackStack(null);
+//nfly senvered
+                }
                 fragmentTransaction.commit();
 
 

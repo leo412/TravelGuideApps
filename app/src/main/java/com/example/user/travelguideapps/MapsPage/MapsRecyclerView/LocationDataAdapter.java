@@ -155,7 +155,7 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
                     ref.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                         LinkedHashMap post = (LinkedHashMap) dataSnapshot.getValue();
+                            LinkedHashMap post = (LinkedHashMap) dataSnapshot.getValue();
 
 
                             //   ArrayList a=new ArrayList();
@@ -171,12 +171,13 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
                             MapsActivity.addWaypointwithDateList(post);
                             //Cannot directly update, findways to reset details,,,,
 
-                            Locationadapter = new SelectedLocationListRecyclerViewAdapter(mContext,
+                            Locationadapter = new SelectedLocationListRecyclerViewAdapter(
                                     MapsActivity
                                             .getWayPointDetailsList());
 
 
                             Locationadapter.notifyDataSetChanged();
+
 
                         }
 
@@ -198,7 +199,7 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
         // display a toast with person name on item click
         //  Toast.makeText(context, personNames.get(position), Toast.LENGTH_SHORT).show();
 
-
+//
     }
 
 

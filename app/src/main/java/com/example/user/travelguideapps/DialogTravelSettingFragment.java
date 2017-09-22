@@ -17,7 +17,10 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.example.user.travelguideapps.MapsPage.MapsActivity;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -34,20 +37,20 @@ public class DialogTravelSettingFragment extends DialogFragment {
     private static String transport = "driving";
     private static String avoid = "";
 
+private     HashMap<Integer,ArrayList> hasharray;
 
-    private int Position;
+    private static int Position;
     private static RecyclerView.ViewHolder holder2;
 
-    public static DialogTravelSettingFragment newInstance(String title) {
+    public static DialogTravelSettingFragment newInstance(int position) {
         DialogTravelSettingFragment frag = new DialogTravelSettingFragment();
         Bundle args = new Bundle();
-
+        Position = position;
 
         frag.setArguments(args);
         return frag;
     }
     // Empty constructor required for DialogFragment
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         super.onCreateDialog(savedInstanceState);
@@ -65,7 +68,16 @@ public class DialogTravelSettingFragment extends DialogFragment {
         final RadioButton highwaysradio = (RadioButton) view.findViewById(R.id.highwaysradio);
         final RadioButton ferriesradio = (RadioButton) view.findViewById(R.id.ferriesradio);
 
-        ArrayList array = DataHolderClass.getInstance4().getDistributor_id4();
+        hasharray = DataHolderClass.getInstancearraylistofradio().getDistributor_idarraylistofradio();
+         ArrayList array = null;
+        if(hasharray!=null) {
+
+            array = hasharray.get(Position);
+        }else{
+            hasharray= new HashMap<Integer, ArrayList>();
+
+
+        }
         if (array != null) {
             switch (array.get(0).toString()) {
                 case "driving":
@@ -108,10 +120,9 @@ public class DialogTravelSettingFragment extends DialogFragment {
         alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
-                ArrayList array = new ArrayList();
+                ArrayList arrayforadd = new ArrayList();
 
                 if (drivingradio.isChecked()) {
-                    System.out.println("isrunningwalking" + array);
 
                     transport = "driving";
                 } else if (walkingradio.isChecked()) {
@@ -139,13 +150,17 @@ public class DialogTravelSettingFragment extends DialogFragment {
                     avoid = "ferries";
 
                 }
-                array.add(transport);
-                array.add(avoid);
+                //arrayforadd.add(Position);
+                arrayforadd.add(transport);
+                arrayforadd.add(avoid);
+                hasharray.put(Position,arrayforadd);
                 //          DataHolderClass.getInstance3().setDistributor_id3(array);
-                DataHolderClass.getInstance4().setDistributor_id4(array);
-                System.out.println("isrunningwalking" + array);
-
+                DataHolderClass.getInstancearraylistofradio().setDistributor_idarraylistofradio(hasharray);
+         //       System.out.println("isrunningwalking" + array);
+                // MapsActivity.setNextDistanceURL(mContext);
                 Toast.makeText(getActivity().getApplicationContext(), "Setting completed", Toast.LENGTH_SHORT).show();
+                MapsActivity.setNextDistanceURL(getContext());
+
             }
         });
         alertDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -154,9 +169,6 @@ public class DialogTravelSettingFragment extends DialogFragment {
             }
         }).create();
         System.out.println("DialogFragment3rd");
-
-        //    alertDialog.show();
-        System.out.println("DialogFragmentLast");
 
         return alertDialog.show();
     }
