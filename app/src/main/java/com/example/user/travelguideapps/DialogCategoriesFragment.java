@@ -18,7 +18,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 
 public class DialogCategoriesFragment extends DialogFragment  {
@@ -29,7 +29,7 @@ public class DialogCategoriesFragment extends DialogFragment  {
     private Context mContext;
     private LayoutInflater mInflater;
     private  ArrayList mDataSource;
-    private static List<LinkedHashMap<String,String>> mDataSourceforSend;
+    private static List<HashMap<String,String>> mDataSourceforSend;
 
     private int Position;
     private static RecyclerView.ViewHolder holder2;

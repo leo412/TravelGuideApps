@@ -10,15 +10,14 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 //TODO:Check Directions Fetcher or DirectionsJSONParser is being used. Note: THis one is probably uSed , Another: DirectionsJSONParser
 public class DirectionsFetcher{
 //Searchiong for path when click on marker
     /** Receives a JSONObject and returns a list of lists containing latitude and longitude */
-    public List<List<LinkedHashMap<String,String>>> parse(JSONObject jObject){
+    public List<List<HashMap<String,String>>> parse(JSONObject jObject){
 
-        List<List<LinkedHashMap<String, String>>> routes = new ArrayList<>() ;
+        List<List<HashMap<String, String>>> routes = new ArrayList<>() ;
         JSONArray jRoutes;
         JSONArray jLegs;
         JSONArray jSteps;
@@ -57,7 +56,7 @@ path.add(hmDistance);
 
                         /** Traversing all points */
                         for(int l=0;l<list.size();l++){
-                            LinkedHashMap<String, String> hm = new LinkedHashMap<>();
+                            HashMap<String, String> hm = new HashMap<>();
                             hm.put("lat", Double.toString((list.get(l)).latitude) );
                             hm.put("lng", Double.toString((list.get(l)).longitude) );
                             path.add(hm);

@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class LocationDetailsActivity extends Fragment{
@@ -56,7 +55,7 @@ static String TAG="LocationDetailsActivity";
 
 
 
-    private ArrayList<LinkedHashMap<String, Object>> placedetails = null;
+    private ArrayList<HashMap<String, Object>> placedetails = null;
     private View place_location;
     private LocationDetailsPictureAdapter pictureadapter;
     private RecyclerView recyclerView;
@@ -187,7 +186,7 @@ static String TAG="LocationDetailsActivity";
             @Override
             public void onClick(View v) {
                                 try {
-                                    LinkedHashMap selecteddata = new LinkedHashMap();
+                                    HashMap selecteddata = new HashMap();
                                     //TODO: Timestamp confirmation? Not Selected?
                                     selecteddata.put("place_id",place_id);
                                     selecteddata.put("starttime",0L);
@@ -359,13 +358,13 @@ return view;
             //Change List of placedetails back to normal
 
             try {
-                LinkedHashMap<String, Object> placedetail = placedetails.get(0);
+                HashMap<String, Object> placedetail = placedetails.get(0);
                 Log.d("DetailsResult", placedetail.toString());
 
                 place_name.setText( placedetail.get("place_name").toString());
 
 
-                LinkedHashMap<String,Object>test= placedetails.get(0);
+                HashMap<String,Object>test= placedetails.get(0);
 
                 Log.d("Followthisshit", placedetails.toString());
 
@@ -464,8 +463,8 @@ if(viewpageradapter!=null) {
 
     }
 
-    public static LinkedHashMap<String, String> toMap(JSONObject object) throws JSONException {
-        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+    public static HashMap<String, String> toMap(JSONObject object) throws JSONException {
+        HashMap<String, String> map = new HashMap<String, String>();
 
         Iterator<String> keysItr = object.keys();
         while(keysItr.hasNext()) {

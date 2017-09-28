@@ -205,7 +205,10 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
             @Override
             public void onClick(View v) {
 
-                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                if (MapsActivity.pd.isShowing()) {
+                    MapsActivity.pd.dismiss();
+                }
+                MapsActivity.pd.show();
 
 
                 final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -219,11 +222,28 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                 query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        System.out.println("THIS IS IT" + dataSnapshot.getValue());
-                   //     Toast.makeText(mContext, "Location Loaded ",  Toast.LENGTH_SHORT).show();
-                                         if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                        System.out.println("datashotvaluefindout" + dataSnapshot.getValue());
+
+                        //     Toast.makeText(mContext, "Location Loaded ",  Toast.LENGTH_SHORT).show();
+                        if (MapsActivity.pd.isShowing()) {
+                            MapsActivity.pd.dismiss();
+                        }
+                        MapsActivity.pd.show();
                         ArrayList<HashMap> post = new ArrayList<HashMap>();
                         ArrayList<HashMap> nostarttime = new ArrayList<HashMap>();
+
+                        ArrayList<HashMap<String, Object>> detail = MapsActivity.getWayPointDetailsList();
+                        System.out.println("letmecheckdeta;s" + "Yes actually ran this ");
+
+                        System.out.println("letmecheckdeta;s" + detail);
+
+                        HashMap h;
+                        for (int i = 0; i < post.size(); i++) {
+                            h = detail.get(i);
+                            h.put("duration", post.get(i));
+
+                        }
+
 
                         for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
                             HashMap Hash = new HashMap<>();
@@ -247,7 +267,6 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
 
 
                         if (!dataSnapshot.getValue().equals("Empty")) {
-                            System.out.println("THIS IS IT" + dataSnapshot.getValue());
 
                             //   ArrayList<HashMap> post = (ArrayList<HashMap>) dataSnapshot.getValue();
                             ArrayList array = new ArrayList();
@@ -261,6 +280,9 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                             //Why should i have made this get 0...
                             MapsActivity.setWaypointwithDateList(post);
                             //Cannot directly update, findways to reset details
+                            MapsActivity.getWayPointDetailsList();
+
+                            System.out.println("letmecheckdeta;s" + detail);
 
                             System.out.println("waypointdetailsList: " + MapsActivity
                                     .getWayPointDetailsList());
@@ -278,7 +300,7 @@ public class SavedDataListAdapter extends RecyclerView.Adapter<SavedDataListAdap
                             }
 
                         } else {
-MapsActivity.pd.dismiss();
+                            MapsActivity.pd.dismiss();
                             Toast.makeText(mContext, "This file is empty, please choose another one!", Toast.LENGTH_SHORT).show();
 
                         }
@@ -391,7 +413,6 @@ MapsActivity.pd.dismiss();
             return super.toString() + " '" + mContentView.getText() + "'";
         }
     }
-
 
 
 }

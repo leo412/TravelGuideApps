@@ -31,7 +31,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.example.user.travelguideapps.MapsPage.MapsActivity.CurrentLocation;
@@ -42,17 +41,17 @@ import static com.example.user.travelguideapps.MapsPage.MapsActivity.CurrentLoca
 public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<LocationListRecyclerViewAdapter.MyViewHolder> {
     private Context mContext;
     private LayoutInflater mInflater;
-    private List<LinkedHashMap<String, Object>> mDataSource;
-    private static List<LinkedHashMap<String, Object>> mDataSourceforSend;
+    private List<HashMap<String, Object>> mDataSource;
+    private static List<HashMap<String, Object>> mDataSourceforSend;
     private static View clickedView;
     private int Position;
     private static RecyclerView.ViewHolder holder2;
 
-    public LocationListRecyclerViewAdapter(List<LinkedHashMap<String, Object>> items) {
-        Log.d("A", "DujjjjjjjNumberofitems(List)" + items);
+    public LocationListRecyclerViewAdapter(List<HashMap<String, Object>> items) {
+      //  Log.d("A", "DujjjjjjjNumberofitems(List)" + items);
         mDataSourceforSend = items;
         mDataSource = items;
-        Log.d("A", "DujjjjjjjNumberofitems(List)Upperitemcount" + mDataSourceforSend);
+      //  Log.d("A", "DujjjjjjjNumberofitems(List)Upperitemcount" + mDataSourceforSend);
 
         //mInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -83,7 +82,7 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
 
     }
 
-    public static List<LinkedHashMap<String, Object>> getItem() {
+    public static List<HashMap<String, Object>> getItem() {
         return mDataSourceforSend;
     }
 
@@ -113,7 +112,6 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
         final Context mContext = holder.itemView.getContext();
         Log.d("LocationListRecyc", "LocationListRecycOnBindviewholder");
         Log.d("A", "ttryginsytoseee   )" + holder.getAdapterPosition());
-        //  Log.d("A", "ttryginsytoseee   )" +mDataSource.get(holder.getAdapterPosition()).get("duration").toString());
 
         String singlephotoreference = mDataSource.get(position).get("photo_reference").toString();
         //Well this helps when comning back from other page sooo....so that i didnt reset to old one or some shit
@@ -394,11 +392,11 @@ public class LocationListRecyclerViewAdapter extends RecyclerView.Adapter<Locati
     @Override
     public int getItemCount() {
         if (mDataSource != null) {
-            Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT" + mDataSource.size());
+         //   Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT" + mDataSource.size());
 
             return mDataSource.size();
         }
-        Log.d("A", "DujjjjjjjNumberofitems(List)  Nope COUNT");
+       // Log.d("A", "DujjjjjjjNumberofitems(List)  Nope COUNT");
 
         return 0;
     }

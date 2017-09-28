@@ -1,6 +1,7 @@
 package com.example.user.travelguideapps;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
@@ -28,19 +29,26 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.user.travelguideapps.LoginPage.LoginActivity;
 import com.example.user.travelguideapps.MainMenu.MainMenuActivityFragment;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.Thing;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -66,7 +74,40 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d("BaseActivity", "Baserunning");
+        FirebaseAuth auth = FirebaseAuth.getInstance();
 
+        if (auth.getCurrentUser() != null) {
+
+
+            // User is logged in
+        }else{
+         //   BaseActivity.this.startActivity(new Intent(BaseActivity.this, LoginActivity.class));
+
+
+        }
+        FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
+
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                if (user == null) {
+
+                    // user auth state is changed - user is null
+                    // launch login activity
+                    Toast.makeText(getApplicationContext(), "User is log out!", Toast.LENGTH_SHORT).show();
+
+                    startActivity(new Intent(BaseActivity.this, LoginActivity.class));
+                    finish();
+                }else{
+
+                    Toast.makeText(getApplicationContext(), "User is Logged in!", Toast.LENGTH_SHORT).show();
+
+                }
+            }
+        };
+        auth.addAuthStateListener(authListener);
 
         setContentView(R.layout.activity_base);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -172,10 +213,21 @@ public class BaseActivity extends AppCompatActivity implements OnMapReadyCallbac
         super.onConfigurationChanged(newConfig);
         drawerToggle.onConfigurationChanged(newConfig);
     }
+    private void signOut() {
+        // Firebase sign out
+      //g  mAuth.signOut();
 
+        // Google sign out
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                new ResultCallback<Status>() {
+                    @Override
+                    public void onResult(@NonNull Status status) {
+                     //   updateUI(null);
+                    }
+                });
+    }
 
     private void setupDrawerContent(NavigationView navigationView) {
-
         navigationView.setNavigationItemSelectedListener(
                 new NavigationView.OnNavigationItemSelectedListener() {
                     @Override

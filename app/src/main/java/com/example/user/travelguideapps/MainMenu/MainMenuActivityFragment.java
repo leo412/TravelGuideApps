@@ -9,10 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
-import com.example.user.travelguideapps.EditLocation.EditLocation;
 import com.example.user.travelguideapps.MapsPage.MapsActivity;
 import com.example.user.travelguideapps.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -83,29 +84,35 @@ public class MainMenuActivityFragment extends Fragment {
         editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = null;
 
-                Class fragmentClass=null;
+                FirebaseAuth auth = FirebaseAuth.getInstance();
+                auth.signOut();
+             //   startActivity(new Intent(MainMenuActivity.this, LoginActivity.class));
+                Toast.makeText(getContext(), "User is now logged out!", Toast.LENGTH_SHORT).show();
 
-                fragmentClass = EditLocation.class;
-
-                try {
-                    if(fragmentClass!=null) {
-                        Log.d("Mainmenu", "Gothere");
-
-                        fragment = (Fragment) fragmentClass.newInstance();
-                    }
-                } catch (Exception e) {
-                    Log.d("Mainmenu", "didnotGothere"+e);
-
-                    e.printStackTrace();
-                }
-
-                FragmentManager fragmentManager = getFragmentManager();
-                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
-                fragmentTransaction.replace(R.id.flContent2, fragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.commit();
+//                Fragment fragment = null;
+//
+//                Class fragmentClass=null;
+//
+//                fragmentClass = EditLocation.class;
+//
+//                try {
+//                    if(fragmentClass!=null) {
+//                        Log.d("Mainmenu", "Gothere");
+//
+//                        fragment = (Fragment) fragmentClass.newInstance();
+//                    }
+//                } catch (Exception e) {
+//                    Log.d("Mainmenu", "didnotGothere"+e);
+//
+//                    e.printStackTrace();
+//                }
+//
+//                FragmentManager fragmentManager = getFragmentManager();
+//                FragmentTransaction fragmentTransaction=fragmentManager.beginTransaction();
+//                fragmentTransaction.replace(R.id.flContent2, fragment);
+//                fragmentTransaction.addToBackStack(null);
+//                fragmentTransaction.commit();
 
 
 

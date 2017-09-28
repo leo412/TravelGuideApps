@@ -22,7 +22,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,15 +30,23 @@ import java.util.List;
  */
 //TODO: NOT used anymore??!??
 public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapter.MyViewHolder> {
+    private static List<HashMap<String, String>> mDataSourceforSend;
+    private static String ItemName;
+    private static RecyclerView.ViewHolder holder2;
+    int globalPosition = -1;
     private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList mDataSource;
-    private static List<LinkedHashMap<String, String>> mDataSourceforSend;
     private SelectedLocationListRecyclerViewAdapter Locationadapter;
-    private static String ItemName;
-
     private int Position;
-    private static RecyclerView.ViewHolder holder2;
+    //1
+
+
+    //2
+    //  @Override
+    //public Object getItem(int position) {
+    //     return mDataSource.get(position);
+    // }
 
     public LocationDataAdapter(ArrayList items) {
         Log.d("A", "LocationDataadap(List)" + items);
@@ -49,23 +57,8 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
 
 
     }
-    //1
 
-
-    //2
-    //  @Override
-    //public Object getItem(int position) {
-    //     return mDataSource.get(position);
-    // }
-
-    //3
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-
-    public static List<LinkedHashMap<String, String>> getItem() {
+    public static List<HashMap<String, String>> getItem() {
         return mDataSourceforSend;
     }
 
@@ -75,6 +68,12 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
 
     public static String getItemName() {
         return ItemName;
+    }
+
+    //3
+    @Override
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
@@ -90,8 +89,6 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
 
         return vh;
     }
-
-    int globalPosition = -1;
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
@@ -155,7 +152,7 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
                     ref.addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            LinkedHashMap post = (LinkedHashMap) dataSnapshot.getValue();
+                            HashMap post = (HashMap) dataSnapshot.getValue();
 
 
                             //   ArrayList a=new ArrayList();
@@ -206,11 +203,11 @@ public class LocationDataAdapter extends RecyclerView.Adapter<LocationDataAdapte
     @Override
     public int getItemCount() {
         if (mDataSource != null) {
-            Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT" + mDataSource.size());
+            //  Log.d("A", "DujjjjjjjNumberofitems(List)  Item COUNT" + mDataSource.size());
 
             return mDataSource.size();
         }
-        Log.d("A", "DujjjjjjjNumberofitems(List)  Nope COUNT");
+        //   Log.d("A", "DujjjjjjjNumberofitems(List)  Nope COUNT");
 
         return 0;
     }

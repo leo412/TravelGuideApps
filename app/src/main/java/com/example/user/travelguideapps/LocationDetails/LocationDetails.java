@@ -18,7 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 
 import static android.content.ContentValues.TAG;
@@ -38,7 +38,7 @@ public class LocationDetails extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private static LinkedHashMap<String, Object> placedetail;
+    private static HashMap<String, Object> placedetail;
     private String mParam2;
     private static TextView place_address;
     private static TextView place_phone;
@@ -88,7 +88,7 @@ public class LocationDetails extends Fragment {
      * @return A new instance of fragment LocationDetails.
      */
     // TODO: Rename and change types and number of parameters
-    public static LocationDetails newInstance(List<LinkedHashMap<String, Object>> placedetails, String param2) {
+    public static LocationDetails newInstance(List<HashMap<String, Object>> placedetails, String param2) {
         LocationDetails fragment = new LocationDetails();
         placedetail = placedetails.get(0);
         Log.d(TAG, "Yeeeeeeeppp" + placedetails);

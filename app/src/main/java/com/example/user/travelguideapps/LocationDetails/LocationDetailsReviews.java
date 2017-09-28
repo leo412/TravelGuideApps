@@ -34,7 +34,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -53,7 +53,7 @@ public class LocationDetailsReviews extends Fragment {
     private static final String TAG = "locationDetailsReivew";
 
     // TODO: Rename and change types of parameters
-    private static LinkedHashMap<String, Object> placedetail;
+    private static HashMap<String, Object> placedetail;
     private String mParam2;
     private static TextView Reviews;
     private static TextView Author;
@@ -80,7 +80,7 @@ private LocationDetailsReviewAdapter reviewAdapter;
      * @return A new instance of fragment LocationDetails.
      */
     // TODO: Rename and change types and number of parameters
-    public static LocationDetailsReviews newInstance(ArrayList<LinkedHashMap<String, Object>> placedetails, String param2) {
+    public static LocationDetailsReviews newInstance(ArrayList<HashMap<String, Object>> placedetails, String param2) {
         LocationDetailsReviews fragment = new LocationDetailsReviews();
         placedetail=placedetails.get(0);
 
@@ -294,8 +294,8 @@ TextView text=(TextView) view.findViewById(R.id.blankreviewtext);
 
 
     }
-    public static LinkedHashMap<String, String> toMap(JSONObject object) throws JSONException {
-        LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
+    public static HashMap<String, String> toMap(JSONObject object) throws JSONException {
+        HashMap<String, String> map = new HashMap<String, String>();
 
         Iterator<String> keysItr = object.keys();
         while(keysItr.hasNext()) {

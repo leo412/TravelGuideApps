@@ -17,7 +17,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import static android.content.ContentValues.TAG;
 //Get Places (Why name Datapasers
@@ -27,7 +26,7 @@ public class DataParser extends Activity {
     //TODO:seems to run twice when clicking view deatails and set places, possible to made it directly obtain previous data?
 //This is where Data is obtain from the internet
     //False.... pretty sure its used to parse String to json (LInked hashmap
-    public ArrayList<LinkedHashMap<String, Object>> parse(String jsonData) {
+    public ArrayList<HashMap<String, Object>> parse(String jsonData) {
         JSONArray jsonArray = new JSONArray();
         JSONObject jsonObject;
         //placenumber 0 = many 1= single
@@ -56,10 +55,10 @@ public class DataParser extends Activity {
     }
 //Add a new variable to see if it is "Single or morwe"
 
-    private ArrayList<LinkedHashMap<String, Object>> getPlaces(JSONArray jsonArray, int placenumber) {
+    private ArrayList<HashMap<String, Object>> getPlaces(JSONArray jsonArray, int placenumber) {
         int placesCount = jsonArray.length();
-        ArrayList<LinkedHashMap<String, Object>> placesList = new ArrayList<>();
-        LinkedHashMap<String, Object> placeMap = null;
+        ArrayList<HashMap<String, Object>> placesList = new ArrayList<>();
+        HashMap<String, Object> placeMap = null;
         Log.d("Places", "getPlaces");
 
         for (int i = 0; i < placesCount; i++) {
@@ -80,9 +79,9 @@ public class DataParser extends Activity {
 
     //TODO: separate details (1) and summaries(0)
 //Isn't this overcomplicated things...?
-    private LinkedHashMap<String, Object> getPlace(JSONObject jPlace, int placenumber) {
+    private HashMap<String, Object> getPlace(JSONObject jPlace, int placenumber) {
 
-        LinkedHashMap<String, Object> place = new LinkedHashMap<String, Object>();
+        HashMap<String, Object> place = new HashMap<String, Object>();
         String placeName = "-NA-";
         String vicinity = "-NA-";
         String latitude = "";

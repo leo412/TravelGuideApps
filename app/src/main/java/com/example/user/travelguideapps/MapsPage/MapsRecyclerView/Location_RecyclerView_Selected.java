@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -105,7 +104,7 @@ public class Location_RecyclerView_Selected extends Fragment {
         //  tvLabel.setText(page + " -- " + title);
         Log.d(TAG, "rthishabehfunance");
 
-        final ArrayList<LinkedHashMap<String, Object>> waypoint = MapsActivity.getWayPointDetailsList();
+        final ArrayList<HashMap<String, Object>> waypoint = MapsActivity.getWayPointDetailsList();
 
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
@@ -137,7 +136,10 @@ public class Location_RecyclerView_Selected extends Fragment {
             @Override
             public void onClick(View v) {
                 try {
-                                     if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                    if (MapsActivity.pd.isShowing()) {
+                        MapsActivity.pd.dismiss();
+                    }
+                    MapsActivity.pd.show();
                 } catch (Exception e) {
 
                     Log.d(TAG, "Some error has occured!" + e);
@@ -258,7 +260,7 @@ public class Location_RecyclerView_Selected extends Fragment {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                     builder.setTitle("Sorting");
                     builder.setItems(new CharSequence[]
-                                    {"By Time", "By Rating", "By Name", "button 4"},
+                                    {"By Time", "By Rating", "By Name", "By Distance","By Duration"},
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     // The 'which' argument contains the index position
@@ -276,7 +278,8 @@ public class Location_RecyclerView_Selected extends Fragment {
 ////
 //                                                if (MapsActivity.getWaypointwithDateList().get(i).get("place_id").equals(waypoint.get(i).get
 //                                                        ("place_id"))) {
-//                                                    waypoint.get(i).put("starttime", MapsActivity.getWaypointwithDateList().get(i).get("starttime"));
+//                                                    waypoint.get(i).put("starttime", MapsActivity.getWaypointwithDateList().get(i).get
+// ("starttime"));
 //                                                    System.out.println(i + "  added for first " + MapsActivity.getWaypointwithDateList().get(i).get
 //                                                            ("starttime"));
 //
@@ -346,9 +349,34 @@ public class Location_RecyclerView_Selected extends Fragment {
 
                                             break;
                                         case 3:
+                                            Collections.sort(waypoint, new Comparator<HashMap>() {
+                                                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                                                @Override
+                                                public int compare(HashMap o1, HashMap o2) {
+                                                    issorted = true;
+
+
+                                                    return Long.compare((Long)o1.get("distancevalue"),(Long) o2.get("distancevalue"));
+                                                }
+
+
+                                            });
                                             break;
 
+                                        case 4:
+                                            Collections.sort(waypoint, new Comparator<HashMap>() {
+                                                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                                                @Override
+                                                public int compare(HashMap o1, HashMap o2) {
+                                                    issorted = true;
 
+
+                                                    return Long.compare((Long)o1.get("durationvalue"),(Long) o2.get("durationvalue"));
+                                                }
+
+
+                                            });
+                                            break;
                                     }
                                     System.out.println("dudeUhhhyeh 2222" + waypoint);
 

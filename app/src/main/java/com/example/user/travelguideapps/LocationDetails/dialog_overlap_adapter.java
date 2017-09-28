@@ -22,7 +22,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,10 +34,10 @@ public class dialog_overlap_adapter extends RecyclerView.Adapter<dialog_overlap_
     private static String ItemName;
     private Context mContext;
     Dialog dialog;
-    private final ArrayList<LinkedHashMap<String, Object>> mValues;
+    private final ArrayList<HashMap<String, Object>> mValues;
     // private final OnListFragmentInteractionListener mListener;
 
-    public dialog_overlap_adapter(ArrayList<LinkedHashMap<String, Object>> items, Dialog dialog) {
+    public dialog_overlap_adapter(ArrayList<HashMap<String, Object>> items, Dialog dialog) {
         System.out.println("dialogoverlapadapter THISITMES" + items);
 
       //  mContext = context;

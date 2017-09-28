@@ -56,6 +56,7 @@ import java.util.List;
 
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
 import static android.Manifest.permission.READ_CONTACTS;
+
 /**
  * A login screen that offers login via email/password.
  */
@@ -87,13 +88,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mProgressView;
     private View mLoginFormView;
     private ImageView login_background;
-private FrameLayout frame;
+    private FrameLayout frame;
     ProgressDialog pd;
-private static String userId;
-    public static  String getUserID(){
+    private static String userId;
+
+    public static String getUserID() {
 
         return userId;
     }
+
     protected void setupLeakCanary() {
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
@@ -103,14 +106,40 @@ private static String userId;
         //  enabledStrictMode();
         LeakCanary.install(this.getApplication());
     }
+
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-       setupLeakCanary();
+        setupLeakCanary();
         // Normal app init code...
-
+      //  CheckBox keeplog = (CheckBox) findViewById(R.id.checkboxkeeplogin);
+        boolean isChecked = false;
         pd = new ProgressDialog(this);
+//        keeplog.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+//
+//            @Override
+//            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+//                SharedPreferences settings = getSharedPreferences("checkkeeplogin", 0);
+//                SharedPreferences.Editor editor = settings.edit();
+//                editor.putBoolean("isChecked", isChecked);
+//                editor.commit();
+//            }
+//        });
+//        SharedPreferences settings1 = getSharedPreferences("checkkeeplogin", 0);
+//        isChecked = settings1.getBoolean("isChecked", false);
+//        if (isChecked) {
+//            Intent i = new Intent(MainActivity.this, ThirdActivity.class);
+//            startActivity(i);
+//        } else {
+//            Intent i = new Intent(MainActivity.this, SecondActivity.class);
+//            startActivity(i);
+//        }
+
+
+
+
+
         pd.setMessage("Logging in... ...");
         pd.setCancelable(false);
         mAuth = FirebaseAuth.getInstance();
@@ -121,7 +150,7 @@ private static String userId;
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    userId=user.getUid();
+                    userId = user.getUid();
                 } else {
                     // User is signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");
@@ -158,15 +187,13 @@ private static String userId;
                 return false;
             }
         });
-       // final ConstraintLayout c= (ConstraintLayout) findViewById(R.id.login_page);
+        // final ConstraintLayout c= (ConstraintLayout) findViewById(R.id.login_page);
 //        ConstraintLayout mCustomLayout = (ConstraintLayout)findViewById(R.id.login_page);
-        ImageView i1= (ImageView) findViewById(R.id.imageView4);
-        ImageView i2= (ImageView) findViewById(R.id.imageView5);
+        ImageView i1 = (ImageView) findViewById(R.id.imageView4);
+        ImageView i2 = (ImageView) findViewById(R.id.imageView5);
 
         Picasso.with(this).load(android.R.drawable.ic_dialog_email).into(i1);
         Picasso.with(this).load(android.R.drawable.ic_lock_idle_lock).into(i2);
-
-
 
 
 //TODO: Put Access for location access,else just plain stop user from logging in
@@ -175,15 +202,16 @@ private static String userId;
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
 
             @Override
-            public void onClick (View view){
+            public void onClick(View view) {
                 if (!DetectConnection.checkInternetConnection(LoginActivity.this)) {
                     Toast.makeText(getApplicationContext(), "Internet is not connected!", Toast.LENGTH_SHORT).show();
-                } else
-                {    int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
+                } else {
+                    int MY_PERMISSION_ACCESS_COURSE_LOCATION = 0;
 //Check if there is permission, if yes login
                     Log.d(TAG, "inside this 1");
 
-                    if (ContextCompat.checkSelfPermission(LoginActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    if (ContextCompat.checkSelfPermission(LoginActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager
+                            .PERMISSION_GRANTED) {
                         Log.d(TAG, "inside this 2");
                         ActivityCompat.requestPermissions(LoginActivity.this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                                 MY_PERMISSION_ACCESS_COURSE_LOCATION);
@@ -196,7 +224,7 @@ private static String userId;
                             // this thread waiting for the user's response! After the user
                             // sees the explanation, try again to request the permission.
                             Log.d(TAG, "inside this3");
-                             //extra from bot
+                            //extra from bot
                             showDialogOK("This permission is important for the apps to run, without it you cannot login",
                                     new DialogInterface.OnClickListener() {
                                         @Override
@@ -214,11 +242,11 @@ private static String userId;
 
 
                         }
-                    }else{
+                    } else {
                         Log.d(TAG, "attempt login 2");
 
                         //If permission is accepted.
-                    attemptLogin();
+                        attemptLogin();
 
                     }
                 }
@@ -227,17 +255,18 @@ private static String userId;
 
         mLoginFormView = findViewById(R.id.login_form);
 
-        Log.d(TAG, "logintestformview"+mLoginFormView);
+        Log.d(TAG, "logintestformview" + mLoginFormView);
         //login_background= (ImageView) findViewById(R.id.login_background);
         //Log.d(TAG, "logintestbackground"+login_background);
 
 
-       // login_background.setImageAlpha(50);
-   //     mLoginPageView=findViewById(R.id.login_page);
-      //mLoginPageView.setAlpha((float) 0.5);
-      //  mProgressView = findViewById(R.id.login_progress);
+        // login_background.setImageAlpha(50);
+        //     mLoginPageView=findViewById(R.id.login_page);
+        //mLoginPageView.setAlpha((float) 0.5);
+        //  mProgressView = findViewById(R.id.login_progress);
 
     }
+
     private void showDialogOK(String message, DialogInterface.OnClickListener okListener) {
         new AlertDialog.Builder(LoginActivity.this)
                 .setTitle("Warning!")
@@ -278,6 +307,7 @@ private static String userId;
         }
         return false;
     }
+
     private boolean mayRequestLocations() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
@@ -303,10 +333,12 @@ private static String userId;
         }
         return false;
     }
+
     public void onStart() {
         super.onStart();
         mAuth.addAuthStateListener(mAuthListener);
     }
+
     @Override
     public void onStop() {
         super.onStop();
@@ -314,6 +346,7 @@ private static String userId;
             mAuth.removeAuthStateListener(mAuthListener);
         }
     }
+
     /**
      * Callback received when a permissions request has been completed.
      */
@@ -353,7 +386,6 @@ private static String userId;
             }
 
 
-
             // other 'case' lines to check for other
             // permissions this app might request
         }
@@ -365,7 +397,7 @@ private static String userId;
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private void  attemptLogin() {
+    private void attemptLogin() {
         pd.show();
         if (mAuthTask != null) {
             return;
@@ -387,7 +419,7 @@ private static String userId;
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
             cancel = true;
-        }else if (password.isEmpty()){
+        } else if (password.isEmpty()) {
 
             mPasswordView.setError("Password cannot be empty");
             focusView = mPasswordView;
@@ -417,7 +449,6 @@ private static String userId;
             mAuthTask = new UserLoginTask(email, password);
             mAuthTask.execute((Void) null);
         }
-
 
 
     }
@@ -520,6 +551,7 @@ private static String userId;
         int ADDRESS = 0;
         int IS_PRIMARY = 1;
     }
+
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
 
@@ -532,7 +564,7 @@ private static String userId;
 
         private final String mEmail;
         private final String mPassword;
-        private  String notification="Error";
+        private String notification = "Error";
         private FirebaseAuth auth;
 
         UserLoginTask(String email, String password) {
@@ -544,7 +576,8 @@ private static String userId;
         @Override
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
-            ;                                Log.d(TAG, "doInBackground" );
+            ;
+            Log.d(TAG, "doInBackground");
 
             try {
                 // Simulate network access.
@@ -554,7 +587,7 @@ private static String userId;
             }
 
             for (String credential : DUMMY_CREDENTIALS) {
-                Log.d(TAG, "Check Crudentials Testing" );
+                Log.d(TAG, "Check Crudentials Testing");
 
                 String[] pieces = credential.split(":");
                 if (pieces[0].equals(mEmail)) {
@@ -564,7 +597,7 @@ private static String userId;
             }
 
 //todo: Test Password system plssss
-            Log.d(TAG, "Before Testing" );
+            Log.d(TAG, "Before Testing");
 
 //todo: show a confirmation box for registerting new account if the user cannot login and it is a new account name.
             mAuth.signInWithEmailAndPassword(mEmail, mPassword)
@@ -581,10 +614,10 @@ private static String userId;
                             // the auth state listener will be notified and logic to handle the
                             // signed in user can be handled in the listener.
                             if (!task.isSuccessful()) {
-                                if(task.getException().toString()=="com.google.firebase.auth.FirebaseAuthInvalidCredentialsException: The password is invalid or the user does not have a password.") {
-                                    notification="Incorrect Password";
-                                }
-                                else{
+                                if (task.getException().toString() == "com.google.firebase.auth.FirebaseAuthInvalidCredentialsException: The " +
+                                        "password is invalid or the user does not have a password.") {
+                                    notification = "Incorrect Password";
+                                } else {
 
                                     mAuth.createUserWithEmailAndPassword(mEmail, mPassword)
                                             .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
@@ -596,8 +629,8 @@ private static String userId;
                                                     // the auth state listener will be notified and logic to handle the
                                                     // signed in user can be handled in the listener.
                                                     if (!task.isSuccessful()) {
-                                                     //   showProgress(false);
-pd.dismiss();
+                                                        //   showProgress(false);
+                                                        pd.dismiss();
                                                         Log.d(TAG, "Testing Not Success" + task.getException());
                                                         task.getException();
                                                         notification = "Incorrect Password";
@@ -608,25 +641,25 @@ pd.dismiss();
                                                                 Toast.LENGTH_SHORT).show();
                                                     } else {
 
-                                                        FirebaseUser user= FirebaseAuth.getInstance().getCurrentUser();
+                                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
                                                         user.sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
                                                             @Override
                                                             public void onComplete(@NonNull Task<Void> task) {
-                                                                if(task.isSuccessful()){
+                                                                if (task.isSuccessful()) {
                                                                     Log.i("Success", "Yes");
+                                                                } else {
+                                                                    Log.i("Success", "No");
                                                                 }
-                                                                else{
-                                                                    Log.i("Success", "No");}
                                                             }
                                                         });
 
 
-
                                                         Log.d(TAG, "Testing is Success" + task.isSuccessful());
-                                                    //    showProgress(false);
-pd.dismiss();
+                                                        //    showProgress(false);
+                                                        pd.dismiss();
                                                         notification = "New Account is Successfully created";
-                                                        Toast.makeText(LoginActivity.this, "New Account is Successfully created, Please verify it in your email first",
+                                                        Toast.makeText(LoginActivity.this, "New Account is Successfully created, Please verify it " +
+                                                                        "in your email first",
                                                                 Toast.LENGTH_SHORT).show();
                                                         // finish();
                                                     }
@@ -634,11 +667,11 @@ pd.dismiss();
                                                     // ...
                                                 }
 
-                                            });}
+                                            });
+                                }
 
 
-
-                            }else {
+                            } else {
                                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
@@ -647,13 +680,13 @@ pd.dismiss();
                                 {
                                     Toast.makeText(LoginActivity.this, "Email is not verified, pls verify your email first.",
                                             Toast.LENGTH_SHORT).show();
-                               //     showProgress(false);
-pd.dismiss();
+                                    //     showProgress(false);
+                                    pd.dismiss();
                                 } else {
 
 
                                     Log.w(TAG, "signInCompleted");
-                                  //  showProgress(false);
+                                    //  showProgress(false);
                                     pd.dismiss();
                                     DataHolderClass.getInstance2().setDistributor_id2(mEmail);
 
@@ -668,7 +701,7 @@ pd.dismiss();
 
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d(TAG, "Start Testing"+e );
+                            Log.d(TAG, "Start Testing" + e);
 
 
                         }
@@ -679,7 +712,7 @@ pd.dismiss();
 
             // TODO: register the new account here.
 
-            Log.d(TAG, "Before Ending" );
+            Log.d(TAG, "Before Ending");
             return false;
         }
 
@@ -707,7 +740,7 @@ pd.dismiss();
         @Override
         protected void onCancelled() {
             mAuthTask = null;
-          //  showProgress(false);
+            //  showProgress(false);
             pd.dismiss();
         }
     }

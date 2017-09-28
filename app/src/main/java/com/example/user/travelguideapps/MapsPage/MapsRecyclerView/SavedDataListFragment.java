@@ -105,7 +105,7 @@ public class SavedDataListFragment extends Fragment {
         }
         recyclerView.addItemDecoration(new SpacesItemDecoration(50));
 
-
+//she q
         System.out.println("WhatispostbeforeitemsBEFORE ");
         try {
             final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -133,7 +133,7 @@ public class SavedDataListFragment extends Fragment {
 
 //For every item (4)
                                 for (Object key : post.keySet()) {
-                                    //  LinkedHashMap b = key;
+                                    //  HashMap b = key;
                                     System.out.println("Whatispostbeforeitemswhatiskey2 " + key);
 
                                     System.out.println("Whatispostbeforeitemswhatiskey2 " + post.get(key));
@@ -233,6 +233,7 @@ public class SavedDataListFragment extends Fragment {
 
 
                             System.out.println("Whatispostbeforeitemswhatiskeyterstingsdnf" + test);
+//TODO:No adapter attached; skipping layout error in Fragment...Happen when the apps "restarted or something
 
                             recyclerView.setAdapter(new SavedDataListAdapter(getFragmentManager(), arrayarray, mListener));
                         }

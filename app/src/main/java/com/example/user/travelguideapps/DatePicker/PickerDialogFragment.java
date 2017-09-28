@@ -28,13 +28,11 @@ public class PickerDialogFragment extends TimeDurationPickerDialogFragment {
     }
 
 
-
     @Override
     public void onDurationSet(TimeDurationPicker view, long duration) {
         durationtime=duration;
         Time_Selection_Fragment.setDuration(duration/1000);
         Time_Selection_Fragment.setPositive(true);
-
 
       //  DurationToast.show(getActivity(), duration);
     }

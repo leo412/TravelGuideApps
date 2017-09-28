@@ -31,7 +31,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import static com.example.user.travelguideapps.MapsPage.MapsActivity.CurrentLocation;
@@ -43,8 +42,8 @@ import static com.example.user.travelguideapps.MapsPage.MapsActivity.CurrentLoca
 //TODO: most probably this is not needed, change if only needed .... called from LocationRecyclerVIew1/2
 public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapter<SelectedLocationListRecyclerViewAdapter.MyViewHolder> {
     private LayoutInflater mInflater;
-    private static List<LinkedHashMap<String, Object>> mDataSource;
-    private static List<LinkedHashMap<String, Object>> mDataSourceforSend;
+    private static List<HashMap<String, Object>> mDataSource;
+    private static List<HashMap<String, Object>> mDataSourceforSend;
 
     private int position;
     private static RecyclerView.ViewHolder holder2;
@@ -54,7 +53,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
     private static ArrayList distance = new ArrayList();
 
 
-    public SelectedLocationListRecyclerViewAdapter(ArrayList<LinkedHashMap<String, Object>> items) {
+    public SelectedLocationListRecyclerViewAdapter(ArrayList<HashMap<String, Object>> items) {
         mDataSource = items;
         //   mInflater = (LayoutInflater) holder.itemView.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -327,7 +326,8 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                 public void onClick(View view) {
                     //         MapsActivity m = new MapsActivity();
                     //Allow single selection hack,...
-                    notifyDataSetChanged();
+                    //TODO:why did i put this here... ...
+                    //        notifyDataSetChanged();
                     //TODO: uhhhh this one is not really that important anyway....
                     //   detailsbutton.setVisibility(View.VISIBLE);
 
@@ -358,8 +358,9 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                         }
                     }
                     Log.d("Hashthisruns", "notifyDataSetChanged  6");
+                    //TODO:why did i put this here... ...
 
-                    notifyDataSetChanged();
+                 //   notifyDataSetChanged();
 
                 }
 
@@ -432,7 +433,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     FragmentManager fragmentManager = ((FragmentActivity) holder.itemView.getContext()).getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     //TODO:Note this one is originally replace, change to add to allow not refreash
-                    fragmentTransaction.add(R.id.flContent2, fragment);
+                    fragmentTransaction.replace(R.id.flContent2, fragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
 
@@ -487,7 +488,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     FragmentManager fragmentManager = ((FragmentActivity) holder.itemView.getContext()).getSupportFragmentManager();
                     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
                     //TODO:Note this one is originally replace, change to add to allow not refresh
-                    fragmentTransaction.add(R.id.flContent2, fragment);
+                    fragmentTransaction.replace(R.id.flContent2, fragment);
                     fragmentTransaction.addToBackStack(null);
                     fragmentTransaction.commit();
 
@@ -514,7 +515,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
     @Override
     public int getItemCount() {
         if (mDataSource != null) {
-            Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
+            // Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
 
             return mDataSource.size();
         }
@@ -523,7 +524,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
     public static int getItemCount2() {
         if (mDataSource != null) {
-            Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
+            //Log.d("A", "Dujjjjjjjgetitemcount" + mDataSource.size());
 
             return mDataSource.size();
         }

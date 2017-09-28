@@ -21,7 +21,6 @@ import com.example.user.travelguideapps.MapsPage.MapsActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 public class DialogTravelSettingFragment extends DialogFragment {
@@ -32,7 +31,7 @@ public class DialogTravelSettingFragment extends DialogFragment {
     private Context mContext;
     private LayoutInflater mInflater;
     private ArrayList mDataSource;
-    private static List<LinkedHashMap<String, String>> mDataSourceforSend;
+    private static List<HashMap<String, String>> mDataSourceforSend;
 
     private static String transport = "driving";
     private static String avoid = "";

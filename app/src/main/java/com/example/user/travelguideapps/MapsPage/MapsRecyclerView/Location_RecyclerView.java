@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AlertDialog;
@@ -48,7 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -83,7 +85,7 @@ public class Location_RecyclerView extends Fragment {
     private static String keyword = "";
     private static AutoCompleteTextView auto;
     ImageButton foodbutton;
-    List<LinkedHashMap<String, Object>> nearbyPlacesList = new List<LinkedHashMap<String, Object>>() {
+    List<HashMap<String, Object>> nearbyPlacesList = new List<HashMap<String, Object>>() {
 
 
         @Override
@@ -103,7 +105,7 @@ public class Location_RecyclerView extends Fragment {
 
         @NonNull
         @Override
-        public Iterator<LinkedHashMap<String, Object>> iterator() {
+        public Iterator<HashMap<String, Object>> iterator() {
             return null;
         }
 
@@ -120,7 +122,7 @@ public class Location_RecyclerView extends Fragment {
         }
 
         @Override
-        public boolean add(LinkedHashMap<String, Object> stringObjectLinkedHashMap) {
+        public boolean add(HashMap<String, Object> stringObjectHashMap) {
             return false;
         }
 
@@ -135,12 +137,12 @@ public class Location_RecyclerView extends Fragment {
         }
 
         @Override
-        public boolean addAll(@NonNull Collection<? extends LinkedHashMap<String, Object>> c) {
+        public boolean addAll(@NonNull Collection<? extends HashMap<String, Object>> c) {
             return false;
         }
 
         @Override
-        public boolean addAll(int index, @NonNull Collection<? extends LinkedHashMap<String, Object>> c) {
+        public boolean addAll(int index, @NonNull Collection<? extends HashMap<String, Object>> c) {
             return false;
         }
 
@@ -160,22 +162,22 @@ public class Location_RecyclerView extends Fragment {
         }
 
         @Override
-        public LinkedHashMap<String, Object> get(int index) {
+        public HashMap<String, Object> get(int index) {
             return null;
         }
 
         @Override
-        public LinkedHashMap<String, Object> set(int index, LinkedHashMap<String, Object> element) {
+        public HashMap<String, Object> set(int index, HashMap<String, Object> element) {
             return null;
         }
 
         @Override
-        public void add(int index, LinkedHashMap<String, Object> element) {
+        public void add(int index, HashMap<String, Object> element) {
 
         }
 
         @Override
-        public LinkedHashMap<String, Object> remove(int index) {
+        public HashMap<String, Object> remove(int index) {
             return null;
         }
 
@@ -190,19 +192,19 @@ public class Location_RecyclerView extends Fragment {
         }
 
         @Override
-        public ListIterator<LinkedHashMap<String, Object>> listIterator() {
+        public ListIterator<HashMap<String, Object>> listIterator() {
             return null;
         }
 
         @NonNull
         @Override
-        public ListIterator<LinkedHashMap<String, Object>> listIterator(int index) {
+        public ListIterator<HashMap<String, Object>> listIterator(int index) {
             return null;
         }
 
         @NonNull
         @Override
-        public List<LinkedHashMap<String, Object>> subList(int fromIndex, int toIndex) {
+        public List<HashMap<String, Object>> subList(int fromIndex, int toIndex) {
             return null;
         }
     };
@@ -365,21 +367,21 @@ public class Location_RecyclerView extends Fragment {
             @Override
             public void onClick(View v) {
 //TODO: add saying that                 builder.setMessage("*Sorting is only for viewing purpose only and will not be saved");
+                System.out.println("dudeUhhhyeh 1111" + nearbyPlacesList);
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                 builder.setTitle("Sorting");
                 builder.setItems(new CharSequence[]
-                                {"By Name", "By rating", "button 3", "button 4"},
+                                {"By Name", "By rating", "By Distance", "By Duration"},
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 // The 'which' argument contains the index position
                                 // of the selected item
                                 switch (which) {
                                     case 0:
-                                        System.out.println("dudeUhhhyeh 1111" + nearbyPlacesList);
-                                        Collections.sort(nearbyPlacesList, new Comparator<LinkedHashMap>() {
+                                        Collections.sort(nearbyPlacesList, new Comparator<HashMap>() {
                                             @Override
-                                            public int compare(LinkedHashMap o1, LinkedHashMap o2) {
+                                            public int compare(HashMap o1, HashMap o2) {
 
 
                                                 return o1.get("place_name").toString().compareTo(o2.get("place_name").toString());
@@ -393,9 +395,9 @@ public class Location_RecyclerView extends Fragment {
                                         break;
                                     case 1:
                                         // System.out.println("dudeUhhhyeh 2222" + waypoint);
-                                        Collections.sort(nearbyPlacesList, new Comparator<LinkedHashMap>() {
+                                        Collections.sort(nearbyPlacesList, new Comparator<HashMap>() {
                                             @Override
-                                            public int compare(LinkedHashMap o1, LinkedHashMap o2) {
+                                            public int compare(HashMap o1, HashMap o2) {
 
 
                                                 return o2.get("rating").toString().compareTo(o1.get("rating").toString());
@@ -407,14 +409,29 @@ public class Location_RecyclerView extends Fragment {
 
                                         break;
                                     case 2:
-                                        //     System.out.println("dudeUhhhyeh 3333" + waypoint);
+                                        Collections.sort(nearbyPlacesList, new Comparator<HashMap>() {
+                                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                                            @Override
+                                            public int compare(HashMap o1, HashMap o2) {
 
-//
+
+                                                return Long.compare((Long) o1.get("distancevalue"), (Long) o2.get("distancevalue"));
+                                            }
+                                        });
                                         break;
                                     case 3:
                                         // System.out.println("dudeUhhhyeh 444" + waypoint);
+                                        Collections.sort(nearbyPlacesList, new Comparator<HashMap>() {
+                                            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                                            @Override
+                                            public int compare(HashMap o1, HashMap o2) {
 
+
+                                                return Long.compare((Long) o1.get("durationvalue"), (Long) o2.get("durationvalue"));
+                                            }
+                                        });
                                         break;
+                                    case 4:
 
 
                                 }
@@ -640,7 +657,10 @@ public class Location_RecyclerView extends Fragment {
                                 } else {
 
                                     expandableLayout.collapse();
-                                                     if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                                    if (MapsActivity.pd.isShowing()) {
+                                        MapsActivity.pd.dismiss();
+                                    }
+                                    MapsActivity.pd.show();
                                     StringBuilder a = nearbyListBuilder(LocationType);
                                     //  emptyview.setVisibility(View.GONE);
                                     recyclerviewvisible = true;
@@ -676,7 +696,10 @@ public class Location_RecyclerView extends Fragment {
                                 StringBuilder s = new StringBuilder();
                                 s.append("amusement_park|aquarium|bowling_alley|campground|library");
                                 expandableLayout.collapse();
-                                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                                if (MapsActivity.pd.isShowing()) {
+                                    MapsActivity.pd.dismiss();
+                                }
+                                MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);
                                 //  emptyview.setVisibility(View.GONE);
                                 recyclerviewvisible = true;
@@ -715,7 +738,10 @@ public class Location_RecyclerView extends Fragment {
                                 //        .travelguideapps-2/split_lib_dependencies_apk.apk has in excess of 100 dex files. Please consider
                                 //          coalescing and shrinking the number to  avoid runtime overhead.
 
-                                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                                if (MapsActivity.pd.isShowing()) {
+                                    MapsActivity.pd.dismiss();
+                                }
+                                MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);
                                 //  emptyview.setVisibility(View.GONE);
                                 recyclerviewvisible = true;
@@ -748,7 +774,10 @@ public class Location_RecyclerView extends Fragment {
                                 StringBuilder s = new StringBuilder();
                                 s.append("restaurant|bakery|bar|cafe");
                                 expandableLayout.collapse();
-                                                 if (MapsActivity.pd.isShowing()) {                     MapsActivity.pd.dismiss();                 }                 MapsActivity.pd.show();
+                                if (MapsActivity.pd.isShowing()) {
+                                    MapsActivity.pd.dismiss();
+                                }
+                                MapsActivity.pd.show();
                                 StringBuilder a = nearbyListBuilder(s);
                                 //  emptyview.setVisibility(View.GONE);
                                 recyclerviewvisible = true;
@@ -795,58 +824,36 @@ public class Location_RecyclerView extends Fragment {
     }
 
     public static StringBuilder nearbyListBuilder(StringBuilder locationtype) {
-        //TODO:probably fixed... location null
         Location location = MapsActivity.CurrentLocation;
-
         try {
             if (location != null) {
                 //use your current location here
                 double mLatitude = location.getLatitude();
                 double mLongitude = location.getLongitude();
-
                 StringBuilder sb = new StringBuilder("https://maps.googleapis.com/maps/api/place/nearbysearch/json?");
                 sb.append("location=" + mLatitude + "," + mLongitude);
-                //TODO: Set radius to be controllable
-                Log.d("Map", "keyword=location=: " + sb.toString());
-
-
                 if (locationtype.length() != 0) {
                     locationtype.deleteCharAt(locationtype.length() - 1);
                 }
-                // sb.append("&radius=5000");
-                //Todo: figure out how to support multiple types (location)..........
-                //IMPORTANT
-                sb.append("&radius=" + Integer.toString(getradius()));
 
+                sb.append("&radius=" + Integer.toString(getradius()));
                 sb.append("&types=" + locationtype);
-                Log.d("Map", "keyword=: " + sb.toString());
 
                 if (keyword != null) {
-                    Log.d("Map", "keyword=: " + keyword.toString());
                     keyword = keyword.replace(",", "%2C");
-
                     keyword = keyword.replace(" ", "%20");
-
-
                     sb.append("&keyword=" + keyword);
-
                 }
-                Log.d("Map", "afterkeyword=: " + sb.toString());
 
                 if (Location_RecyclerView.getswitch()) {
                     sb.append("&opennow=true");
-
-
                 }
 
-                //if -1 then anything.....TODO:problem of price cannot detect
                 if (minpriceint == 0) {
                     minpriceint = -1;
-
                 }
                 if (maxpriceint == 4) {
                     maxpriceint = -1;
-
                 }
 
 
@@ -854,18 +861,13 @@ public class Location_RecyclerView extends Fragment {
                 sb.append("&sensor=true");
                 sb.append("&key=AIzaSyDkIa12Y9nXORou_xCnwS09K53kbJabKHo");
                 ;
-                Log.d("Map", "api: " + sb.toString());
-
-
                 return sb;
             } else {
-
                 return null;
             }
         } catch (Exception e) {
             StringBuilder sb = new StringBuilder("Fail");
             Log.d("Location_RecyclerVIew ", e.toString());
-
             return sb.append("Test");
         }
 

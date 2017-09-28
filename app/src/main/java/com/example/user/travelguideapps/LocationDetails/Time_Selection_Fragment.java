@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.TimeZone;
 
 /**
@@ -57,8 +56,8 @@ public class Time_Selection_Fragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-    private static LinkedHashMap<String, Object> placedetail;
-    private static LinkedHashMap<String, Object> otherplacedetail;
+    private static HashMap<String, Object> placedetail;
+    private static HashMap<String, Object> otherplacedetail;
 
     // TODO: Rename and change types of parameters
     private String mParam1;
@@ -80,7 +79,7 @@ public class Time_Selection_Fragment extends Fragment {
      * @return A new instance of fragment Time_Selection_Fragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static Time_Selection_Fragment newInstance(ArrayList<LinkedHashMap<String, Object>> placedetails, String param2) {
+    public static Time_Selection_Fragment newInstance(ArrayList<HashMap<String, Object>> placedetails, String param2) {
         Time_Selection_Fragment fragment = new Time_Selection_Fragment();
 
         placedetail = placedetails.get(0);
@@ -125,7 +124,7 @@ public class Time_Selection_Fragment extends Fragment {
     int finalNumber1;
     ArrayList selecteddata = new ArrayList();
     boolean executesave = false;
-    LinkedHashMap waypointwithdateafter = new LinkedHashMap();
+    HashMap waypointwithdateafter = new HashMap();
 
     //e
     public static void setDuration(long duration) {
@@ -150,7 +149,7 @@ public class Time_Selection_Fragment extends Fragment {
         dialogboolean = false;
 
         View view = inflater.inflate(R.layout.fragment_location_time_selected, container, false);
-        HashMap waypointwithdate = new LinkedHashMap();
+        HashMap waypointwithdate = new HashMap();
         int number = 0;
         selecteddurationtext = (TextView) view.findViewById(R.id.timedurationtext);
         emptyimage = (ImageView) view.findViewById(R.id.empty_clock);
@@ -361,7 +360,7 @@ public class Time_Selection_Fragment extends Fragment {
             Log.d("Checking", "checkdateused " + dateused);
 
             Log.d("Checking", "nowchecking " + waypointwithdatedup);
-            waypointwithdateafter = new LinkedHashMap(waypointwithdatedup);
+            waypointwithdateafter = new HashMap(waypointwithdatedup);
             //        Collections.copy(waypointwithdatedup,waypointwithdateafter);
             Log.d("Checking", "nowchecking " + waypointwithdateafter);
 
@@ -579,8 +578,8 @@ public class Time_Selection_Fragment extends Fragment {
                     now.get(Calendar.DAY_OF_MONTH)
             );
 
-
-            dpd.setTitle("Date for visiting" + Calendar.HOUR);
+            dpd.setAccentColor("#7783F0");
+            dpd.setTitle("Travel Date");
             if (v.getId() == R.id.selectstarttimebutton) {
                 //TODO: just reset the "Select end time?"
 
@@ -607,6 +606,7 @@ public class Time_Selection_Fragment extends Fragment {
 //            SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
 //          Date b=  sdf.format(cal.getTime());
 
+            tpdStart.setAccentColor("#7783F0");
 
             tpdStart.setTitle("Starting Time");
             //tpdend.setTitle("Ending Time");
@@ -663,7 +663,7 @@ public class Time_Selection_Fragment extends Fragment {
                             MapsActivity.changeWaypointwithDateList(waypointwithdateafter);
 
 
-                            FragmentManager fragmentManager = Time_Selection_Fragment.this.getActivity().getSupportFragmentManager();
+//                            FragmentManager fragmentManager = Time_Selection_Fragment.this.getActivity().getSupportFragmentManager();
                             //To refresh the time
                             FragmentTransaction ft = getFragmentManager().beginTransaction();
                             ft.detach(Time_Selection_Fragment.this).attach(Time_Selection_Fragment.this).commit();
@@ -694,7 +694,7 @@ public class Time_Selection_Fragment extends Fragment {
     public boolean checkIfOpen() {
         boolean checkisopened = true;
 
-        LinkedHashMap<String, Object> detail = MapsActivity.getWayPointDetails(waypointwithdateafter.get("place_id").toString());
+        HashMap<String, Object> detail = MapsActivity.getWayPointDetails(waypointwithdateafter.get("place_id").toString());
 
         // arr=(ArrayList)detail.get("opening_hours");
         //ArrayList  arr= (ArrayList) detail.get("opening_hours");
@@ -992,24 +992,17 @@ public class Time_Selection_Fragment extends Fragment {
 //        newFragment.show(ft, "dialog");
 //    }
     public boolean checkoverlap() {
-        Log.d("haha", "dafaqcheckingoverlap" + MapsActivity.getWaypointwithDateList());
-//
-        //THIS just run to see of dialog open/ save the data
         executesave = true;
-        ArrayList<LinkedHashMap<String, Object>> overlaparray = new ArrayList();
+        ArrayList<HashMap<String, Object>> overlaparray = new ArrayList();
         StringBuilder overlaplist = new StringBuilder();
         for (int i = 0; i < waypointWithDateListDup.size(); i++) {
             boolean next = true;
-
-            //Checking this shit
-            //Cannot enter date into existing period
-            //Cannot enter duration that cause overlap into single date or existing period
             long selecteddate = 0;
             long selectedduration = 0;
             long selectedenddate = 0;
+
             if ((long) waypointwithdateafter.get("starttime") != 0) {
                 selecteddate = (long) waypointwithdateafter.get("starttime");
-
             }
 
             if ((long) waypointwithdateafter.get("duration") != 0) {
@@ -1030,12 +1023,6 @@ public class Time_Selection_Fragment extends Fragment {
                 previousselectedenddate = previousselecteddate + previousselectedduration;
 
             }
-            System.out.println("datex  " + waypointWithDateListDup);
-
-            System.out.println("checkdate1  " + selecteddate);
-            System.out.println("checkdate2  " + selectedenddate);
-            System.out.println("checkdate3  " + previousselecteddate);
-            System.out.println("checkdate4  " + previousselectedenddate);
 
             String startdate = new java.text.SimpleDateFormat("dd-MMM-yyyy HH:mm").format(new java.util.Date(previousselecteddate * 1000));
             String enddate;
@@ -1046,39 +1033,15 @@ public class Time_Selection_Fragment extends Fragment {
                 enddate = "N/A";
 
             }
-            //To pick only not equals place id
             if (!waypointwithdateafter.get("place_id").equals(waypointWithDateListDup.get(i).get("place_id"))) {
 
-//require equals so that can compare long
                 if ((long) waypointWithDateListDup.get(i).get("starttime") != 0) {
                     if ((long) waypointwithdateafter.get("starttime") != 0) {
                         if (selecteddate >= previousselecteddate && selecteddate <=
                                 previousselectedenddate) {
-                            //1>3
-                            //1<4
-//1503870720
-//1503763440--1503871440
-
-                            //3<1<4
-                            //  1-----A
-                            //3----4
-
-                            //3<2<4
-                            //  A-----2
-                            //      3----4
-
-                            //1<3<2
-                            //  1-----2
-                            //      3----A
-                            //Impossible.
-                            //         1-----2
-                            //      A----4
-
-                            //...WHew is 4 between?
                             next = false;
                             executesave = false;
-                            System.out.println("checkdate  fail 1 " + MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get("place_id")
-                                    .toString()));
+
                             overlaplist.append(MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get("place_id").toString()).get
                                     ("place_name")
                                     .toString()
@@ -1088,50 +1051,33 @@ public class Time_Selection_Fragment extends Fragment {
                             otherplacedetail.put("selectedstartdate", startdate);
                             otherplacedetail.put("selectedenddate", enddate);
                             overlaparray.add(otherplacedetail);
-
-                            //        MapsActivity.showDialog(getContext(), "The chosen time is overlapping with others locations!");
-
                         }
                     }
                     if ((long) waypointwithdateafter.get("duration") != 0) {
 
                         if (selectedenddate >= previousselecteddate) {
 
-                            //      1----2
-                            //          3--4
-                            if (selectedenddate <=
-                                    previousselectedenddate && next) {
+
+                            if (selectedenddate <=previousselectedenddate && next) {
                                 executesave = false;
                                 next = false;
 
-                                //        MapsActivity.showDialog(getContext(), "The chosen time is overlapping with others locations!");
-                                System.out.println("checkdate  fail 2 " + MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get
-                                        ("place_id")
-                                        .toString()));
                                 overlaplist.append(MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get("place_id").toString()).get
                                         ("place_name").toString()
                                         + previousselecteddate + "--" + previousselectedenddate);
-                                //   overlaparray.add(MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get(0).toString()).get
-                                // ("place_name")+": " +
-                                //         ""+startdate+"---"+enddate);
+
                                 otherplacedetail = MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get("place_id").toString());
                                 otherplacedetail.put("selectedstartdate", startdate);
                                 otherplacedetail.put("selectedenddate", enddate);
                                 overlaparray.add(otherplacedetail);
 
-
                             } else if (previousselecteddate >= selecteddate && next) {
                                 executesave = false;
                                 next = false;
 
-                                //      MapsActivity.showDialog(getContext(), "The chosen time is overlapping with others locations!");
-                                System.out.println("checkdate  fail 3 " + MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get
-                                        ("place_id")
-                                        .toString()));
                                 overlaplist.append(MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get("place_id").toString()).get
                                         ("place_name").toString()
                                         + previousselecteddate + "--" + previousselectedenddate);
-
 
                                 otherplacedetail = MapsActivity.getWayPointDetails(waypointWithDateListDup.get(i).get("place_id").toString());
                                 otherplacedetail.put("selectedstartdate", startdate);
@@ -1139,18 +1085,9 @@ public class Time_Selection_Fragment extends Fragment {
                                 overlaparray.add(otherplacedetail);
 
                             }
-
-
                         }
-
-
                     }
                 }
-
-
-                System.out.println("checkdate  fail final" + overlaplist.toString());
-
-
             }
 
         }
@@ -1183,14 +1120,8 @@ public class Time_Selection_Fragment extends Fragment {
             rv.setHasFixedSize(true);
 
             dialog.show();
-//            Window window = dialog.getWindow();
-//            window.setLayout(RecyclerView.LayoutParams.MATCH_PARENT, RecyclerView.LayoutParams.MATCH_PARENT);
-            // MapsActivity.showDialog(getContext(), "These chosen time is overlapping with others locations!"+overlaplist.toString());
 
         }
-        System.out.println("boooooin picker  checkif excet " + executesave);
-        Log.d("haha", "dafaqcheckingoverlap" + MapsActivity.getWaypointwithDateList());
-
         return executesave;
     }
 

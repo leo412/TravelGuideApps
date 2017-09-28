@@ -51,7 +51,16 @@
         android:visibility="gone"
         tools:layout_editor_absoluteY="284dp"
         tools:layout_editor_absoluteX="192dp"/>
-
+<CheckBox
+    android:text="Keep me Logged in"
+    android:layout_marginTop="20dp"
+    android:background="#80e8eaed"
+    android:paddingRight="118dp"
+    android:id="@+id/checkboxkeeplogin"
+    app:layout_constraintTop_toBottomOf="@id/password"
+    app:layout_constraintLeft_toLeftOf="@id/password"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"/>
     <Button
         android:background="#D43ebff2"
 android:textSize="30dp"
