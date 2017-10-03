@@ -32,19 +32,23 @@ public class DialogTravelSettingFragment extends DialogFragment {
     private LayoutInflater mInflater;
     private ArrayList mDataSource;
     private static List<HashMap<String, String>> mDataSourceforSend;
+    private static String typeof;
 
     private static String transport = "driving";
     private static String avoid = "";
 
-private     HashMap<Integer,ArrayList> hasharray;
+private     HashMap<Integer,ArrayList> hasharraytonext;
+    private     HashMap<Integer,ArrayList> hasharraylocal;
 
     private static int Position;
     private static RecyclerView.ViewHolder holder2;
 
-    public static DialogTravelSettingFragment newInstance(int position) {
+    public static DialogTravelSettingFragment newInstance(int position,String type) {
         DialogTravelSettingFragment frag = new DialogTravelSettingFragment();
         Bundle args = new Bundle();
         Position = position;
+typeof=type;
+
 
         frag.setArguments(args);
         return frag;
@@ -67,55 +71,107 @@ private     HashMap<Integer,ArrayList> hasharray;
         final RadioButton highwaysradio = (RadioButton) view.findViewById(R.id.highwaysradio);
         final RadioButton ferriesradio = (RadioButton) view.findViewById(R.id.ferriesradio);
 
-        hasharray = DataHolderClass.getInstancearraylistofradio().getDistributor_idarraylistofradio();
-         ArrayList array = null;
-        if(hasharray!=null) {
+        hasharraytonext = DataHolderClass.getInstancearraylistofradio().getDistributor_idarraylistofradio();
+        hasharraylocal= DataHolderClass.getInstancearraylistofradio2().getDistributor_idarraylistofradio2();
 
-            array = hasharray.get(Position);
+        Toast.makeText(getActivity().getApplicationContext(), "tonext"+hasharraytonext, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity().getApplicationContext(), "local"+hasharraylocal, Toast.LENGTH_SHORT).show();
+
+
+        ArrayList array = null;
+        ArrayList localarray = null;
+
+        if(hasharraytonext !=null) {
+
+            array = hasharraytonext.get(Position);
         }else{
-            hasharray= new HashMap<Integer, ArrayList>();
+            hasharraytonext = new HashMap<Integer, ArrayList>();
 
 
         }
-        if (array != null) {
-            switch (array.get(0).toString()) {
-                case "driving":
-                    drivingradio.setChecked(true);
-                    break;
-                case "walking":
-                    walkingradio.setChecked(true);
-                    break;
-                case "bicycling":
-                    bicyclingradio.setChecked(true);
-                    break;
-                case "transit":
-                    transitradio.setChecked(true);
-                    break;
+        if(hasharraylocal !=null) {
 
+            localarray = hasharraylocal.get(Position);
+        }else{
+            hasharraylocal = new HashMap<Integer, ArrayList>();
+
+
+        }
+        if(typeof.equals("tonext")) {
+            if (array != null) {
+                switch (array.get(0).toString()) {
+                    case "driving":
+                        drivingradio.setChecked(true);
+                        break;
+                    case "walking":
+                        walkingradio.setChecked(true);
+                        break;
+                    case "bicycling":
+                        bicyclingradio.setChecked(true);
+                        break;
+                    case "transit":
+                        transitradio.setChecked(true);
+                        break;
+
+                }
+
+
+                switch (array.get(1).toString()) {
+                    case "":
+                        noradio.setChecked(true);
+                        break;
+                    case "tolls":
+                        tollsradio.setChecked(true);
+                        break;
+                    case "highways":
+                        highwaysradio.setChecked(true);
+                        break;
+                    case "ferries":
+                        ferriesradio.setChecked(true);
+                        break;
+
+                }
             }
+        }else {
+            if (localarray != null) {
+                switch (localarray.get(0).toString()) {
+                    case "driving":
+                        drivingradio.setChecked(true);
+                        break;
+                    case "walking":
+                        walkingradio.setChecked(true);
+                        break;
+                    case "bicycling":
+                        bicyclingradio.setChecked(true);
+                        break;
+                    case "transit":
+                        transitradio.setChecked(true);
+                        break;
+
+                }
 
 
-            switch (array.get(1).toString()) {
-                case "":
-                    noradio.setChecked(true);
-                    break;
-                case "tolls":
-                    tollsradio.setChecked(true);
-                    break;
-                case "highways":
-                    highwaysradio.setChecked(true);
-                    break;
-                case "ferries":
-                    ferriesradio.setChecked(true);
-                    break;
+                switch (localarray.get(1).toString()) {
+                    case "":
+                        noradio.setChecked(true);
+                        break;
+                    case "tolls":
+                        tollsradio.setChecked(true);
+                        break;
+                    case "highways":
+                        highwaysradio.setChecked(true);
+                        break;
+                    case "ferries":
+                        ferriesradio.setChecked(true);
+                        break;
 
+                }
             }
         }
-
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setView(view);
         alertDialog.setIcon(android.R.drawable.stat_notify_error);
-        alertDialog.setTitle("Transport Setting");
+        alertDialog.setTitle("Travel Setting");
         alertDialog.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
 
@@ -149,13 +205,20 @@ private     HashMap<Integer,ArrayList> hasharray;
                     avoid = "ferries";
 
                 }
-                //arrayforadd.add(Position);
                 arrayforadd.add(transport);
                 arrayforadd.add(avoid);
-                hasharray.put(Position,arrayforadd);
-                //          DataHolderClass.getInstance3().setDistributor_id3(array);
-                DataHolderClass.getInstancearraylistofradio().setDistributor_idarraylistofradio(hasharray);
-         //       System.out.println("isrunningwalking" + array);
+                hasharraytonext.put(Position,arrayforadd);
+                //arrayforadd.add(Position);
+                if(typeof.equals("local")){
+
+                    DataHolderClass.getInstancearraylistofradio2().setDistributor_idarraylistofradio2(hasharraytonext);
+
+
+                }else {
+                    DataHolderClass.getInstancearraylistofradio().setDistributor_idarraylistofradio(hasharraytonext);
+
+                }
+    //   System.out.println("isrunningwalking" + array);
                 // MapsActivity.setNextDistanceURL(mContext);
                 Toast.makeText(getActivity().getApplicationContext(), "Setting completed", Toast.LENGTH_SHORT).show();
                 MapsActivity.setNextDistanceURL(getContext());

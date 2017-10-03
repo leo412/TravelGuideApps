@@ -15,8 +15,9 @@ public class DataHolderClass {
     private static DataHolderClass dataObject3 = null;
     private static DataHolderClass dataObjectarray = null;
     private static DataHolderClass dataObject4 = null;
-
     private static DataHolderClass arraylistofradio = null;
+
+    private static DataHolderClass arraylistofradio2 = null;
     private static DataHolderClass booleanhaschanges = null;
 
     private DataHolderClass() {
@@ -128,6 +129,23 @@ public class DataHolderClass {
 
 
 
+    public static DataHolderClass getInstancearraylistofradio2() {
+        if (arraylistofradio2 == null)
+            arraylistofradio2 = new DataHolderClass();
+        return arraylistofradio2;
+    }
+    private HashMap<Integer,ArrayList> distributor_idarraylistofradio2;
+
+    public HashMap<Integer,ArrayList>getDistributor_idarraylistofradio2() {
+        return distributor_idarraylistofradio2;
+    }
+
+    public void setDistributor_idarraylistofradio2( HashMap<Integer,ArrayList> distributor_idarraylistofradio2) {
+        this.distributor_idarraylistofradio2 = distributor_idarraylistofradio2;
+    }
+
+
+
     public static DataHolderClass getInstancearraylistofradio() {
         if (arraylistofradio == null)
             arraylistofradio = new DataHolderClass();
@@ -142,6 +160,12 @@ public class DataHolderClass {
     public void setDistributor_idarraylistofradio( HashMap<Integer,ArrayList> distributor_idarraylistofradio) {
         this.distributor_idarraylistofradio = distributor_idarraylistofradio;
     }
+
+
+
+
+
+
 
 
     public static DataHolderClass getBooleanhaschanges() {

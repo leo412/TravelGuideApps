@@ -898,11 +898,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
 
     public static void setNextDistanceURL(Context mContext) {
         instancesfortesting++;
-        Log.d("MapsAcitivity", "findouthowmanytimesinstances" + instancesfortesting);
+        Log.d("MapsAcitivity", "findouthowmanytimesinstancesfortesting" + instancesfortesting);
+        Log.d("tocheckthestring ", "howmanytimeshavethisrun? 1");
+        Log.d("tocheckthestring ", "howmanytimeshavethisrun? 1  "+instancesfortesting);
 
         Log.d("MapsAcitivity", "ifhaveruninempty inside" + WaypointwithDateList);
         Log.d("MapsAcitivity", "ifhaveruninempty details" + WayPointDetailsList);
         Log.d("MapsAcitivity", "ifhaveruninempty nearby" + getNearbyPlacesList());
+
 
 
         for (int i = 0; i < WaypointwithDateList.size(); i++) {
@@ -943,6 +946,7 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                         end.put("place_id", "null");
                     }
                     Log.d("MapsAcitivity", "asdasdacwwide" + h);
+                    ArrayList array2 = null;
 
                     if ((Long) WaypointwithDateList.get(i).get("starttime") != 0) {
                         Log.d("MapsAcitivity", "runninghowmanye" + i);
@@ -957,6 +961,9 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                         Log.d("A", "WaypointwithDateLigethash 4 " + BaseActivity.getCurrentLocation());
                         Log.d(TAG, "WaypointwithDateLigethash 5" + url.toString());
                         HashMap<Integer, ArrayList> hasharray = DataHolderClass.getInstancearraylistofradio().getDistributor_idarraylistofradio();
+                        HashMap<Integer, ArrayList> hasharray2 = DataHolderClass.getInstancearraylistofradio2().getDistributor_idarraylistofradio2();
+
+
                         ArrayList array = null;
 
                         if (hasharray != null) {
@@ -965,6 +972,14 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                             array = hasharray.get(i);
                         } else {
                             hasharray = new HashMap<Integer, ArrayList>();
+
+                        }
+                        if (hasharray2 != null) {
+                            Log.d(TAG, "hasharray5" + hasharray);
+
+                            array2 = hasharray2.get(i);
+                        } else {
+                            hasharray2 = new HashMap<Integer, ArrayList>();
 
                         }
 //TODO: why didnt i put everything in one url?
@@ -1012,6 +1027,12 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
                             BaseActivity.getCurrentLocation().getLongitude() +
                             "&destinations=place_id:" + h
                             .get("place_id"));
+                    if (array2 != null && !array2.isEmpty()) {
+
+                        localurl.append("&mode=" + array2.get(0));
+                        localurl.append("&avoid=" + array2.get(1));
+
+                    }
                     localurl.append("&key=AIzaSyD5XXsvbPu_ZMHr6D_nLfRmcIj7bESfzYk");
 
                     downloadDistanceurl downloadlocal = new downloadDistanceurl(mContext, "selectedlocal");
@@ -1993,214 +2014,278 @@ public class MapsActivity extends Fragment implements OnMapReadyCallback, Google
             String jsonArraydurationtonext = new String();
             Long durationtonextvalue = new Long(0);
             ArrayList<HashMap<String, Object>> wayPointDetailsList = MapsActivity.getWayPointDetailsList();
+            Log.d("tocheckthestring ", "distancematrixcheck" + result);
+            Log.d("tocheckthestring ", "whatiswaypointdetailss" + wayPointDetailsList);
+            Log.d("tocheckthestring ", "howmanytimeshavethisrun? 2");
+
+            Log.d("tocheckthestring ", "actualrunning   " + variable+"Inst "+instancesfortesting);
 
 
             JSONObject jsonObject;
-            if (variable.equals("selectednext")) {
-                if (result != null) {
-                    try {
-                        jsonObject = new JSONObject(result);
-                        if (!jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getString("status")
-                                .equals("NOT_FOUND")) {
+            if (result != null) {
+                if (!result.contains("ZERO_RESULTS")) {
+                    if (variable.equals("selectednext")) {
+                        try {
+                            jsonObject = new JSONObject(result);
+                            if (!jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getString("status")
+                                    .equals("NOT_FOUND")) {
 
-                            jsonArraydistancetonext = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("distance").getString("text");
+                                jsonArraydistancetonext = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("distance").getString("text");
 
-                            jsonArraydurationtonext = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("duration").getString("text");
+                                jsonArraydurationtonext = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("duration").getString("text");
 
-                            durationtonextvalue = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("duration").getLong("value");
+                                durationtonextvalue = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("duration").getLong("value");
 
 
-                            //everytime run a new url... add new
-                            if (distancetonext.size() != wayPointDetailsList.size()) {
+                                if (distancetonext.size() != wayPointDetailsList.size()) {
 
-                                starttime.add(durationtonextvalue);
-                                distancetonext.add(jsonArraydistancetonext);
-                                durationtonext.add(jsonArraydurationtonext);
+                                    starttime.add(durationtonextvalue);
+                                    distancetonext.add(jsonArraydistancetonext);
+                                    durationtonext.add(jsonArraydurationtonext);
+                                }
+
+
+                            } else {
+                                //this is when
+                                starttime.clear();
+                                duration.clear();
+                                distance.clear();
+                                durationtonext.clear();
+                                distancetonext.clear();
+                                durationvalue.clear();
+                                distancevalue.clear();
+
                             }
-
-
-                        } else {
-                            //this is when
-                            starttime.clear();
-                            duration.clear();
-                            distance.clear();
-                            durationtonext.clear();
-                            distancetonext.clear();
-                            durationvalue.clear();
-                            distancevalue.clear();
-
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d("JSONException", "exceptionherejsonplscheck" + e);
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.d("JSONException", "exceptionherejsonplscheck" + e);
-                    }
-
-                }
 
 
-            } else {
-                if (result != null) {
-                    try {
-                        jsonObject = new JSONObject(result);
+                    } else {
+                        try {
+                            jsonObject = new JSONObject(result);
 
-                        if (!jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getString("status")
-                                .equals("NOT_FOUND")) {
+                            if (!jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0).getString("status")
+                                    .equals("NOT_FOUND")) {
 
-                            jsonArraydistance = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("distance").getString("text");
+                                jsonArraydistance = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("distance").getString("text");
 
-                            jsonArrayduration = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("duration").getString("text");
-                            jsondurationvalue = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("duration").getLong("value");
-                            jsondistancevalue = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
-                                    .getJSONObject
-                                            ("distance").getLong("value");
-                            //TODO: need to remove durations
+                                jsonArrayduration = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("duration").getString("text");
+                                jsondurationvalue = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("duration").getLong("value");
+                                jsondistancevalue = jsonObject.getJSONArray("rows").getJSONObject(0).getJSONArray("elements").getJSONObject(0)
+                                        .getJSONObject
+                                                ("distance").getLong("value");
+                                //TODO: need to remove durations
+                                Log.d("JSONException", "whatisduration currentlocal foradding!  " + jsonArrayduration);
 
-                            if (variable.equals("selectedlocal")) {
+                                if (variable.equals("selectedlocal")) {
 
-                                if (distance.size() != wayPointDetailsList.size()) {
-                                    distancevalue.add(jsondistancevalue);
-                                    durationvalue.add(jsondurationvalue);
+                                    if (distance.size() != wayPointDetailsList.size()) {
+                                        distancevalue.add(jsondistancevalue);
+                                        durationvalue.add(jsondurationvalue);
 
-                                    distance.add(jsonArraydistance);
+                                        distance.add(jsonArraydistance);
 
-                                    duration.add(jsonArrayduration);
+                                        duration.add(jsonArrayduration);
 
+                                    }
+
+
+                                } else if (variable.equals("nearbylocal")) {
+
+
+                                    if (distance.size() != getNearbyPlacesList().size()) {
+                                        distancevalue.add(jsondistancevalue);
+                                        durationvalue.add(jsondurationvalue);
+
+                                        distance.add(jsonArraydistance);
+                                        duration.add(jsonArrayduration);
+
+                                    } else {
+                                        Log.d("A", "checkhowmanytimeshavethisrun (distance else)");
+
+
+                                    }
                                 }
-                                for (int i = 0; i < distance.size(); i++) {
-
-                                    wayPointDetailsList.get(i).put("duration", duration.get(i));
-
-                                    wayPointDetailsList.get(i).put("distance", distance.get(i));
-
-                                    wayPointDetailsList.get(i).put("distancevalue", distancevalue.get(i));
-
-                                    wayPointDetailsList.get(i).put("durationvalue", durationvalue.get(i));
-
-
-                                    //TODO:trying to add this here...
-//                                nearbyPlacesList.get(i).put("duration", duration.get(i));
-                                    //       nearbyPlacesList.get(i).put("distance", distance.get(i));
-
-                                }
-
-                            } else if (variable.equals("nearbylocal")) {
-
-
-                                if (distance.size() != getNearbyPlacesList().size()) {
-                                    distancevalue.add(jsondistancevalue);
-                                    durationvalue.add(jsondurationvalue);
-
-                                    distance.add(jsonArraydistance);
-                                    duration.add(jsonArrayduration);
-
-                                } else {
-                                    Log.d("A", "checkhowmanytimeshavethisrun (distance else)");
-
-
-                                }
-                            }
-                            Log.d("A", "testthesze" + distance.size());
-                            Log.d("A", "testthesze while" + distance);
+                                Log.d("A", "testthesze" + distance.size());
+                                Log.d("A", "testthesze while" + distance);
 
 //                            Log.d("A", "testthesze  one" + getNearbyPlacesList().size());
 
-                            Log.d("A", "checkingwtfisa" + wayPointDetailsList);
-                            Log.d("A", "checkingwtfisa this is way" + getWayPointDetailsList());
-                        } else {
+                                Log.d("A", "checkingwtfisa" + wayPointDetailsList);
+                                Log.d("A", "checkingwtfisa this is way" + getWayPointDetailsList());
+                            } else {
 
-                            Log.d("A", "Yephaveranhgere" + getWayPointDetailsList());
-                            duration.clear();
-                            distance.clear();
-                            durationtonext.clear();
-                            distancetonext.clear();
-                            starttime.clear();
-                            durationvalue.clear();
-                            distancevalue.clear();
+                                Log.d("A", "Yephaveranhgere" + getWayPointDetailsList());
+                                duration.clear();
+                                distance.clear();
+                                durationtonext.clear();
+                                distancetonext.clear();
+                                starttime.clear();
+                                durationvalue.clear();
+                                distancevalue.clear();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.d("JSONException", "exceptionherejsonplscheck" + e);
+
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                        Log.d("JSONException", "exceptionherejsonplscheck" + e);
+
 
                     }
-                }
-            }
+                    Log.d("JSONException", "whatisduration tonext" + durationtonext + variable);
+                    Log.d("JSONException", "whatisduration currentlocal" + duration +"  Instabnces  "+instancesfortesting);
+                    Log.d("JSONException", "whatisduratasddsaion" + starttime);
+
+//After deciding what variable is...
 
 
-            if (wayPointDetailsList.size() == duration.size()) {
-                for (int i = 0; i < durationtonext.size(); i++) {
-                    if (i + 1 != durationtonext.size()) {
-                        wayPointDetailsList.get(i).put("durationtonext", durationtonext.get(i));
-                        wayPointDetailsList.get(i).put("distancetonext", distancetonext.get(i));
-                        Long travelstarttime = null;
-                        if (i != getWaypointwithDateList().size() + 1) {
-                            if (Long.parseLong(starttime.get(i).toString()) != 0) {
-                                Long durationtoreach = Long.parseLong(starttime.get(i).toString());
-                                Long starttime = Long.parseLong(getWaypointwithDateList().get(i + 1).get("starttime").toString());
-                                travelstarttime = starttime - durationtoreach;
-                                String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm").format(new java.util.Date
-                                        (travelstarttime *
-                                                1000));
-                                wayPointDetailsList.get(i).put("timetostarttravel", date);
-                                wayPointDetailsList.get(i).put("starttime", travelstarttime);
+                    if (wayPointDetailsList.size() == duration.size()) {
+                        for (int i = 0; i < durationtonext.size(); i++) {
+                            if (i + 1 != durationtonext.size()) {
+                                wayPointDetailsList.get(i).put("durationtonext", durationtonext.get(i));
+                                wayPointDetailsList.get(i).put("distancetonext", distancetonext.get(i));
+                                Long travelstarttime = null;
+                                if (i != getWaypointwithDateList().size() + 1) {
+
+                                    if (!starttime.get(i).equals("N/A")) {
+                                        if (Long.parseLong(starttime.get(i).toString()) != 0) {
+                                            Long durationtoreach = Long.parseLong(starttime.get(i).toString());
+                                            Long starttime = Long.parseLong(getWaypointwithDateList().get(i + 1).get("starttime").toString());
+                                            travelstarttime = starttime - durationtoreach;
+                                            String date = new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm").format(new java.util.Date
+                                                    (travelstarttime *
+                                                            1000));
+                                            wayPointDetailsList.get(i).put("timetostarttravel", date);
+                                            wayPointDetailsList.get(i).put("starttime", travelstarttime);
+
+                                        }
+                                    } else {
+                                        wayPointDetailsList.get(i).put("timetostarttravel", "N/A");
+                                        wayPointDetailsList.get(i).put("starttime", "N/A");
+
+                                    }
+
+                                } else {
+                                    wayPointDetailsList.get(i).put("starttime", "Not Selected");
+
+                                }
+
 
                             }
-                        } else {
-                            wayPointDetailsList.get(i).put("starttime", "Not Selected");
-
                         }
 
+                    }
 
+
+                } else {
+                    Toast.makeText(context, "The selected setting has no result!", Toast.LENGTH_SHORT).show();
+
+                    if (variable.equals("selectednext")) {
+
+                        starttime.add("N/A");
+                        distancetonext.add("N/A");
+                        durationtonext.add("N/A");
+                    } else if (variable.equals("selectedlocal")) {
+
+                        distance.add("N/A");
+                        duration.add("N/A");
+                        durationvalue.add("N/A");
+                        distancevalue.add("N/A");
+
+                    } else if (variable.equals("nearbylocal")) {
+                        distance.add("N/A");
+                        duration.add("N/A");
+                        durationvalue.add("N/A");
+                        distancevalue.add("N/A");
+                    }
+                }
+                if (wayPointDetailsList != null) {
+
+                    if (duration.size() == wayPointDetailsList.size()) {
+                        for (int i = 0; i < distance.size(); i++) {
+
+
+                            wayPointDetailsList.get(i).put("duration", duration.get(i));
+
+                            wayPointDetailsList.get(i).put("distance", distance.get(i));
+
+                            wayPointDetailsList.get(i).put("distancevalue", distancevalue.get(i));
+
+                            wayPointDetailsList.get(i).put("durationvalue", durationvalue.get(i));
+                        }
+                        distancevalue.clear();
+                        durationvalue.clear();
+                        starttime.clear();
+                        duration.clear();
+                        distance.clear();
+                        durationtonext.clear();
+                        distancetonext.clear();
+                        pager.invalidate();
+
+                        try {
+                            fragmentPagerAdapter.notifyDataSetChanged();
+                            setTabIcon();
+                        } catch (Exception e) {
+                            Log.d("ExceptionMapsActivity", "fragmentPagerAdapter " + e);
+
+                            //   Toast.makeText(getA(),"Uh s", Toast.LENGTH_SHORT).show();
+
+                        }
                     }
 
 
                 }
-            }
+                if (getNearbyPlacesList() != null) {
+                    if (duration.size() == getNearbyPlacesList().size()) {
+                        for (int i = 0; i < distance.size(); i++) {
 
-            if (getNearbyPlacesList() != null) {
-                if (duration.size() == getNearbyPlacesList().size()) {
-                    for (int i = 0; i < distance.size(); i++) {
+                            nearbyPlacesList.get(i).put("duration", duration.get(i));
+                            nearbyPlacesList.get(i).put("distance", distance.get(i));
 
-                        nearbyPlacesList.get(i).put("duration", duration.get(i));
-                        nearbyPlacesList.get(i).put("distance", distance.get(i));
+                            nearbyPlacesList.get(i).put("durationvalue", durationvalue.get(i));
+                            nearbyPlacesList.get(i).put("distancevalue", distancevalue.get(i));
 
-                        nearbyPlacesList.get(i).put("durationvalue", durationvalue.get(i));
-                        nearbyPlacesList.get(i).put("distancevalue", distancevalue.get(i));
 
+                        }
+                        distancevalue.clear();
+                        durationvalue.clear();
+                        starttime.clear();
+                        duration.clear();
+                        distance.clear();
+                        durationtonext.clear();
+                        distancetonext.clear();
+                        pager.invalidate();
+
+                        try {
+                            fragmentPagerAdapter.notifyDataSetChanged();
+                            setTabIcon();
+                        } catch (Exception e) {
+                            Log.d("ExceptionMapsActivity", "fragmentPagerAdapter " + e);
+
+                            //   Toast.makeText(getA(),"Uh s", Toast.LENGTH_SHORT).show();
+
+                        }
                     }
-                    distancevalue.clear();
-                    durationvalue.clear();
-                    starttime.clear();
-                    duration.clear();
-                    distance.clear();
-                    durationtonext.clear();
-                    distancetonext.clear();
-                    pager.invalidate();
 
-                    try {
-                        fragmentPagerAdapter.notifyDataSetChanged();
-                        setTabIcon();
-                    } catch (Exception e) {
-                        Log.d("ExceptionMapsActivity", "fragmentPagerAdapter " + e);
-
-                        //   Toast.makeText(getA(),"Uh s", Toast.LENGTH_SHORT).show();
-
-                    }
                 }
-//the whole and no info ackoewhicheven at t and
+
 
             }
+
             if (duration.size() == wayPointDetailsList.size()) {
 
                 durationtonext.clear();

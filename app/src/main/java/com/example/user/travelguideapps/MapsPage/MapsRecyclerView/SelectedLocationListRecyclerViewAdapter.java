@@ -238,7 +238,8 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                         (holder.localduration);
                 Log.d("A", "randomlygetitgher" + mDataSource.get(holder.getAdapterPosition()).get("durationtonext"));
                 Log.d("A", "randomlygetitgherthewhole" + mDataSource.get(holder.getAdapterPosition()));
-
+                Picasso.with(holder.itemView.getContext()).load(R.drawable.settingsicon).fit().into
+                        (holder.travellocalsetting);
                 if (!mDataSource.get(holder.getAdapterPosition()).get("durationtonext").toString().equals("0") && !Location_RecyclerView_Selected
                         .getissorted()) {
 
@@ -255,8 +256,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                             (holder.startingtimeimage);
                     Picasso.with(holder.itemView.getContext()).load(R.drawable.settingsicon).fit().into
                             (holder.travelsetting);
-                    Picasso.with(holder.itemView.getContext()).load(R.drawable.settingsicon).fit().into
-                            (holder.travellocalsetting);
+
 
                     holder.distanceimage.setVisibility(View.VISIBLE);
                     holder.durationimage.setVisibility(View.VISIBLE);
@@ -266,13 +266,13 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     holder.startingtimeimage.setVisibility(View.VISIBLE);
                     holder.departuretime.setVisibility(View.VISIBLE);
                     holder.travelsetting.setVisibility(View.VISIBLE);
-                    holder.travellocalsetting.setVisibility(View.VISIBLE);
+                  //  holder.travellocalsetting.setVisibility(View.VISIBLE);
 
                     //TODO working but need some adjustment
                 } else {
 
                     Log.d("A", "Loading...for  inviisble" + holder.getAdapterPosition());
-                    holder.travellocalsetting.setVisibility(View.GONE);
+          //          holder.travellocalsetting.setVisibility(View.GONE);
 
                     holder.distanceimage.setVisibility(View.GONE);
                     holder.durationimage.setVisibility(View.GONE);
@@ -369,6 +369,19 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
 
             // display a toast with person name on item click
             //  Toast.makeText(context, personNames.get(holder.getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            holder.travellocalsetting.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    FragmentManager manager = ((AppCompatActivity) holder.itemView.getContext()).getSupportFragmentManager();
+
+                    // Create and show the dialog.
+                    DialogTravelSettingFragment newFragment = DialogTravelSettingFragment.newInstance(holder.getAdapterPosition(),"local");
+                    newFragment.show(manager, "dialog");
+
+
+                }
+            });
 
             holder.travelsetting.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -377,7 +390,7 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
                     FragmentManager manager = ((AppCompatActivity) holder.itemView.getContext()).getSupportFragmentManager();
 
                     // Create and show the dialog.
-                    DialogTravelSettingFragment newFragment = DialogTravelSettingFragment.newInstance(holder.getAdapterPosition());
+                    DialogTravelSettingFragment newFragment = DialogTravelSettingFragment.newInstance(holder.getAdapterPosition(),"tonext");
                     newFragment.show(manager, "dialog");
 
 
@@ -385,9 +398,16 @@ public class SelectedLocationListRecyclerViewAdapter extends RecyclerView.Adapte
             });
 
 //i was house-sitting there werewe call tmy best friend til i am
+
+
+
+
             directionsbutton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+
+
                     String lat = Double.toString(CurrentLocation.getLatitude());
                     String lng = Double.toString(CurrentLocation.getLongitude());
                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/maps/dir/?api=1&origin=" + lat + "," + lng +
